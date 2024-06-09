@@ -23,6 +23,7 @@ dependencies {
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
 	implementation("org.springframework:spring-jdbc")
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 	runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.3")
 	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
