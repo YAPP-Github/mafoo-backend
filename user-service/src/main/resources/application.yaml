@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: mafoo-user-service
+  r2dbc:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
