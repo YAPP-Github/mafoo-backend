@@ -1,0 +1,12 @@
+### Global .gitignore ###
+# Only use for excluding root directory files #
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### VS Code ###
+.vscode/
