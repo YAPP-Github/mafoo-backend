@@ -17,6 +17,7 @@ public class SpringSecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .anyExchange().permitAll()
                 )
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults());
         return http.build();
