@@ -2,8 +2,8 @@ name: 사진 서비스 빌드 후 도커허브에 올리기
 on:
   push:
     branches: [ 'main' ]
-#    paths:
-#      - 'photo-service/**' # API Gateway 모듈 변경
+    paths:
+      - 'photo-service/**' # API Gateway 모듈 변경
 
 env:
   SPRING_PROFILE: prod
