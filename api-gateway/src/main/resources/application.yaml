@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: https://user-service.mafoo.kr
+          predicates:
+            - Path=/user/**
+            - Method=GET
+          filters:
+            - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: photo-service
+          uri: https://photo-service.mafoo.kr
+          predicates:
+            - Path=/photo/**
+            - Method=GET
+          filters:
+            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
+springdoc:
+  swagger-ui:
+    urls[0]:
+      name: "유저 서비스"
+      url: https://gating.mafoo.kr/user/v3/api-docs
+
+    urls[1]:
+      name: "사진 서비스"
+      url: https://gating.mafoo.kr/photo/v3/api-docs
