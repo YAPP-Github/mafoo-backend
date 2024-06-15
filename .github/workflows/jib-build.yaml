@@ -1,0 +1,63 @@
+name: 이미지 빌드 & 푸쉬
+on:
+  workflow_call:
+    inputs:
+      spring-profile:
+        required: true
+        type: string
+      server-port:
+        required: true
+        type: string
+      image-name:
+        required: true
+        type: string
+      image-tag:
+        required: true
+        type: string
+      module-path:
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+
+jobs:
+  build:
+    runs-on: [ ubuntu-latest ]
+    name: 이미지 빌드하기
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: GitHub 에서 레포 받아오기
+        uses: actions/checkout@v3
+
+      - name: 도커허브 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: JDK17 준비하기
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle 준비하기
+        uses: gradle/gradle-build-action@v2
+
+      - name: 이미지 빌드하고 푸쉬하기
+        id: build-image
+        env:
+          SPRING_PROFILES_ACTIVE: ${{ inputs.spring-profile }}
+          IMAGE_NAME: ${{ inputs.image-name }}
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          SERVER_PORT: ${{ inputs.server-port }}
+        run: |
+          cd ${{ inputs.module-path }} && \
+          chmod +x gradlew && ./gradlew jib
