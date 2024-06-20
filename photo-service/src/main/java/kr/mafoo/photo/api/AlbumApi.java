@@ -19,7 +19,7 @@ public interface AlbumApi {
     );
 
     @Operation(summary = "앨범 생성", description = "앨범을 생성합니다.")
-    @PostMapping("")
+    @PostMapping
     Mono<AlbumResponse> createAlbum(
             @RequestBody
             AlbumCreateRequest request

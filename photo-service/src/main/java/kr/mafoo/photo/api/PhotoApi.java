@@ -22,7 +22,7 @@ public interface PhotoApi {
     );
 
     @Operation(summary = "사진 생성", description = "사진을 생성합니다.")
-    @PostMapping("")
+    @PostMapping
     Mono<PhotoResponse> createPhoto(
             @RequestBody
             PhotoCreateRequest request
