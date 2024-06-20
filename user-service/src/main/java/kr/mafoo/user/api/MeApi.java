@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.config.RequestMemberId;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +20,7 @@ public interface MeApi {
     );
 
     @Operation(summary = "탈퇴", description = "현재 토큰 주인이 탈퇴합니다.")
-    @PostMapping("/quit")
+    @DeleteMapping
     Mono<Void> deleteMemberWhoRequested(
             @RequestMemberId @Parameter(hidden = true) String memberId
     );
