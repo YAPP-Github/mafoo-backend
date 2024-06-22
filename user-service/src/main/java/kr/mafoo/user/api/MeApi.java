@@ -3,7 +3,7 @@ package kr.mafoo.user.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.mafoo.user.config.RequestMemberId;
+import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

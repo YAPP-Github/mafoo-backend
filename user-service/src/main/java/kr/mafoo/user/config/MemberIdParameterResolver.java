@@ -1,6 +1,7 @@
 package kr.mafoo.user.config;
 
 
+import kr.mafoo.user.annotation.RequestMemberId;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
