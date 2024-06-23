@@ -27,7 +27,11 @@ public class AuthService {
     public Mono<AuthToken> loginWithKakao(String code) {
         return getKakaoTokenWithCode(code)
                 .flatMap(this::getUserInfoWithKakaoToken)
-                .flatMap(kakaoLoginInfo -> getOrCreateMember(IdentityProvider.KAKAO, kakaoLoginInfo.id()));
+                .flatMap(kakaoLoginInfo -> getOrCreateMember(
+                        IdentityProvider.KAKAO,
+                        kakaoLoginInfo.id(),
+                        kakaoLoginInfo.nickname()
+                ));
     }
 
     public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
@@ -40,10 +44,10 @@ public class AuthService {
                 });
     }
 
-    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id) {
+    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username) {
         return socialMemberRepository
                 .findByIdentityProviderAndId(provider, id)
-                .switchIfEmpty(createNewSocialMember(provider, id))
+                .switchIfEmpty(createNewSocialMember(provider, id, username))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
                     String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
@@ -51,9 +55,9 @@ public class AuthService {
                 });
     }
 
-    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id) {
+    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username) {
         return memberService
-                .createNewMember(id)
+                .createNewMember(username)
                 .flatMap(newMember -> socialMemberRepository.save(
                         SocialMemberEntity.newSocialMember(provider, id, newMember.getId())
                 ));
@@ -86,9 +90,9 @@ public class AuthService {
                 .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new KakaoLoginFailedException()))
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> new KakaoLoginInfo(
-                        String.valueOf((Long) map.get("id")),
-                        (String) map.get("kakao_account.email"),
-                        (String) map.get("properties.nickname"))
-                );
+                                String.valueOf((Long) map.get("id")),
+                                (String) ((LinkedHashMap)map.get("properties")).get("nickname"),
+                                (String) map.get("kakao_account.email")
+                ));
     }
 }
