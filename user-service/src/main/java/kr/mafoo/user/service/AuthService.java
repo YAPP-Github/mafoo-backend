@@ -4,8 +4,8 @@ import kr.mafoo.user.config.properties.KakaoOAuthProperties;
 import kr.mafoo.user.controller.dto.response.KakaoLoginInfo;
 import kr.mafoo.user.domain.AuthToken;
 import kr.mafoo.user.domain.SocialMemberEntity;
-import kr.mafoo.user.domain.SocialMemberEntityKey;
 import kr.mafoo.user.enums.IdentityProvider;
+import kr.mafoo.user.exception.KakaoLoginFailedException;
 import kr.mafoo.user.repository.SocialMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class AuthService {
 
     public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
         return Mono
-                .just(jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
+                .fromCallable(() -> jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
                 .map(memberId -> {
                     String accessToken = jwtTokenService.generateAccessToken(memberId);
                     String newRefreshToken = jwtTokenService.generateRefreshToken(memberId);
@@ -72,6 +72,7 @@ public class AuthService {
                         +"&code="
                         + code)
                 .retrieve()
+                .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new KakaoLoginFailedException()))
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> (String) map.get("access_token"));
     }
@@ -82,6 +83,7 @@ public class AuthService {
                 .uri("https://kapi.kakao.com/v2/user/me")
                 .headers(headers -> headers.setBearerAuth(kakaoToken))
                 .retrieve()
+                .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new KakaoLoginFailedException()))
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> new KakaoLoginInfo(
                         String.valueOf((Long) map.get("id")),

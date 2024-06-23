@@ -1,11 +1,11 @@
 package kr.mafoo.user.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwe;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import kr.mafoo.user.config.JacksonSerializer;
+import kr.mafoo.user.exception.InvalidTokenException;
+import kr.mafoo.user.exception.TokenExpiredException;
+import kr.mafoo.user.exception.TokenTypeMismatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,12 +74,19 @@ public class JWTTokenService {
     }
 
     public String extractUserIdFromRefreshToken(String refreshToken){
-        Jwe<Claims> claims = parser
-                .parseEncryptedClaims(refreshToken);
+        Jwe<Claims> claims;
+        try {
+             claims = parser
+                    .parseEncryptedClaims(refreshToken);
+        } catch(ExpiredJwtException e){
+            throw new TokenExpiredException();
+        } catch (Exception e){
+            throw new InvalidTokenException();
+        }
 
         String type = (String) claims.getHeader().get(TOKEN_TYPE_HEADER_KEY);
         if (!type.equals(REFRESH_TOKEN_TYPE_VALUE)){
-            throw new IllegalArgumentException("Invalid token type");
+            throw new TokenTypeMismatchException();
         }
 
         return claims.getPayload().get(USER_ID_CLAIM_KEY, String.class);
