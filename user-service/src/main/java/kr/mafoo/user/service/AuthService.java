@@ -1,5 +1,6 @@
 package kr.mafoo.user.service;
 
+import kr.mafoo.user.config.properties.KakaoOAuthProperties;
 import kr.mafoo.user.controller.dto.response.KakaoLoginInfo;
 import kr.mafoo.user.domain.AuthToken;
 import kr.mafoo.user.domain.SocialMemberEntity;
@@ -20,6 +21,7 @@ public class AuthService {
     private final SocialMemberRepository socialMemberRepository;
     private final MemberService memberService;
     private final JWTTokenService jwtTokenService;
+    private final KakaoOAuthProperties kakaoOAuthProperties;
 
 
     public Mono<AuthToken> loginWithKakao(String code) {
@@ -39,9 +41,8 @@ public class AuthService {
     }
 
     private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id) {
-        SocialMemberEntityKey key = new SocialMemberEntityKey(provider, id);
         return socialMemberRepository
-                .findById(key)
+                .findByIdentityProviderAndId(provider, id)
                 .switchIfEmpty(createNewSocialMember(provider, id))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
@@ -64,8 +65,12 @@ public class AuthService {
     private Mono<String> getKakaoTokenWithCode(String code) {
         return externalWebClient
                 .post()
-                .uri("https://kauth.kakao.com/oauth/token")
-                .bodyValue("grant_type=authorization_code&client_id=client_id&redirect_uri=http://localhost:8080/login/kakao&code=" + code)
+                .uri("https://kauth.kakao.com/oauth/token" + "?grant_type=authorization_code&client_id="
+                        + kakaoOAuthProperties.clientId()
+                        + "&redirect_uri="
+                        + kakaoOAuthProperties.redirectUri()
+                        +"&code="
+                        + code)
                 .retrieve()
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> (String) map.get("access_token"));
@@ -79,7 +84,7 @@ public class AuthService {
                 .retrieve()
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> new KakaoLoginInfo(
-                        (String) map.get("id"),
+                        String.valueOf((Long) map.get("id")),
                         (String) map.get("kakao_account.email"),
                         (String) map.get("properties.nickname"))
                 );

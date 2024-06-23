@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -16,11 +18,11 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @Table("social_member")
-public class SocialMemberEntity {
+public class SocialMemberEntity implements Persistable<SocialMemberEntityKey> {
     @Column("identity_provider")
     private IdentityProvider identityProvider;
 
-    @Column("id")
+    @Column("identifier")
     private String id;
 
     @CreatedDate
@@ -30,6 +32,9 @@ public class SocialMemberEntity {
     @Column("member_id")
     private String memberId;
 
+    @Transient
+    private boolean isNew = false;
+
     @Override
     public boolean equals(Object obj) {
        if (this == obj) return true;
@@ -38,6 +43,10 @@ public class SocialMemberEntity {
        SocialMemberEntity that = (SocialMemberEntity) obj;
 
         return id.equals(that.id) && identityProvider.equals(that.identityProvider);
+    }
+
+    public SocialMemberEntityKey getId() {
+        return new SocialMemberEntityKey(identityProvider, id);
     }
 
     @Override
@@ -50,6 +59,7 @@ public class SocialMemberEntity {
         socialMember.identityProvider = identityProvider;
         socialMember.id = id;
         socialMember.memberId = memberId;
+        socialMember.isNew = true;
         return socialMember;
     }
 }

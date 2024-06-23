@@ -1,6 +1,12 @@
 spring:
   application:
     name: mafoo-user-service
+  flyway:
+    url: ${FLYWAY_URL}
+    baseline-on-migrate: true
+    enabled: true
+    user: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
   r2dbc:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
@@ -10,8 +16,12 @@ logging:
     org.springframework.data.r2dbc: DEBUG
 
 app:
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID}
+      redirect-uri: ${KAKAO_REDIRECT_URL}
   jwt:
-    verify-key: askdgjasdgjasdkgasjdgkasjdgkasjd832f892sdf
+    verify-key: ${JWT_VERIFY_KEY}
     expiration:
       access-token: 86400 # 1 day
       refresh-token: 2592000 # 30 days
