@@ -34,6 +34,19 @@ dependencies {
 	implementation("org.projectlombok:lombok:1.18.32")
 	implementation("com.github.f4b6a3:ulid-creator:5.2.3")
 	annotationProcessor("org.projectlombok:lombok:1.18.32")
+
+	val jjwtVersion = "0.12.5"
+	implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+
+	implementation("io.projectreactor.tools:blockhound:1.0.9.RELEASE")
+}
+
+tasks.withType<Test>().all {
+	if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)) {
+		jvmArgs("-XX:+AllowRedefinitionToAddDeleteMethods")
+	}
 }
 
 tasks.withType<Test> {

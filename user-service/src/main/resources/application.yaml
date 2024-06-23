@@ -8,3 +8,10 @@ spring:
 logging:
   level:
     org.springframework.data.r2dbc: DEBUG
+
+app:
+  jwt:
+    verify-key: askdgjasdgjasdkgasjdgkasjdgkasjd832f892sdf
+    expiration:
+      access-token: 86400 # 1 day
+      refresh-token: 2592000 # 30 days

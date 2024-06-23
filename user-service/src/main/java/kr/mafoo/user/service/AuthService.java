@@ -19,6 +19,7 @@ public class AuthService {
     private final WebClient externalWebClient;
     private final SocialMemberRepository socialMemberRepository;
     private final MemberService memberService;
+    private final JWTTokenService jwtTokenService;
 
 
     public Mono<AuthToken> loginWithKakao(String code) {
@@ -27,16 +28,16 @@ public class AuthService {
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(IdentityProvider.KAKAO, kakaoLoginInfo.id()));
     }
 
-    private Mono<AuthToken> generateTokenWithMemberId(String memberId) {
-        return Mono.empty();
-    }
-
     private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id) {
         SocialMemberEntityKey key = new SocialMemberEntityKey(provider, id);
         return socialMemberRepository
                 .findById(key)
                 .switchIfEmpty(createNewSocialMember(provider, id))
-                .flatMap(socialMember -> generateTokenWithMemberId(socialMember.getMemberId()));
+                .map(socialMember -> {
+                    String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
+                    String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
+                    return new AuthToken(accessToken, refreshToken);
+                });
     }
 
     private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id) {
