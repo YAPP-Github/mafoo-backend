@@ -1,5 +1,7 @@
 package kr.mafoo.user.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwe;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
@@ -62,6 +64,18 @@ public class JWTTokenService {
                 .expiration(generateRefreshTokenExpirationDate())
                 .encryptWith(signKey, Jwts.ENC.A128CBC_HS256)
                 .compact();
+    }
+
+    public String extractUserIdFromRefreshToken(String refreshToken){
+        Jwe<Claims> claims = parser
+                .parseEncryptedClaims(refreshToken);
+
+        String type = (String) claims.getHeader().get(TOKEN_TYPE_HEADER_KEY);
+        if (!type.equals(REFRESH_TOKEN_TYPE_VALUE)){
+            throw new IllegalArgumentException("Invalid token type");
+        }
+
+        return claims.getPayload().get(USER_ID_CLAIM_KEY, String.class);
     }
 
     private Date generateAccessTokenExpirationDate() {

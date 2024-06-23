@@ -28,6 +28,16 @@ public class AuthService {
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(IdentityProvider.KAKAO, kakaoLoginInfo.id()));
     }
 
+    public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
+        return Mono
+                .just(jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
+                .map(memberId -> {
+                    String accessToken = jwtTokenService.generateAccessToken(memberId);
+                    String newRefreshToken = jwtTokenService.generateRefreshToken(memberId);
+                    return new AuthToken(accessToken, newRefreshToken);
+                });
+    }
+
     private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id) {
         SocialMemberEntityKey key = new SocialMemberEntityKey(provider, id);
         return socialMemberRepository

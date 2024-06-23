@@ -23,6 +23,8 @@ public class AuthController implements AuthApi {
 
     @Override
     public Mono<LoginResponse> loginWithRefreshToken(TokenRefreshRequest request) {
-        return Mono.just(new LoginResponse("test_access_token", request.refreshToken()));
+        return authService
+                .loginWithRefreshToken(request.refreshToken())
+                .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 }
