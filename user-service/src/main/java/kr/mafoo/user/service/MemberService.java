@@ -3,6 +3,7 @@ package kr.mafoo.user.service;
 import kr.mafoo.user.domain.MemberEntity;
 import kr.mafoo.user.exception.MemberNotFoundException;
 import kr.mafoo.user.repository.MemberRepository;
+import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -22,4 +23,8 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
+    public Mono<MemberEntity> createNewMember(String username) {
+        MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username);
+        return memberRepository.save(memberEntity);
+    }
 }

@@ -40,4 +40,11 @@ public class MemberEntity {
     public int hashCode() {
         return id.hashCode();
     }
+
+    public static MemberEntity newMember(String id, String name) {
+        MemberEntity member = new MemberEntity();
+        member.id = id;
+        member.name = name;
+        return member;
+    }
 }
