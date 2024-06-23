@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwe;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
+import kr.mafoo.user.config.JacksonSerializer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,12 @@ public class JWTTokenService {
     @Value("${app.jwt.expiration.refresh-token}")
     private Long refreshTokenExpiration;
 
+
+
     private SecretKey signKey = null;
     private JwtParser parser = null;
+
+    private JacksonSerializer jacksonSerializer = new JacksonSerializer();
 
     @PostConstruct
     public void initSignKey() {
@@ -50,6 +55,7 @@ public class JWTTokenService {
                 .and()
                 .expiration(generateAccessTokenExpirationDate())
                 .encryptWith(signKey, Jwts.ENC.A128CBC_HS256)
+                .json(jacksonSerializer)
                 .compact();
     }
 
@@ -63,6 +69,7 @@ public class JWTTokenService {
                 .and()
                 .expiration(generateRefreshTokenExpirationDate())
                 .encryptWith(signKey, Jwts.ENC.A128CBC_HS256)
+                .json(jacksonSerializer)
                 .compact();
     }
 
