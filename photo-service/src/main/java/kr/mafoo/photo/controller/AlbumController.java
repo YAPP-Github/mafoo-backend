@@ -2,54 +2,63 @@ package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumRenameRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumRetypeRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
-import org.springframework.web.bind.annotation.*;
+import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.service.AlbumService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static kr.mafoo.photo.domain.AlbumType.*;
-
+@RequiredArgsConstructor
 @RestController
 public class AlbumController implements AlbumApi {
+    private final AlbumService albumService;
 
     @Override
     public Flux<AlbumResponse> getAlbums(
+            String memberId
     ) {
-        return Flux.just(
-                new AlbumResponse("test_album_id_a", "단짝이랑", TYPE_A, "1"),
-                new AlbumResponse("test_album_id_b", "야뿌들", TYPE_B, "5"),
-                new AlbumResponse("test_album_id_c", "농구팟", TYPE_C, "2"),
-                new AlbumResponse("test_album_id_d", "화사사람들", TYPE_D, "12"),
-                new AlbumResponse("test_album_id_e", "기념일", TYPE_E, "4"),
-                new AlbumResponse("test_album_id_f", "친구들이랑", TYPE_F, "9")
-        );
+        return albumService
+                .findAllByOwnerMemberId(memberId)
+                .map(AlbumResponse::fromEntity);
     }
 
     @Override
     public Mono<AlbumResponse> createAlbum(
+            String memberId,
             AlbumCreateRequest request
     ){
-        return Mono.just(
-                new AlbumResponse("test_album_id", "시금치파슷하", TYPE_A, "0")
-        );
+        AlbumType type = AlbumType.valueOf(request.type());
+        return albumService
+                .createNewAlbum(memberId, request.name(), type)
+                .map(AlbumResponse::fromEntity);
     }
 
     @Override
-    public Mono<AlbumResponse> updateAlbum(
-            String albumId,
-            AlbumUpdateRequest request
-    ){
-        return Mono.just(
-                new AlbumResponse("test_album_id", "시금치파슷하", TYPE_A, "0")
-        );
+    public Mono<AlbumResponse> updateAlbumName(String memberId, String albumId, AlbumRenameRequest request) {
+        return albumService
+                .updateAlbumName(albumId, request.name())
+                .map(AlbumResponse::fromEntity);
     }
+
+    @Override
+    public Mono<AlbumResponse> updateAlbumType(String memberId, String albumId, AlbumRetypeRequest request) {
+        return albumService
+                .updateAlbumType(albumId, request.type())
+                .map(AlbumResponse::fromEntity);
+    }
+
 
     @Override
     public Mono<Void> deleteAlbum(
+            String memberId,
             String albumId
     ){
-        return Mono.empty();
+        return albumService
+                .deleteAlbumById(albumId);
     }
 
 }
