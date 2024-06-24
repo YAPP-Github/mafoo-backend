@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +27,11 @@ public class AlbumService {
     public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                 .flatMap(albumEntity -> {
                     if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                        // 내 앨범이 아니면 그냥 없는 앨범 처리
+                        return Mono.error(new AlbumNotFoundException());
                     } else {
                         return albumRepository.deleteById(albumId);
                     }
@@ -39,10 +41,11 @@ public class AlbumService {
     public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                 .flatMap(albumEntity -> {
                     if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                        // 내 앨범이 아니면 그냥 없는 앨범 처리
+                        return Mono.error(new AlbumNotFoundException());
                     } else {
                         return albumRepository.save(albumEntity.updateName(albumName));
                     }
@@ -52,10 +55,11 @@ public class AlbumService {
     public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                 .flatMap(albumEntity -> {
                     if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                        // 내 앨범이 아니면 그냥 없는 앨범 처리
+                        return Mono.error(new AlbumNotFoundException());
                     } else {
                         return albumRepository.save(albumEntity.updateType(albumType));
                     }
