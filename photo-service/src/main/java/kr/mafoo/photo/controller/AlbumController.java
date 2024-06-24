@@ -40,14 +40,14 @@ public class AlbumController implements AlbumApi {
     @Override
     public Mono<AlbumResponse> updateAlbumName(String memberId, String albumId, AlbumRenameRequest request) {
         return albumService
-                .updateAlbumName(albumId, request.name())
+                .updateAlbumName(albumId, request.name(), memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
     @Override
     public Mono<AlbumResponse> updateAlbumType(String memberId, String albumId, AlbumRetypeRequest request) {
         return albumService
-                .updateAlbumType(albumId, request.type())
+                .updateAlbumType(albumId, request.type(), memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
@@ -58,7 +58,7 @@ public class AlbumController implements AlbumApi {
             String albumId
     ){
         return albumService
-                .deleteAlbumById(albumId);
+                .deleteAlbumById(albumId, memberId);
     }
 
 }

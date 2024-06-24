@@ -23,21 +23,42 @@ public class AlbumService {
         return albumRepository.findAllByOwnerMemberId(ownerMemberId);
     }
 
-    public Mono<Void> deleteAlbumById(String albumId) {
-        return albumRepository.deleteById(albumId);
-    }
-
-    public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName) {
+    public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
-                .map(albumEntity -> albumEntity.updateName(albumName))
-                .flatMap(albumRepository::save);
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .flatMap(albumEntity -> {
+                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                    } else {
+                        return albumRepository.deleteById(albumId);
+                    }
+                });
     }
 
-    public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType) {
+    public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
-                .map(albumEntity -> albumEntity.updateType(albumType))
-                .flatMap(albumRepository::save);
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .flatMap(albumEntity -> {
+                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                    } else {
+                        return albumRepository.save(albumEntity.updateName(albumName));
+                    }
+                });
+    }
+
+    public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType, String requestMemberId) {
+        return albumRepository
+                .findById(albumId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("앨범을 찾을 수 없습니다.")))
+                .flatMap(albumEntity -> {
+                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                        return Mono.error(new IllegalArgumentException("앨범을 삭제할 권한이 없습니다."));
+                    } else {
+                        return albumRepository.save(albumEntity.updateType(albumType));
+                    }
+                });
     }
 }
