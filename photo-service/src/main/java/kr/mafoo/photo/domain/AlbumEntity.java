@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -21,18 +22,22 @@ public class AlbumEntity implements Persistable<String> {
     @Column("id")
     private String albumId;
 
-    @Column("owner_member_id")
-    private String ownerMemberId;
-
     @Column("name")
     private String name;
 
     @Column("type")
     private AlbumType type;
 
+    @Column("owner_member_id")
+    private String ownerMemberId;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
 
     @Transient
     private boolean isNew = false;
