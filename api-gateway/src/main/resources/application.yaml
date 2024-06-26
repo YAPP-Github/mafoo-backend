@@ -18,14 +18,12 @@ spring:
           uri: https://user-service.mafoo.kr
           predicates:
             - Path=/user/**
-            - Method=GET
           filters:
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service
           uri: https://photo-service.mafoo.kr
           predicates:
             - Path=/photo/**
-            - Method=GET
           filters:
             - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
 springdoc:
