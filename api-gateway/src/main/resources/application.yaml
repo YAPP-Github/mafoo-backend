@@ -3,6 +3,16 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 'http://localhost:3000,https://mafoo.kr,https://dev.mafoo.kr'
+            allow-credentials: true
+            allowedHeaders: '*'
+            allowedMethods: '*'
       routes:
         - id: user-service
           uri: https://user-service.mafoo.kr
