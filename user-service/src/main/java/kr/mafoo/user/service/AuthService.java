@@ -74,7 +74,10 @@ public class AuthService {
                         + "&redirect_uri="
                         + kakaoOAuthProperties.redirectUri()
                         +"&code="
-                        + code)
+                        + code
+                        + "&client_secret="
+                        + kakaoOAuthProperties.clientSecret()
+                )
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new KakaoLoginFailedException()))
                 .bodyToMono(LinkedHashMap.class)
@@ -90,7 +93,7 @@ public class AuthService {
                 .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new KakaoLoginFailedException()))
                 .bodyToMono(LinkedHashMap.class)
                 .map(map -> new KakaoLoginInfo(
-                                String.valueOf((Long) map.get("id")),
+                                String.valueOf(map.get("id")),
                                 (String) ((LinkedHashMap)map.get("properties")).get("nickname"),
                                 (String) map.get("kakao_account.email")
                 ));

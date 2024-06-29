@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBindin
 @ConfigurationPropertiesBinding
 public record KakaoOAuthProperties(
         String clientId,
-        String redirectUri
+        String redirectUri,
+        String clientSecret
 ) {
 }
