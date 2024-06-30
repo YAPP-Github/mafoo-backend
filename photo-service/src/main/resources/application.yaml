@@ -5,3 +5,9 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+  flyway:
+    url: ${FLYWAY_URL}
+    baseline-on-migrate: true
+    enabled: true
+    user: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}

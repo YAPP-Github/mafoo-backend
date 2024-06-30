@@ -1,6 +1,7 @@
 package kr.mafoo.photo.controller.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.mafoo.photo.domain.AlbumType;
 
 @Schema(description = "앨범 수정 요청")
 public record AlbumUpdateRequest(
@@ -8,6 +9,6 @@ public record AlbumUpdateRequest(
         String name,
 
         @Schema(description = "앨범 타입", example = "TYPE_A")
-        String type
+        AlbumType type
 ) {
 }

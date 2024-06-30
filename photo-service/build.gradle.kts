@@ -25,12 +25,16 @@ dependencies {
 	implementation("org.flywaydb:flyway-mysql")
 	implementation("org.springframework:spring-jdbc")
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
-	runtimeOnly("org.mariadb:r2dbc-mariadb:1.1.3")
-	runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+	implementation("com.mysql:mysql-connector-j:8.4.0")
+	implementation("io.asyncer:r2dbc-mysql:1.1.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.projectlombok:lombok:1.18.32")
+	annotationProcessor("org.projectlombok:lombok:1.18.32")
+	implementation("com.github.f4b6a3:ulid-creator:5.2.3")
+
 }
 
 tasks.withType<Test> {
