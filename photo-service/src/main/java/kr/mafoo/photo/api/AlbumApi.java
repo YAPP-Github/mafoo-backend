@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumRenameRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumRetypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +31,9 @@ public interface AlbumApi {
             AlbumCreateRequest request
     );
 
-    @Operation(summary = "앨범 이름 변경", description = "앨범의 이름을 변경합니다.")
-    @PatchMapping("/{albumId}/name")
-    Mono<AlbumResponse> updateAlbumName(
+    @Operation(summary = "앨범 변경", description = "앨범의 속성을 변경합니다.")
+    @PutMapping("/{albumId}")
+    Mono<AlbumResponse> updateAlbum(
             @RequestMemberId
             String memberId,
 
@@ -44,21 +42,7 @@ public interface AlbumApi {
             String albumId,
 
             @RequestBody
-            AlbumRenameRequest request
-    );
-
-    @Operation(summary = "앨범 타입 변경", description = "앨범의 타입을 변경합니다.")
-    @PatchMapping("/{albumId}/type")
-    Mono<AlbumResponse> updateAlbumType(
-            @RequestMemberId
-            String memberId,
-
-            @Parameter(description = "앨범 ID", example = "test_album_id")
-            @PathVariable
-            String albumId,
-
-            @RequestBody
-            AlbumRetypeRequest request
+            AlbumUpdateRequest request
     );
 
     @Operation(summary = "앨범 삭제", description = "앨범을 삭제합니다.")
