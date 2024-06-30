@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -14,7 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Table("member")
-public class MemberEntity {
+public class MemberEntity implements Persistable<String> {
     @Id
     @Column("member_id")
     private String id;
@@ -25,6 +27,9 @@ public class MemberEntity {
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
+
+    @Transient
+    private boolean isNew = false;
 
     @Override
     public boolean equals(Object obj) {
@@ -39,5 +44,13 @@ public class MemberEntity {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public static MemberEntity newMember(String id, String name) {
+        MemberEntity member = new MemberEntity();
+        member.id = id;
+        member.name = name;
+        member.isNew = true;
+        return member;
     }
 }
