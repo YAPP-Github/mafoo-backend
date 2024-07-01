@@ -14,17 +14,37 @@ spring:
             allowedHeaders: '*'
             allowedMethods: '*'
       routes:
+        - id: user-service-swagger
+          uri: https://user-service.mafoo.kr
+          predicates:
+              - Path=/user/v3/api-docs/**
+          filters:
+              - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: user-service-auth
+          uri: https://user-service.mafoo.kr
+          predicates:
+            - Path=/user/v1/auth/**
+          filters:
+            - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: photo-service-swagger
+          uri: https://photo-service.mafoo.kr
+          predicates:
+            - Path=/photo/v3/api-docs/**
+          filters:
+            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
         - id: user-service
           uri: https://user-service.mafoo.kr
           predicates:
             - Path=/user/**
           filters:
+            - JWTAuthenticationFilter
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service
           uri: https://photo-service.mafoo.kr
           predicates:
             - Path=/photo/**
           filters:
+            - JWTAuthenticationFilter
             - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
 springdoc:
   swagger-ui:
@@ -35,3 +55,7 @@ springdoc:
     urls[1]:
       name: "사진 서비스"
       url: https://gateway.mafoo.kr/photo/v3/api-docs
+
+app:
+  jwt:
+    verify-key: ${JWT_VERIFY_KEY}
