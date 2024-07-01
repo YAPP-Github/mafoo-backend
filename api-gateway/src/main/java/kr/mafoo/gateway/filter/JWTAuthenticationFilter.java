@@ -29,7 +29,7 @@ public class JWTAuthenticationFilter extends AbstractGatewayFilterFactory<Object
     private JwtParser parser = null;
 
     private final static String TOKEN_TYPE_HEADER_KEY = "tkn_typ";
-    private final static String REFRESH_TOKEN_TYPE_VALUE = "refresh";
+    private final static String ACCESS_TOKEN_TYPE_VALUE = "access";
     private final static String USER_ID_CLAIM_KEY = "user_id";
     private final static String MEMBER_ID_HEADER_KEY = "X-MEMBER-ID";
 
@@ -45,7 +45,7 @@ public class JWTAuthenticationFilter extends AbstractGatewayFilterFactory<Object
         return Mono.defer(() -> {
             Jwe<Claims> claims = parser.parseEncryptedClaims(token);
             String type = (String) claims.getHeader().get(TOKEN_TYPE_HEADER_KEY);
-            if (!type.equals(REFRESH_TOKEN_TYPE_VALUE)) {
+            if (!type.equals(ACCESS_TOKEN_TYPE_VALUE)) {
                 return createSimpleErrorResponse(exchange, "AU0005", "토큰 타입이 올바르지 않습니다");
             }
             String userId = claims.getPayload().get(USER_ID_CLAIM_KEY, String.class);
