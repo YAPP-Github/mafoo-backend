@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
     ALBUM_NOT_FOUND("AE0001", "앨범을 찾을 수 없습니다"),
+    PHOTO_NOT_FOUND("PE0001", "사진을 찾을 수 없습니다"),
 
     ;
     private final String code;
