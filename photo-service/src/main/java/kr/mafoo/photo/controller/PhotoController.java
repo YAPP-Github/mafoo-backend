@@ -2,28 +2,33 @@ package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.PhotoApi;
 import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoAlbumUpdateRequest;
+import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
+import kr.mafoo.photo.service.PhotoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @RestController
 public class PhotoController implements PhotoApi {
 
+    private final PhotoService photoService;
+
     @Override
-    public Flux<PhotoResponse> getAlbumPhotos(
+    public Flux<PhotoResponse> getPhotos(
+            String memberId,
             String albumId
     ){
-        return Flux.just(
-                new PhotoResponse("test_photo_id_a", "test_album_id_a", "photo_url"),
-                new PhotoResponse("test_photo_id_b", "test_album_id_a", "photo_url"),
-                new PhotoResponse("test_photo_id_c", "test_album_id_a", "photo_url")
-        );
+        return photoService
+                .findAllByAlbumId(albumId, memberId)
+                .map(PhotoResponse::fromEntity);
     }
 
     @Override
     public Mono<PhotoResponse> createPhoto(
+            String memberId,
             PhotoCreateRequest request
     ){
         return Mono.just(
@@ -33,18 +38,21 @@ public class PhotoController implements PhotoApi {
 
     @Override
     public Mono<PhotoResponse> updatePhotoAlbum(
+            String memberId,
             String photoId,
-            PhotoAlbumUpdateRequest request
+            PhotoUpdateAlbumIdRequest request
     ){
-        return Mono.just(
-                new PhotoResponse("test_photo_id", "photo_url", "test_album_id")
-        );
+        return photoService
+                .updatePhotoAlbumId(photoId, request.albumId(), memberId)
+                .map(PhotoResponse::fromEntity);
     }
 
     @Override
     public Mono<Void> deletePhoto(
+            String memberId,
             String photoId
     ){
-        return Mono.empty();
+        return photoService
+                .deletePhotoById(photoId, memberId);
     }
 }

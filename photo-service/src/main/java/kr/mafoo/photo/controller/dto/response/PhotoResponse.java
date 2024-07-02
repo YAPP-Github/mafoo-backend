@@ -1,6 +1,7 @@
 package kr.mafoo.photo.controller.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.mafoo.photo.domain.PhotoEntity;
 
 @Schema(description = "사진 응답")
 public record PhotoResponse(
@@ -13,4 +14,13 @@ public record PhotoResponse(
         @Schema(description = "앨범 ID", example = "test_album_id")
         String albumId
 ) {
+        public static PhotoResponse fromEntity(
+                PhotoEntity entity
+        ) {
+                return new PhotoResponse(
+                        entity.getPhotoId(),
+                        entity.getPhotoUrl(),
+                        entity.getAlbumId()
+                );
+        }
 }
