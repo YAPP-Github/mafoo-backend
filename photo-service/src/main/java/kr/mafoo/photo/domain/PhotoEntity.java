@@ -26,8 +26,8 @@ public class PhotoEntity implements Persistable<String> {
     @Column("owner_member_id")
     private String ownerMemberId;
 
-    @Column("owner_album_id")
-    private String ownerAlbumId;
+    @Column("album_id")
+    private String albumId;
 
     @CreatedDate
     @Column("created_at")
@@ -59,8 +59,8 @@ public class PhotoEntity implements Persistable<String> {
         return photoId;
     }
 
-    public PhotoEntity updateOwnerAlbumId(String albumId) {
-        this.ownerAlbumId = albumId;
+    public PhotoEntity updateAlbumId(String albumId) {
+        this.albumId = albumId;
         return this;
     }
 

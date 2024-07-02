@@ -16,16 +16,16 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final AlbumRepository albumRepository;
 
-    public Flux<PhotoEntity> findAllByOwnerAlbumId(String ownerAlbumId, String requestMemberId) {
+    public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
         return albumRepository
-                .findById(ownerAlbumId)
+                .findById(albumId)
                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                 .flatMapMany(albumEntity -> {
                     if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return photoRepository.findAllByOwnerAlbumId(ownerAlbumId);
+                        return photoRepository.findAllByAlbumId(albumId);
                     }
                 });
     }
@@ -44,7 +44,7 @@ public class PhotoService {
                 });
     }
 
-    public Mono<PhotoEntity> updatePhotoOwnerAlbumId(String photoId, String ownerAlbumId, String requestMemberId) {
+    public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
         return photoRepository
                 .findById(photoId)
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
@@ -54,14 +54,14 @@ public class PhotoService {
                         return Mono.error(new PhotoNotFoundException());
                     } else {
                         return albumRepository
-                                .findById(ownerAlbumId)
+                                .findById(albumId)
                                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                                 .flatMap(albumEntity -> {
                                     if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
                                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                                         return Mono.error(new AlbumNotFoundException());
                                     } else {
-                                        return photoRepository.save(photoEntity.updateOwnerAlbumId(ownerAlbumId));
+                                        return photoRepository.save(photoEntity.updateAlbumId(albumId));
                                     }
                                 });
                     }

@@ -22,7 +22,7 @@ public class PhotoController implements PhotoApi {
             String albumId
     ){
         return photoService
-                .findAllByOwnerAlbumId(albumId, memberId)
+                .findAllByAlbumId(albumId, memberId)
                 .map(PhotoResponse::fromEntity);
     }
 
@@ -43,7 +43,7 @@ public class PhotoController implements PhotoApi {
             PhotoUpdateAlbumIdRequest request
     ){
         return photoService
-                .updatePhotoOwnerAlbumId(photoId, request.albumId(), memberId)
+                .updatePhotoAlbumId(photoId, request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 

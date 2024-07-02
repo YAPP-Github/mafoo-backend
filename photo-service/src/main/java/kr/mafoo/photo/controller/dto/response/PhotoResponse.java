@@ -20,7 +20,7 @@ public record PhotoResponse(
                 return new PhotoResponse(
                         entity.getPhotoId(),
                         entity.getPhotoUrl(),
-                        entity.getOwnerAlbumId()
+                        entity.getAlbumId()
                 );
         }
 }
