@@ -32,9 +32,20 @@ public class QrService {
 
     private Mono<byte[]> getLifeFourCutsFiles(String qrUrl) {
 
+        return getRedirectUri(qrUrl)
+                .flatMap(redirectUri -> {
+                    // TODO : 추후 비디오 URL 추가 예정
+                    // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
+
+                    String imageUrl = redirectUri.toString().replace("index.html", "image.jpg");
+                    return getFileAsByte(imageUrl);
+                });
+    }
+
+    private Mono<URI> getRedirectUri(String url) {
         return externalWebClient
                 .get()
-                .uri(qrUrl)
+                .uri(url)
                 .retrieve()
                 .toBodilessEntity()
                 .flatMap(response -> {
@@ -42,11 +53,7 @@ public class QrService {
                     if (redirectUri == null) {
                         throw new RuntimeException("No redirection URL found");
                     } else {
-                        // TODO : 추후 비디오 URL 추가 예정
-                        // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
-
-                        String imageUrl = redirectUri.toString().replace("index.html", "image.jpg");
-                        return getFileAsByte(imageUrl);
+                        return Mono.just(redirectUri);
                     }
                 });
     }
