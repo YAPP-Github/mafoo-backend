@@ -27,7 +27,7 @@ public class QrService {
             case LIFE_FOUR_CUTS -> getLifeFourCutsFiles(qrUrl);
             case PHOTOISM -> null;
             case HARU_FILM -> getHaruFilmFiles(qrUrl);
-            case DONT_LOOK_UP -> null;
+            case DONT_LOOK_UP -> getDontLookUpFiles(qrUrl);
         };
 
     }
@@ -53,6 +53,20 @@ public class QrService {
 
         // TODO : 추후 비디오 URL 추가 예정
         // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";
+
+        return getFileAsByte(imageUrl);
+    }
+
+    private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
+
+        String imageName = qrUrl.split("/")[4];
+
+        String baseUrl = "https://x.dontlxxkup.kr/uploads/";
+        String imageUrl = baseUrl + imageName;
+
+        // TODO : 추후 비디오 URL 추가 예정
+        // String videoName = imageName.replace("image", "video").replace(".jpg", ".mp4");
+        // String videoUrl = baseUrl + videoName;
 
         return getFileAsByte(imageUrl);
     }
