@@ -31,9 +31,9 @@ public class PhotoController implements PhotoApi {
             String memberId,
             PhotoCreateRequest request
     ){
-        return Mono.just(
-                new PhotoResponse("test_photo_id", "photo_url", null)
-        );
+        return photoService
+                .createNewPhoto(request.qrUrl(), memberId)
+                .map(PhotoResponse::fromEntity);
     }
 
     @Override

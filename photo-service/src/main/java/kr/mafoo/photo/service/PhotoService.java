@@ -1,10 +1,12 @@
 package kr.mafoo.photo.service;
 
+import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
+import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,6 +17,20 @@ import reactor.core.publisher.Mono;
 public class PhotoService {
     private final PhotoRepository photoRepository;
     private final AlbumRepository albumRepository;
+
+    private final QrService qrService;
+    private final ObjectStorageService objectStorageService;
+
+    public Mono<PhotoEntity> createNewPhoto(String qrUrl, String requestMemberId) {
+        return qrService
+                .getFileFromQrUrl(qrUrl)
+                .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
+                        .flatMap(photoUrl -> {
+                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, fileDto.type(), requestMemberId);
+                            return photoRepository.save(photoEntity);
+                        })
+                );
+    }
 
     public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
         return albumRepository

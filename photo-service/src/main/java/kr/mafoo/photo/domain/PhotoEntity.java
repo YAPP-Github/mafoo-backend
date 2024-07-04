@@ -23,6 +23,9 @@ public class PhotoEntity implements Persistable<String> {
     @Column("url")
     private String photoUrl;
 
+    @Column("brand")
+    private BrandType brand;
+
     @Column("owner_member_id")
     private String ownerMemberId;
 
@@ -64,10 +67,11 @@ public class PhotoEntity implements Persistable<String> {
         return this;
     }
 
-    public static PhotoEntity newPhoto(String photoId, String photoUrl, String ownerMemberId) {
+    public static PhotoEntity newPhoto(String photoId, String photoUrl, BrandType brandType, String ownerMemberId) {
         PhotoEntity photo = new PhotoEntity();
         photo.photoId = photoId;
         photo.photoUrl = photoUrl;
+        photo.brand = brandType;
         photo.ownerMemberId = ownerMemberId;
         photo.isNew = true;
         return photo;

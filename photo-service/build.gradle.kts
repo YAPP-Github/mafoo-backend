@@ -34,7 +34,7 @@ dependencies {
 	implementation("org.projectlombok:lombok:1.18.32")
 	annotationProcessor("org.projectlombok:lombok:1.18.32")
 	implementation("com.github.f4b6a3:ulid-creator:5.2.3")
-
+	implementation("io.awspring.cloud:spring-cloud-starter-aws:2.4.4")
 }
 
 tasks.withType<Test> {
