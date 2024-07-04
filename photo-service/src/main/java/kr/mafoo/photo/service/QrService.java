@@ -3,6 +3,7 @@ package kr.mafoo.photo.service;
 import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
 import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
+import kr.mafoo.photo.exception.RedirectUriNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -114,7 +115,7 @@ public class QrService {
                 .flatMap(response -> {
                     URI redirectUri = response.getHeaders().getLocation();
                     if (redirectUri == null) {
-                        throw new RuntimeException("No redirection URL found");
+                        return Mono.error(new RedirectUriNotFoundException());
                     } else {
                         return Mono.just(redirectUri.toString());
                     }
