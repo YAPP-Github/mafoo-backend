@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+
+    REDIRECT_URI_NOT_FOUND("EX001", "리다이렉트 URI를 찾을 수 없습니다"),
+
     ALBUM_NOT_FOUND("AE0001", "앨범을 찾을 수 없습니다"),
     PHOTO_NOT_FOUND("PE0001", "사진을 찾을 수 없습니다"),
     PHOTO_BRAND_NOT_EXISTS("PE002", "사진 브랜드가 존재하지 않습니다"),
