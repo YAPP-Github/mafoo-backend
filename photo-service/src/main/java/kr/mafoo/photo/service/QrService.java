@@ -4,6 +4,7 @@ import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
 import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
 import kr.mafoo.photo.exception.RedirectUriNotFoundException;
+import kr.mafoo.photo.service.dto.FileDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -23,17 +24,20 @@ public class QrService {
 
     private final WebClient externalWebClient;
 
-    protected Mono<byte[]> getFileFromQrUrl(String qrUrl) {
+    public Mono<FileDto> getFileFromQrUrl(String qrUrl) {
         BrandType brandType = Optional.ofNullable(BrandType.matchBrandType(qrUrl))
                 .orElseThrow(PhotoBrandNotExistsException::new);
 
         return switch (brandType) {
-            case LIFE_FOUR_CUTS -> getLifeFourCutsFiles(qrUrl);
-            case PHOTOISM -> getPhotoismFiles(qrUrl);
-            case HARU_FILM -> getHaruFilmFiles(qrUrl);
-            case DONT_LOOK_UP -> getDontLookUpFiles(qrUrl);
+            case LIFE_FOUR_CUTS -> createFileDto(brandType, getLifeFourCutsFiles(qrUrl));
+            case PHOTOISM -> createFileDto(brandType, getPhotoismFiles(qrUrl));
+            case HARU_FILM -> createFileDto(brandType, getHaruFilmFiles(qrUrl));
+            case DONT_LOOK_UP -> createFileDto(brandType, getDontLookUpFiles(qrUrl));
         };
+    }
 
+    private Mono<FileDto> createFileDto(BrandType brandType, Mono<byte[]> fileMono) {
+        return fileMono.map(file -> new FileDto(brandType, file));
     }
 
     private Mono<byte[]> getLifeFourCutsFiles(String qrUrl) {

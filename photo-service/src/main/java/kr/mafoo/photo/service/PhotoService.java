@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service;
 
+import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
@@ -23,11 +24,12 @@ public class PhotoService {
     public Mono<PhotoEntity> createNewPhoto(String qrUrl, String requestMemberId) {
         return qrService
                 .getFileFromQrUrl(qrUrl)
-                .flatMap(objectStorageService::uploadFile)
-                .flatMap(photoUrl -> {
-                    PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, requestMemberId);
-                    return photoRepository.save(photoEntity);
-                });
+                .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
+                        .flatMap(photoUrl -> {
+                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, fileDto.type(), requestMemberId);
+                            return photoRepository.save(photoEntity);
+                        })
+                );
     }
 
     public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
