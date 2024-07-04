@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -25,7 +27,7 @@ public class QrService {
 
         return switch (brandType) {
             case LIFE_FOUR_CUTS -> getLifeFourCutsFiles(qrUrl);
-            case PHOTOISM -> null;
+            case PHOTOISM -> getPhotoismFiles(qrUrl);
             case HARU_FILM -> getHaruFilmFiles(qrUrl);
             case DONT_LOOK_UP -> getDontLookUpFiles(qrUrl);
         };
@@ -36,17 +38,39 @@ public class QrService {
 
         return getRedirectUri(qrUrl)
                 .flatMap(redirectUri -> {
+                    String imageUrl = redirectUri.toString().replace("index.html", "image.jpg");
+
                     // TODO : 추후 비디오 URL 추가 예정
                     // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
 
-                    String imageUrl = redirectUri.toString().replace("index.html", "image.jpg");
                     return getFileAsByte(imageUrl);
                 });
     }
 
-    private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
+    private Mono<byte[]> getPhotoismFiles(String qrUrl) {
+        return getRedirectUri(qrUrl)
+                .flatMap(redirectUri -> {
+                    String uid = extractValueFromUrl(redirectUri.toString(), "u=");
 
-        String albumCode = qrUrl.split("/@")[1];
+                    return externalWebClient
+                            .post()
+                            .uri("https://cmsapi.seobuk.kr/v1/etc/seq/resource")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(Map.of("uid", uid, "appUserId", null))
+                            .retrieve()
+                            .bodyToMono(LinkedHashMap.class)
+                            .flatMap(responseBody -> {
+                                LinkedHashMap<String, Object> content = (LinkedHashMap<String, Object>) responseBody.get("content");
+                                LinkedHashMap<String, Object> fileInfo = (LinkedHashMap<String, Object>) content.get("fileInfo");
+                                String imageUrl = (String) fileInfo.get("picFile.path");
+
+                                return getFileAsByte(imageUrl);
+                            });
+                });
+    }
+
+    private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
+        String albumCode = extractValueFromUrl(qrUrl, "/@");
 
         String baseUrl = "http://haru6.mx2.co.kr/base_api?command=albumdn&albumCode=";
         String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
@@ -58,8 +82,7 @@ public class QrService {
     }
 
     private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
-
-        String imageName = qrUrl.split("/")[4];
+        String imageName = extractValueFromUrl(qrUrl, ".kr/");
 
         String baseUrl = "https://x.dontlxxkup.kr/uploads/";
         String imageUrl = baseUrl + imageName;
@@ -85,6 +108,10 @@ public class QrService {
                         return Mono.just(redirectUri);
                     }
                 });
+    }
+
+    private String extractValueFromUrl(String url, String delimiter) {
+        return url.split(delimiter)[1];
     }
 
     private Mono<byte[]> getFileAsByte(String url) {
