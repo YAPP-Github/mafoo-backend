@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
+import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -44,7 +45,8 @@ public class QrService {
                     // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
 
                     return getFileAsByte(imageUrl);
-                });
+                })
+                .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 
     private Mono<byte[]> getPhotoismFiles(String qrUrl) {
@@ -66,7 +68,8 @@ public class QrService {
 
                                 return getFileAsByte(imageUrl);
                             });
-                });
+                })
+                .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 
     private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
@@ -78,7 +81,8 @@ public class QrService {
         // TODO : 추후 비디오 URL 추가 예정
         // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";
 
-        return getFileAsByte(imageUrl);
+        return getFileAsByte(imageUrl)
+                .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 
     private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
@@ -91,7 +95,14 @@ public class QrService {
         // String videoName = imageName.replace("image", "video").replace(".jpg", ".mp4");
         // String videoUrl = baseUrl + videoName;
 
-        return getFileAsByte(imageUrl);
+        return getRedirectUri(qrUrl)
+                .flatMap(redirectUri -> {
+                    if (redirectUri.endsWith("/delete")) {
+                        return Mono.error(new PhotoQrUrlExpiredException());
+                    } else {
+                        return getFileAsByte(imageUrl);
+                    }
+                });
     }
 
     private Mono<String> getRedirectUri(String url) {
