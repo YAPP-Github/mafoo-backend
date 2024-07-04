@@ -38,7 +38,7 @@ public class QrService {
 
         return getRedirectUri(qrUrl)
                 .flatMap(redirectUri -> {
-                    String imageUrl = redirectUri.toString().replace("index.html", "image.jpg");
+                    String imageUrl = redirectUri.replace("index.html", "image.jpg");
 
                     // TODO : 추후 비디오 URL 추가 예정
                     // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
@@ -50,7 +50,7 @@ public class QrService {
     private Mono<byte[]> getPhotoismFiles(String qrUrl) {
         return getRedirectUri(qrUrl)
                 .flatMap(redirectUri -> {
-                    String uid = extractValueFromUrl(redirectUri.toString(), "u=");
+                    String uid = extractValueFromUrl(redirectUri, "u=");
 
                     return externalWebClient
                             .post()
@@ -94,7 +94,7 @@ public class QrService {
         return getFileAsByte(imageUrl);
     }
 
-    private Mono<URI> getRedirectUri(String url) {
+    private Mono<String> getRedirectUri(String url) {
         return externalWebClient
                 .get()
                 .uri(url)
@@ -105,7 +105,7 @@ public class QrService {
                     if (redirectUri == null) {
                         throw new RuntimeException("No redirection URL found");
                     } else {
-                        return Mono.just(redirectUri);
+                        return Mono.just(redirectUri.toString());
                     }
                 });
     }
