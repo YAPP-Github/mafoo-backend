@@ -24,6 +24,20 @@ public class AlbumService {
         return albumRepository.findAllByOwnerMemberId(ownerMemberId);
     }
 
+    public Mono<AlbumEntity> findByAlbumId(String albumId, String requestMemberId) {
+        return albumRepository
+                .findById(albumId)
+                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
+                .flatMap(albumEntity -> {
+                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                        // 내 앨범이 아니면 그냥 없는 앨범 처리
+                        return Mono.error(new AlbumNotFoundException());
+                    } else {
+                        return Mono.just(albumEntity);
+                    }
+                });
+    }
+
     public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
