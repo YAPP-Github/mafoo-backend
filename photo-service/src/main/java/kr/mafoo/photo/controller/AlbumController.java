@@ -26,6 +26,16 @@ public class AlbumController implements AlbumApi {
     }
 
     @Override
+    public Mono<AlbumResponse> getAlbum(
+            String memberId,
+            String albumId
+    ) {
+        return albumService
+                .findByAlbumId(albumId, memberId)
+                .map(AlbumResponse::fromEntity);
+    }
+
+    @Override
     public Mono<AlbumResponse> createAlbum(
             String memberId,
             AlbumCreateRequest request
