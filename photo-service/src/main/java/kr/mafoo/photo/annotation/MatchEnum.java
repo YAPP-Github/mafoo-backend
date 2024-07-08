@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MatchEnum {
-    String message() default "타입이 올바르지 않습니다";
+    String message() default "ENUM 타입이 올바르지 않습니다";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
     Class<? extends java.lang.Enum<?>> enumClass();
