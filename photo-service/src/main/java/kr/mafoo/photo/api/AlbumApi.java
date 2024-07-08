@@ -3,14 +3,18 @@ package kr.mafoo.photo.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
+import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Validated
 @Tag(name = "앨범 관련 API", description = "앨범 조회, 생성, 수정, 삭제 등 API")
 @RequestMapping("/v1/albums")
 public interface AlbumApi {
@@ -27,6 +31,7 @@ public interface AlbumApi {
             @RequestMemberId
             String memberId,
 
+            @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @PathVariable
             String albumId
@@ -38,6 +43,7 @@ public interface AlbumApi {
             @RequestMemberId
             String memberId,
 
+            @Valid
             @RequestBody
             AlbumCreateRequest request
     );
@@ -48,10 +54,12 @@ public interface AlbumApi {
             @RequestMemberId
             String memberId,
 
+            @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @PathVariable
             String albumId,
 
+            @Valid
             @RequestBody
             AlbumUpdateRequest request
     );
@@ -62,6 +70,7 @@ public interface AlbumApi {
             @RequestMemberId
             String memberId,
 
+            @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @PathVariable
             String albumId
