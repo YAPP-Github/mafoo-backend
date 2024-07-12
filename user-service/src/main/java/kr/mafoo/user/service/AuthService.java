@@ -97,7 +97,7 @@ public class AuthService {
                                 String.valueOf(map.get("id")),
                                 (String) ((LinkedHashMap)map.get("properties")).get("nickname"),
                                 (String) map.get("kakao_account.email"),
-                        (String) map.get("kakao_account.profile.profile_image_url")
+                        (String) ((LinkedHashMap)map.get("properties")).get("profile_image")
                 ));
     }
 }
