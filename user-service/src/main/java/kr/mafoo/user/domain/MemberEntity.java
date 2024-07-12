@@ -49,10 +49,11 @@ public class MemberEntity implements Persistable<String> {
         return id.hashCode();
     }
 
-    public static MemberEntity newMember(String id, String name) {
+    public static MemberEntity newMember(String id, String name, String profileImageUrl) {
         MemberEntity member = new MemberEntity();
         member.id = id;
         member.name = name;
+        member.profileImageUrl = profileImageUrl;
         member.isNew = true;
         return member;
     }

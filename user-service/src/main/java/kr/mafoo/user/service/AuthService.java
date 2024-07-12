@@ -30,7 +30,8 @@ public class AuthService {
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
-                        kakaoLoginInfo.nickname()
+                        kakaoLoginInfo.nickname(),
+                        kakaoLoginInfo.profileImageUrl()
                 ));
     }
 
@@ -44,10 +45,10 @@ public class AuthService {
                 });
     }
 
-    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username) {
+    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
         return socialMemberRepository
                 .findByIdentityProviderAndId(provider, id)
-                .switchIfEmpty(createNewSocialMember(provider, id, username))
+                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
                     String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
@@ -55,9 +56,9 @@ public class AuthService {
                 });
     }
 
-    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username) {
+    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
         return memberService
-                .createNewMember(username)
+                .createNewMember(username, profileImageUrl)
                 .flatMap(newMember -> socialMemberRepository.save(
                         SocialMemberEntity.newSocialMember(provider, id, newMember.getId())
                 ));
@@ -95,7 +96,8 @@ public class AuthService {
                 .map(map -> new KakaoLoginInfo(
                                 String.valueOf(map.get("id")),
                                 (String) ((LinkedHashMap)map.get("properties")).get("nickname"),
-                                (String) map.get("kakao_account.email")
+                                (String) map.get("kakao_account.email"),
+                        (String) map.get("kakao_account.profile.profile_image_url")
                 ));
     }
 }
