@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorCode {
     MEMBER_NOT_FOUND("ME0001", "사용자를 찾을 수 없습니다"),
     KAKAO_LOGIN_FAILED("EX0001", "카카오 로그인에 실패했습니다"),
+    REQUEST_INPUT_NOT_VALID("EX0002", "입력 값이 올바르지 않습니다."),
 
     TOKEN_TYPE_MISMATCH("AU0001", "토큰 타입이 일치하지 않습니다. (아마 AccessToken?)"),
     TOKEN_EXPIRED("AU0002", "토큰이 만료되었습니다"),
