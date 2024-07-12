@@ -28,6 +28,9 @@ public class MemberEntity implements Persistable<String> {
     @Column("created_at")
     private LocalDateTime createdAt;
 
+    @Column("profile_img_url")
+    private String profileImageUrl;
+
     @Transient
     private boolean isNew = false;
 
