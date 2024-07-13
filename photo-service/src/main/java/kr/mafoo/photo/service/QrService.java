@@ -44,7 +44,7 @@ public class QrService {
 
         return getRedirectUri(qrUrl)
                 .flatMap(redirectUri -> {
-                    String imageUrl = redirectUri.replace("index.html", "image.jpg");
+                    String imageUrl = extractValueFromUrl(redirectUri, "path=")[1].replace("index.html", "image.jpg");
 
                     // TODO : 추후 비디오 URL 추가 예정
                     // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
@@ -83,8 +83,6 @@ public class QrService {
 
         String baseUrl = urlValueList[0] + "/base_api?command=albumdn&albumCode=";
         String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
-
-        log.info("이미지 url : {}", imageUrl);
 
         // TODO : 추후 비디오 URL 추가 예정
         // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";
