@@ -57,20 +57,19 @@ public class QrService {
     private Mono<byte[]> getPhotoismFiles(String qrUrl) {
         return getRedirectUri(qrUrl)
                 .flatMap(redirectUri -> {
-                    String uid = extractValueFromUrl(redirectUri, "u=");
+                    String uid = extractValueFromUrl(redirectUri, "u=")[1];
 
                     return externalWebClient
                             .post()
                             .uri("https://cmsapi.seobuk.kr/v1/etc/seq/resource")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(Map.of("uid", uid))
+                            .bodyValue(Map.of("uid", uid, "appUserId", null))
                             .retrieve()
                             .bodyToMono(LinkedHashMap.class)
                             .flatMap(responseBody -> {
                                 LinkedHashMap<String, Object> content = (LinkedHashMap<String, Object>) responseBody.get("content");
                                 LinkedHashMap<String, Object> fileInfo = (LinkedHashMap<String, Object>) content.get("fileInfo");
-                                LinkedHashMap<String, Object> picFile = (LinkedHashMap<String, Object>) fileInfo.get("picFile");
-                                String imageUrl = (String) picFile.get("path");
+                                String imageUrl = (String) fileInfo.get("picFile.path");
 
                                 return getFileAsByte(imageUrl);
                             });
@@ -79,10 +78,13 @@ public class QrService {
     }
 
     private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
-        String albumCode = extractValueFromUrl(qrUrl, "/@");
+        String[] urlValueList = extractValueFromUrl(qrUrl, "/@");
+        String albumCode = urlValueList[1];
 
-        String baseUrl = "http://haru6.mx2.co.kr/base_api?command=albumdn&albumCode=";
+        String baseUrl = urlValueList[0] + "/base_api?command=albumdn&albumCode=";
         String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
+
+        log.info("이미지 url : {}", imageUrl);
 
         // TODO : 추후 비디오 URL 추가 예정
         // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";
@@ -92,7 +94,7 @@ public class QrService {
     }
 
     private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
-        String imageName = extractValueFromUrl(qrUrl, ".kr/image/");
+        String imageName = extractValueFromUrl(qrUrl, ".kr/image/")[1];
 
         String baseUrl = "https://x.dontlxxkup.kr/uploads/";
         String imageUrl = baseUrl + imageName;
@@ -130,8 +132,8 @@ public class QrService {
                 });
     }
 
-    private String extractValueFromUrl(String url, String delimiter) {
-        return url.split(delimiter)[1];
+    private String[] extractValueFromUrl(String url, String delimiter) {
+        return url.split(delimiter);
     }
 
     private Mono<byte[]> getFileAsByte(String url) {

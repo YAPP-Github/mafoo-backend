@@ -1,24 +1,22 @@
 package kr.mafoo.photo.domain;
 
+import java.util.regex.Pattern;
+
 public enum BrandType {
-    LIFE_FOUR_CUTS("https://api.life4cut.net/"),
-    PHOTOISM("https://qr.seobuk.kr/"),
-    HARU_FILM( "http://haru6.mx2.co.kr/"),
-    DONT_LOOK_UP("https://x.dontlxxkup.kr/"),
+    LIFE_FOUR_CUTS(Pattern.compile("https://api\\.life4cut\\.net/.*")),
+    PHOTOISM(Pattern.compile("https://qr\\.seobuk\\.kr/.*")),
+    HARU_FILM(Pattern.compile("http://haru\\d+\\.mx\\d+\\.co\\.kr/.*")),
+    DONT_LOOK_UP(Pattern.compile("https://x\\.dontlxxkup\\.kr/.*")),
     ;
 
-    private String urlFormat;
+    private final Pattern urlPattern;
 
-    private BrandType(String urlFormat) {
-        this.urlFormat = urlFormat;
-    }
-
-    public String getUrlFormat() {
-        return urlFormat;
+    private BrandType(Pattern urlPattern) {
+        this.urlPattern = urlPattern;
     }
 
     public boolean matches(String qrUrl) {
-        return qrUrl.startsWith(this.urlFormat);
+        return urlPattern.matcher(qrUrl).matches();
     }
 
     public static BrandType matchBrandType(String qrUrl) {
@@ -30,3 +28,4 @@ public enum BrandType {
         return null;
     }
 }
+
