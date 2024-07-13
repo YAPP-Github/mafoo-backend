@@ -91,7 +91,7 @@ public class QrService {
     }
 
     private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
-        String imageName = extractValueFromUrl(qrUrl, ".kr/");
+        String imageName = extractValueFromUrl(qrUrl, ".kr/image/");
 
         String baseUrl = "https://x.dontlxxkup.kr/uploads/";
         String imageUrl = baseUrl + imageName;
@@ -107,7 +107,10 @@ public class QrService {
                     } else {
                         return getFileAsByte(imageUrl);
                     }
-                });
+                })
+                .onErrorResume(
+                        RedirectUriNotFoundException.class, e -> getFileAsByte(imageUrl)
+                );
     }
 
     private Mono<String> getRedirectUri(String url) {
