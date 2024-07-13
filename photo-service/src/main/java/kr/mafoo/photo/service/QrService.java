@@ -78,9 +78,10 @@ public class QrService {
     }
 
     private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
-        String albumCode = extractValueFromUrl(qrUrl, "/@")[1];
+        String[] urlValueList = extractValueFromUrl(qrUrl, "/@");
+        String albumCode = urlValueList[1];
 
-        String baseUrl = "http://haru6.mx2.co.kr/base_api?command=albumdn&albumCode=";
+        String baseUrl = urlValueList[0] + "/base_api?command=albumdn&albumCode=";
         String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
 
         log.info("이미지 url : {}", imageUrl);
