@@ -63,13 +63,14 @@ public class QrService {
                             .post()
                             .uri("https://cmsapi.seobuk.kr/v1/etc/seq/resource")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(Map.of("uid", uid, "appUserId", null))
+                            .bodyValue(Map.of("uid", uid))
                             .retrieve()
                             .bodyToMono(LinkedHashMap.class)
                             .flatMap(responseBody -> {
                                 LinkedHashMap<String, Object> content = (LinkedHashMap<String, Object>) responseBody.get("content");
                                 LinkedHashMap<String, Object> fileInfo = (LinkedHashMap<String, Object>) content.get("fileInfo");
-                                String imageUrl = (String) fileInfo.get("picFile.path");
+                                LinkedHashMap<String, Object> picFile = (LinkedHashMap<String, Object>) fileInfo.get("picFile");
+                                String imageUrl = (String) picFile.get("path");
 
                                 return getFileAsByte(imageUrl);
                             });
