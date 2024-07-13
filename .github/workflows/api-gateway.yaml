@@ -54,3 +54,19 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  call-deploy-workflow:
+    needs: [ prepare-variables, call-build-workflow ]
+    name: ArgoCD로 배포하기
+    uses: ./.github/workflows/argocd-deploy.yaml
+    permissions:
+      contents: write
+    with:
+      argocd-repo-name: YAPP-Github/mafoo-argocd-manifest
+      overlay-name: ${{ needs.prepare-variables.outputs.spring-profile }}
+      service-name: ${{ needs.prepare-variables.outputs.module-path }}
+      image-name: spinachpasta/api-gateway
+      image-tag: ${{ needs.prepare-variables.outputs.image-tag }}
+      environment: ${{ needs.prepare-variables.outputs.spring-profile }}
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
