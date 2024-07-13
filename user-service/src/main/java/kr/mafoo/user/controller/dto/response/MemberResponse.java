@@ -9,12 +9,16 @@ public record MemberResponse(
         String memberId,
 
         @Schema(description = "사용자 이름", example = "송영민")
-        String name
+        String name,
+
+        @Schema(description = "프로필 이미지 URL", example = "https://mafoo.kr/profile.jpg")
+        String profileImageUrl
 ) {
         public static MemberResponse fromEntity(MemberEntity memberEntity) {
                 return new MemberResponse(
                         memberEntity.getId(),
-                        memberEntity.getName()
+                        memberEntity.getName(),
+                        memberEntity.getProfileImageUrl()
                 );
         }
 }

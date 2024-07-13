@@ -23,8 +23,8 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
-    public Mono<MemberEntity> createNewMember(String username) {
-        MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username);
+    public Mono<MemberEntity> createNewMember(String username, String profileImageUrl) {
+        MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
         return memberRepository.save(memberEntity);
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE member ADD COLUMN `profile_img_url` VARCHAR(255) DEFAULT NULL AFTER `name`;
