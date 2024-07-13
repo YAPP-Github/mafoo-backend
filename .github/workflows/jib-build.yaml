@@ -49,7 +49,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Gradle 준비하기
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
 
       - name: 이미지 빌드하고 푸쉬하기
         id: build-image

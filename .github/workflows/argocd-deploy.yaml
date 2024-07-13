@@ -48,5 +48,5 @@ jobs:
           cat kustomization.yaml
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -am "deploy(${{ inputs.service-name }}): 자동배포 ${{ inputs.image-name }}"
+          git commit -am "release(${{ inputs.service-name }}): 자동배포 ${{ inputs.image-name }}:${{ inputs.image-tag }}"
           git push -u origin main
