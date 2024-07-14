@@ -19,6 +19,9 @@ public class TracingConfig {
                     return false;
                 }
             }
+            if (StringUtils.equalsAny(name,"spring.security.filterchains","spring.security.authorizations","spring.security.http.secured.requests")) {
+                return false;
+            }
             return true;
         };
 
