@@ -9,7 +9,7 @@ spring:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowedOrigins: 'http://localhost:3000,https://mafoo.kr,https://dev.mafoo.kr,https://gateway.mafoo.kr'
+            allowedOrigins: 'http://localhost:3000,https://mafoo.kr,https://dev.mafoo.kr,https://gateway.mafoo.kr,https://gateway-dev.mafoo.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods: '*'
