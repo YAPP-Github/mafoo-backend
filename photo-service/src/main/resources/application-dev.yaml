@@ -1,0 +1,3 @@
+app:
+  gateway:
+    endpoint: https://gateway-dev.mafoo.kr

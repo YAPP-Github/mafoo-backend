@@ -1,0 +1,9 @@
+springdoc:
+  swagger-ui:
+    urls[0]:
+      name: "유저 서비스"
+      url: https://gateway-dev.mafoo.kr/user/v3/api-docs
+
+    urls[1]:
+      name: "사진 서비스"
+      url: https://gateway-dev.mafoo.kr/photo/v3/api-docs

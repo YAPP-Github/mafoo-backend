@@ -16,6 +16,8 @@ logging:
     org.springframework.data.r2dbc: DEBUG
 
 app:
+  gateway:
+    endpoint: https://gateway.mafoo.kr
   oauth:
     kakao:
       client-id: ${KAKAO_CLIENT_ID}

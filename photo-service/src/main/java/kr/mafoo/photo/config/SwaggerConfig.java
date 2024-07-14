@@ -8,11 +8,13 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
+    @Value("${app.gateway.endpoint}") String gatewayEndpoint;
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
@@ -28,7 +30,7 @@ public class SwaggerConfig {
                                 .url("https://opensource.org/licenses/MIT"))
                 )
                 .addServersItem(new Server()
-                        .url("https://gateway.mafoo.kr/photo/")
+                        .url(gatewayEndpoint + "/photo/")
                         .description("프로덕션 서버 사진/앨범 서비스 URL")
                 )
                 .addSecurityItem(new SecurityRequirement().addList("Authorization"))

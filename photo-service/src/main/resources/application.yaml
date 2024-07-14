@@ -11,6 +11,9 @@ spring:
     enabled: true
     user: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+app:
+  gateway:
+    endpoint: https://gateway.mafoo.kr
 
 cloud:
   aws:
