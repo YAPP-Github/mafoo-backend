@@ -15,32 +15,32 @@ spring:
             allowedMethods: '*'
       routes:
         - id: user-service-swagger
-          uri: user-service
+          uri: http://user-service
           predicates:
               - Path=/user/v3/api-docs/**
           filters:
               - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: user-service-auth
-          uri: user-service
+          uri: http://user-service
           predicates:
             - Path=/user/v1/auth/**
           filters:
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service-swagger
-          uri: photo-service
+          uri: http://photo-service
           predicates:
             - Path=/photo/v3/api-docs/**
           filters:
             - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
         - id: user-service
-          uri: user-service
+          uri: http://user-service
           predicates:
             - Path=/user/**
           filters:
             - JWTAuthenticationFilter
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service
-          uri: photo-service
+          uri: http://photo-service
           predicates:
             - Path=/photo/**
           filters:
