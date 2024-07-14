@@ -4,6 +4,7 @@ import io.micrometer.observation.ObservationPredicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.observation.ServerRequestObservationContext;
 
@@ -16,6 +17,10 @@ public class TracingConfig {
                 ServerHttpRequest servletRequest = c.getCarrier();
                 String requestURI = servletRequest.getPath().toString();
                 if(StringUtils.containsAny(requestURI, "actuator", "swagger", "api-docs")) {
+                    return false;
+                }
+
+                if(servletRequest.getMethod() == HttpMethod.OPTIONS) {
                     return false;
                 }
             }
