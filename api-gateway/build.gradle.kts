@@ -29,6 +29,11 @@ dependencies {
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+// https://mvnrepository.com/artifact/io.micrometer/micrometer-tracing-bridge-otel
+	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
+// https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporter-zipkin
+	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
+
 
 	val jjwtVersion = "0.12.5"
 	implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
