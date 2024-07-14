@@ -1,17 +1,17 @@
-name: API 게이트웨이 빌드 후 도커허브에 올리기
+name: API 게이트웨이 DEV 빌드 후 도커허브에 올리기
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'dev' ]
     paths:
       - 'api-gateway/**' # API Gateway 모듈 변경
-      - '.github/workflows/api-gateway.yaml' # API Gateway 워크플로우 변경
+      - '.github/workflows/api-gateway-dev.yaml' # API Gateway 워크플로우 변경
 
 env:
-  SPRING_PROFILE: prod
-  IMAGE_NAME: spinachpasta/api-gateway
+  SPRING_PROFILE: dev
+  IMAGE_NAME: spinachpasta/api-gateway-dev
   MODULE_PATH: api-gateway
   SERVER_PORT: 8080
-  GIT_ENVIRONMENT: prod (api-gateway)
+  GIT_ENVIRONMENT: dev (api-gateway)
 
 concurrency:
   group: api-gateway

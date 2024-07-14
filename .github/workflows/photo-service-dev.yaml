@@ -1,20 +1,20 @@
-name: API 게이트웨이 빌드 후 도커허브에 올리기
+name: 사진 서비스 DEV 빌드 후 도커허브에 올리기
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'dev' ]
     paths:
-      - 'api-gateway/**' # API Gateway 모듈 변경
-      - '.github/workflows/api-gateway.yaml' # API Gateway 워크플로우 변경
+      - 'photo-service/**' # Photo Service 모듈 변경
+      - '.github/workflows/photo-service-dev.yaml' # Photo Service 워크플로우 변경
 
 env:
-  SPRING_PROFILE: prod
-  IMAGE_NAME: spinachpasta/api-gateway
-  MODULE_PATH: api-gateway
+  SPRING_PROFILE: dev
+  IMAGE_NAME: spinachpasta/photo-service-dev
+  MODULE_PATH: photo-service
   SERVER_PORT: 8080
-  GIT_ENVIRONMENT: prod (api-gateway)
+  GIT_ENVIRONMENT: dev (photo-service)
 
 concurrency:
-  group: api-gateway
+  group: photo-service
 
 jobs:
   prepare-variables:
@@ -59,6 +59,7 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
+
   call-deploy-workflow:
     needs: [ prepare-variables, call-build-workflow ]
     name: ArgoCD로 배포하기
@@ -72,6 +73,6 @@ jobs:
       image-name: ${{ needs.prepare-variables.outputs.image-name }}
       image-tag: ${{ needs.prepare-variables.outputs.image-tag }}
       environment: ${{ needs.prepare-variables.outputs.git-environment }}
-      default-image-name: spinachpasta/api-gateway
+      default-image-name: spinachpasta/photo-service
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
