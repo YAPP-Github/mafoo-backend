@@ -21,8 +21,8 @@ app:
   oauth:
     kakao:
       client-id: ${KAKAO_CLIENT_ID}
-      redirect-uri: ${KAKAO_REDIRECT_URL}
       client-secret: ${KAKAO_CLIENT_SECRET}
+      redirect-uri: ${KAKAO_REDIRECT_URL}
   jwt:
     verify-key: ${JWT_VERIFY_KEY}
     expiration:
