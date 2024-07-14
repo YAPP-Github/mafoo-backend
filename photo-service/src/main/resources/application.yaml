@@ -1,6 +1,6 @@
 spring:
   application:
-    name: mafoo-photo-service
+    name: photo-service
   r2dbc:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
@@ -24,3 +24,11 @@ cloud:
     s3:
       endpoint: https://kr.object.ncloudstorage.com
       bucket: ${NCP_BUCKET}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin/api/v2/spans

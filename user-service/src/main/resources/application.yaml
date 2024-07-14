@@ -1,6 +1,6 @@
 spring:
   application:
-    name: mafoo-user-service
+    name: user-service
   flyway:
     url: ${FLYWAY_URL}
     baseline-on-migrate: true
@@ -26,3 +26,11 @@ app:
     expiration:
       access-token: 2592000 # 30 days
       refresh-token: 2592000 # 30 days
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin/api/v2/spans

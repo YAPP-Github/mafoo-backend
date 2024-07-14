@@ -45,6 +45,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
 
 	implementation("io.projectreactor.tools:blockhound:1.0.9.RELEASE")
+	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
+	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
 }
 
 tasks.withType<Test>().all {

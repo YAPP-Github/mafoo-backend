@@ -36,6 +36,8 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok:1.18.32")
 	implementation("com.github.f4b6a3:ulid-creator:5.2.3")
 	implementation("io.awspring.cloud:spring-cloud-starter-aws:2.4.4")
+	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
+	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
 }
 
 tasks.withType<Test> {
