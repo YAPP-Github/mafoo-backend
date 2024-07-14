@@ -30,6 +30,10 @@ cloud:
       bucket: ${NCP_BUCKET}
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
   tracing:
     sampling:
       probability: 1.0

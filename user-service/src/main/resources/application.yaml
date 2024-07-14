@@ -30,6 +30,10 @@ app:
       refresh-token: 2592000 # 30 days
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
   tracing:
     sampling:
       probability: 1.0

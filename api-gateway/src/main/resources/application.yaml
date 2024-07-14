@@ -57,6 +57,10 @@ springdoc:
       url: https://gateway.mafoo.kr/photo/v3/api-docs
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
   tracing:
     sampling:
       probability: 1.0
