@@ -3,13 +3,15 @@ on:
   push:
     branches: [ 'main' ]
     paths:
-      - 'user-service/**' # API Gateway 모듈 변경
+      - 'user-service/**' # User Service 모듈 변경
+      - '.github/workflows/user-service.yaml' # User Service 워크플로우 변경
 
 env:
   SPRING_PROFILE: prod
   IMAGE_NAME: spinachpasta/user-service
   MODULE_PATH: user-service
   SERVER_PORT: 8080
+  GIT_ENVIRONMENT: prod (user-service)
 
 concurrency:
   group: user-service
@@ -24,6 +26,7 @@ jobs:
       spring-profile: ${{ steps.setup-env.outputs.spring-profile }}
       server-port: ${{ steps.setup-env.outputs.server-port }}
       image-name: ${{ steps.setup-env.outputs.image-name }}
+      git-environment: ${{ steps.setup-env.outputs.git-environment }}
     steps:
       - name: GitHub 에서 레포 받아오기
         uses: actions/checkout@v3
@@ -36,6 +39,7 @@ jobs:
           echo "spring-profile=$SPRING_PROFILE" >> $GITHUB_OUTPUT
           echo "server-port=$SERVER_PORT" >> $GITHUB_OUTPUT
           echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "git-environment=$GIT_ENVIRONMENT" >> $GITHUB_OUTPUT
 
   call-build-workflow:
     if: github.event_name == 'push'
@@ -54,3 +58,20 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
+  call-deploy-workflow:
+    needs: [ prepare-variables, call-build-workflow ]
+    name: ArgoCD로 배포하기
+    uses: ./.github/workflows/argocd-deploy.yaml
+    permissions:
+      contents: write
+    with:
+      argocd-repo-name: YAPP-Github/mafoo-argocd-manifest
+      overlay-name: ${{ needs.prepare-variables.outputs.spring-profile }}
+      service-name: ${{ needs.prepare-variables.outputs.module-path }}
+      image-name: ${{ needs.prepare-variables.outputs.image-name }}
+      image-tag: ${{ needs.prepare-variables.outputs.image-tag }}
+      environment: ${{ needs.prepare-variables.outputs.git-environment }}
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
