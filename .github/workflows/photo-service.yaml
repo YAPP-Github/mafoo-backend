@@ -73,5 +73,6 @@ jobs:
       image-name: ${{ needs.prepare-variables.outputs.image-name }}
       image-tag: ${{ needs.prepare-variables.outputs.image-tag }}
       environment: ${{ needs.prepare-variables.outputs.git-environment }}
+      default-image-name: spinachpasta/photo-service
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
