@@ -1,4 +1,4 @@
-name: 유저 서비스 빌드 후 도커허브에 올리기
+name: 유저 서비스 DEV 빌드 후 도커허브에 올리기
 on:
   push:
     branches: [ 'dev' ]

@@ -1,4 +1,4 @@
-name: API 게이트웨이 빌드 후 도커허브에 올리기
+name: API 게이트웨이 DEV 빌드 후 도커허브에 올리기
 on:
   push:
     branches: [ 'dev' ]
