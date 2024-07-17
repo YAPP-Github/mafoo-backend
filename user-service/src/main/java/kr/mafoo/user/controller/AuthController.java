@@ -25,7 +25,7 @@ public class AuthController implements AuthApi {
     @Override
     public Mono<LoginResponse> loginWithApple(AppleLoginRequest request) {
         return authService
-                .loginWithApple(request.code())
+                .loginWithApple(request.identityToken())
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 

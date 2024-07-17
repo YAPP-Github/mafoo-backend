@@ -28,6 +28,7 @@ dependencies {
 // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
 	implementation("com.mysql:mysql-connector-j:8.4.0")
 
+
 	implementation("org.springframework:spring-jdbc")
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 	implementation("io.asyncer:r2dbc-mysql:1.1.0")
@@ -43,6 +44,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+	implementation("com.nimbusds:nimbus-jose-jwt:9.37.2")
 
 	implementation("io.projectreactor.tools:blockhound:1.0.9.RELEASE")
 	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
