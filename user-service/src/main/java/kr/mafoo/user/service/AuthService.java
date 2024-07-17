@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.JWK;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import kr.mafoo.user.config.properties.AppleOAuthProperties;
 import kr.mafoo.user.config.properties.KakaoOAuthProperties;
 import kr.mafoo.user.controller.dto.response.AppleKeyListResponse;
 import kr.mafoo.user.controller.dto.response.AppleKeyResponse;
@@ -35,6 +36,7 @@ public class AuthService {
     private final MemberService memberService;
     private final JWTTokenService jwtTokenService;
     private final KakaoOAuthProperties kakaoOAuthProperties;
+    private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
 
 
@@ -150,6 +152,12 @@ public class AuthService {
                     .verifyWith(pubKey)
                     .build()
                     .parseSignedClaims(identityToken);
+
+            String client = claims.getPayload().get("aud", String.class);
+            if (!client.equals(appleOAuthProperties.clientId())) {
+                throw new RuntimeException();
+            }
+
             return new AppleLoginInfo(claims.getPayload().get("sub", String.class));
         });
     }

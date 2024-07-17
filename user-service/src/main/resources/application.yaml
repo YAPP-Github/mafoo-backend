@@ -23,6 +23,8 @@ app:
       client-id: ${KAKAO_CLIENT_ID}
       client-secret: ${KAKAO_CLIENT_SECRET}
       redirect-uri: ${KAKAO_REDIRECT_URL}
+    apple:
+      client-id: ${APPLE_CLIENT_ID}
   jwt:
     verify-key: ${JWT_VERIFY_KEY}
     expiration:
