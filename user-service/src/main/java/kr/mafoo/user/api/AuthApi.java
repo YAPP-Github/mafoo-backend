@@ -2,6 +2,7 @@ package kr.mafoo.user.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.mafoo.user.controller.dto.request.AppleLoginRequest;
 import kr.mafoo.user.controller.dto.request.KakaoLoginRequest;
 import kr.mafoo.user.controller.dto.request.TokenRefreshRequest;
 import kr.mafoo.user.controller.dto.response.LoginResponse;
@@ -19,6 +20,12 @@ public interface AuthApi {
     @PostMapping("/login/kakao")
     Mono<LoginResponse> loginWithKakao(
             @RequestBody KakaoLoginRequest request
+    );
+
+    @Operation(summary = "애플 로그인" , description = "애플 인가 코드로 로그인(토큰 발행)합니다.")
+    @PostMapping("/login/apple")
+    Mono<LoginResponse> loginWithApple(
+            @RequestBody AppleLoginRequest request
     );
 
     @Operation(summary = "토큰 갱신", description = "리프레시 토큰으로 기존 토큰을 갱신합니다.")

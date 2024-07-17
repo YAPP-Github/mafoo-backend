@@ -35,6 +35,10 @@ public class AuthService {
                 ));
     }
 
+    public Mono<AuthToken> loginWithApple(String code) {
+        return Mono.empty();
+    }
+
     public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
         return Mono
                 .fromCallable(() -> jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
