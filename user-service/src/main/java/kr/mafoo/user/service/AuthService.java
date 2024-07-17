@@ -17,6 +17,7 @@ import kr.mafoo.user.domain.SocialMemberEntity;
 import kr.mafoo.user.enums.IdentityProvider;
 import kr.mafoo.user.exception.KakaoLoginFailedException;
 import kr.mafoo.user.repository.SocialMemberRepository;
+import kr.mafoo.user.util.NicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -57,7 +58,7 @@ public class AuthService {
                 .flatMap(appleLoginInfo -> getOrCreateMember(
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
-                        appleLoginInfo.id(),
+                        NicknameGenerator.generate(),
                         null
                 ));
     }
