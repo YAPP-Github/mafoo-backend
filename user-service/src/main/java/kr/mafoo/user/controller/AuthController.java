@@ -1,6 +1,7 @@
 package kr.mafoo.user.controller;
 
 import kr.mafoo.user.api.AuthApi;
+import kr.mafoo.user.controller.dto.request.AppleLoginRequest;
 import kr.mafoo.user.controller.dto.request.KakaoLoginRequest;
 import kr.mafoo.user.controller.dto.request.TokenRefreshRequest;
 import kr.mafoo.user.controller.dto.response.LoginResponse;
@@ -18,6 +19,13 @@ public class AuthController implements AuthApi {
     public Mono<LoginResponse> loginWithKakao(KakaoLoginRequest request) {
         return authService
                 .loginWithKakao(request.code())
+                .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
+    }
+
+    @Override
+    public Mono<LoginResponse> loginWithApple(AppleLoginRequest request) {
+        return authService
+                .loginWithApple(request.identityToken())
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 
