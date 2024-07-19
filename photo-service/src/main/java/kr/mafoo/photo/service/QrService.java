@@ -75,7 +75,10 @@ public class QrService {
                                 return getFileAsByte(imageUrl);
                             });
                 })
-                .onErrorMap(e -> new PhotoQrUrlExpiredException());
+                .onErrorMap(e -> {
+                    e.printStackTrace();
+                    return new PhotoQrUrlExpiredException();
+                });
     }
 
     private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
