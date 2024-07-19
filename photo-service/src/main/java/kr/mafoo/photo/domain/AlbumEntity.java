@@ -74,6 +74,11 @@ public class AlbumEntity implements Persistable<String> {
         return this;
     }
 
+    public AlbumEntity increasePhotoCount() {
+        this.photoCount += 1;
+        return this;
+    }
+
     public static AlbumEntity newAlbum(String albumId, String albumName, AlbumType albumType, String ownerMemberId) {
         AlbumEntity album = new AlbumEntity();
         album.albumId = albumId;
