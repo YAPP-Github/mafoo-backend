@@ -23,7 +23,7 @@ public record AlbumResponse(
                         entity.getAlbumId(),
                         entity.getName(),
                         entity.getType(),
-                        "0"
+                        entity.getPhotoCount().toString()
                 );
         }
 }

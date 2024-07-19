@@ -1,6 +1,5 @@
 package kr.mafoo.photo.service;
 
-import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
@@ -18,6 +17,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final AlbumRepository albumRepository;
 
+    private final AlbumService albumService;
     private final QrService qrService;
     private final ObjectStorageService objectStorageService;
 
@@ -77,7 +77,9 @@ public class PhotoService {
                                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                                         return Mono.error(new AlbumNotFoundException());
                                     } else {
-                                        return photoRepository.save(photoEntity.updateAlbumId(albumId));
+                                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                                                .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
+                                                .then(photoRepository.save(photoEntity.updateAlbumId(albumId)));
                                     }
                                 });
                     }
