@@ -42,9 +42,6 @@ public class AlbumEntity implements Persistable<String> {
     @Transient
     private boolean isNew = false;
 
-    @Transient
-    private long photoCount = 0;
-
     @Override
     public boolean equals(Object obj) {
        if (this == obj) return true;

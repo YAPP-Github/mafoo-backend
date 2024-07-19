@@ -16,14 +16,14 @@ public record AlbumResponse(
         AlbumType type,
 
         @Schema(description = "앨범 내 사진 수", example = "6")
-        Long photoCount
+        String photoCount
 ) {
         public static AlbumResponse fromEntity(AlbumEntity entity) {
                 return new AlbumResponse(
                         entity.getAlbumId(),
                         entity.getName(),
                         entity.getType(),
-                        entity.getPhotoCount()
+                        "0"
                 );
         }
 }
