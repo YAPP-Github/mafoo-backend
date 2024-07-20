@@ -33,6 +33,7 @@ public class QrService {
             case PHOTOISM -> createFileDto(brandType, getPhotoismFiles(qrUrl));
             case HARU_FILM -> createFileDto(brandType, getHaruFilmFiles(qrUrl));
             case DONT_LOOK_UP -> createFileDto(brandType, getDontLookUpFiles(qrUrl));
+            case MY_FOUR_CUT -> createFileDto(brandType, getMyFourCutFiles(qrUrl));
         };
     }
 
@@ -116,6 +117,10 @@ public class QrService {
                 .onErrorResume(
                         RedirectUriNotFoundException.class, e -> getFileAsByte(imageUrl)
                 );
+    }
+
+    private Mono<byte[]> getMyFourCutFiles(String qrUrl) {
+        return getFileAsByte(qrUrl);
     }
 
     private Mono<String> getRedirectUri(String url) {
