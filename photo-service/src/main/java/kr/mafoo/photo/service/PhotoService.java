@@ -55,7 +55,8 @@ public class PhotoService {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
-                        return photoRepository.deleteById(photoId);
+                        return photoRepository.deleteById(photoId)
+                                .then(albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId));
                     }
                 });
     }
