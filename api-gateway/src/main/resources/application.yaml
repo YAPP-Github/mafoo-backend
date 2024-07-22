@@ -39,6 +39,13 @@ spring:
           filters:
             - JWTAuthenticationFilter
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: photo-service-add-photo
+          uri: http://photo-service
+          predicates:
+            - Path=/photo/v1/photos
+            - Method=POST
+          filters:
+            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
         - id: photo-service
           uri: http://photo-service
           predicates:
