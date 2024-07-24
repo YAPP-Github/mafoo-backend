@@ -8,6 +8,7 @@ import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,6 +22,7 @@ public class PhotoService {
     private final QrService qrService;
     private final ObjectStorageService objectStorageService;
 
+    @Transactional
     public Mono<PhotoEntity> createNewPhoto(String qrUrl, String requestMemberId) {
         return qrService
                 .getFileFromQrUrl(qrUrl)
@@ -46,6 +48,7 @@ public class PhotoService {
                 });
     }
 
+    @Transactional
     public Mono<Void> deletePhotoById(String photoId, String requestMemberId) {
         return photoRepository
                 .findById(photoId)
@@ -61,6 +64,7 @@ public class PhotoService {
                 });
     }
 
+    @Transactional
     public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
         return photoRepository
                 .findById(photoId)
