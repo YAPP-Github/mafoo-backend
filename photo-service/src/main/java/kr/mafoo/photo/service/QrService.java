@@ -2,20 +2,12 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
-import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
-import kr.mafoo.photo.exception.RedirectUriNotFoundException;
 import kr.mafoo.photo.service.dto.FileDto;
-import kr.mafoo.photo.service.vendors.PhotoGrayQrVendor;
+import kr.mafoo.photo.service.vendors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -23,140 +15,31 @@ import java.util.Optional;
 @Service
 public class QrService {
 
-    private final WebClient externalWebClient;
-
+    private final LifeFourCutsQrVendor lifeFourCutsQrVendor;
+    private final PhotoismQrVendor photoismQrVendor;
+    private final DontLookUpQrVendor dontLookUpQrVendor;
+    private final HaruFilmQrVendor haruFilmQrVendor;
+    private final MyFourCutQrVendor myFourCutQrVendor;
     private final PhotoGrayQrVendor photoGrayQrVendor;
+
 
     public Mono<FileDto> getFileFromQrUrl(String qrUrl) {
         BrandType brandType = Optional.ofNullable(BrandType.matchBrandType(qrUrl))
                 .orElseThrow(PhotoBrandNotExistsException::new);
 
-        Mono<byte[]> imagePublisher = switch (brandType) {
-            case LIFE_FOUR_CUTS -> getLifeFourCutsFiles(qrUrl);
-            case PHOTOISM -> getPhotoismFiles(qrUrl);
-            case HARU_FILM -> getHaruFilmFiles(qrUrl);
-            case DONT_LOOK_UP -> getDontLookUpFiles(qrUrl);
-            case MY_FOUR_CUT -> getMyFourCutFiles(qrUrl);
-            case PHOTOGRAY -> photoGrayQrVendor.extractImageFromQrUrl(qrUrl);
+        QrVendor qrVendor = switch (brandType) {
+            case LIFE_FOUR_CUTS -> lifeFourCutsQrVendor;
+            case PHOTOISM -> photoismQrVendor;
+            case HARU_FILM -> haruFilmQrVendor;
+            case DONT_LOOK_UP -> dontLookUpQrVendor;
+            case MY_FOUR_CUT -> myFourCutQrVendor;
+            case PHOTOGRAY -> photoGrayQrVendor;
         };
 
-        return createFileDto(brandType, imagePublisher);
+        return createFileDto(brandType, qrVendor.extractImageFromQrUrl(qrUrl));
     }
 
     private Mono<FileDto> createFileDto(BrandType brandType, Mono<byte[]> fileMono) {
         return fileMono.map(file -> new FileDto(brandType, file));
     }
-
-    private Mono<byte[]> getLifeFourCutsFiles(String qrUrl) {
-
-        return getRedirectUri(qrUrl)
-                .flatMap(redirectUri -> {
-                    String imageUrl = extractValueFromUrl(redirectUri, "path=")[1].replace("index.html", "image.jpg");
-
-                    // TODO : 추후 비디오 URL 추가 예정
-                    // String videoUrl = redirectUri.toString().replace("index.html", "video.mp4");
-
-                    return getFileAsByte(imageUrl);
-                })
-                .onErrorMap(e -> new PhotoQrUrlExpiredException());
-    }
-
-    private Mono<byte[]> getPhotoismFiles(String qrUrl) {
-        return getRedirectUri(qrUrl)
-                .flatMap(redirectUri -> {
-                    String uid = extractValueFromUrl(redirectUri, "u=")[1];
-
-                    return externalWebClient
-                            .post()
-                            .uri("https://cmsapi.seobuk.kr/v1/etc/seq/resource")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(Map.of("uid", uid))
-                            .retrieve()
-                            .bodyToMono(LinkedHashMap.class)
-                            .flatMap(responseBody -> {
-                                LinkedHashMap<String, Object> content = (LinkedHashMap<String, Object>) responseBody.get("content");
-                                LinkedHashMap<String, Object> fileInfo = (LinkedHashMap<String, Object>) content.get("fileInfo");
-                                LinkedHashMap<String, Object> picFile = (LinkedHashMap<String, Object>) fileInfo.get("picFile");
-                                String imageUrl = (String) picFile.get("path");
-
-                                return getFileAsByte(imageUrl);
-                            });
-                })
-                .onErrorMap(e -> {
-                    e.printStackTrace();
-                    return new PhotoQrUrlExpiredException();
-                });
-    }
-
-    private Mono<byte[]> getHaruFilmFiles(String qrUrl) {
-        String[] urlValueList = extractValueFromUrl(qrUrl, "/@");
-        String albumCode = urlValueList[1];
-
-        String baseUrl = urlValueList[0] + "/base_api?command=albumdn&albumCode=";
-        String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
-
-        // TODO : 추후 비디오 URL 추가 예정
-        // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";
-
-        return getFileAsByte(imageUrl)
-                .onErrorMap(e -> new PhotoQrUrlExpiredException());
-    }
-
-    private Mono<byte[]> getDontLookUpFiles(String qrUrl) {
-        String imageName = extractValueFromUrl(qrUrl, ".kr/image/")[1];
-
-        String baseUrl = "https://x.dontlxxkup.kr/uploads/";
-        String imageUrl = baseUrl + imageName;
-
-        // TODO : 추후 비디오 URL 추가 예정
-        // String videoName = imageName.replace("image", "video").replace(".jpg", ".mp4");
-        // String videoUrl = baseUrl + videoName;
-
-        return getRedirectUri(qrUrl)
-                .flatMap(redirectUri -> {
-                    if (redirectUri.endsWith("/delete")) {
-                        return Mono.error(new PhotoQrUrlExpiredException());
-                    } else {
-                        return getFileAsByte(imageUrl);
-                    }
-                })
-                .onErrorResume(
-                        RedirectUriNotFoundException.class, e -> getFileAsByte(imageUrl)
-                );
-    }
-
-    private Mono<byte[]> getMyFourCutFiles(String qrUrl) {
-        return getFileAsByte(qrUrl);
-    }
-
-    private Mono<String> getRedirectUri(String url) {
-        return externalWebClient
-                .get()
-                .uri(url)
-                .retrieve()
-                .toBodilessEntity()
-                .flatMap(response -> {
-                    URI redirectUri = response.getHeaders().getLocation();
-                    if (redirectUri == null) {
-                        return Mono.error(new RedirectUriNotFoundException());
-                    } else {
-                        return Mono.just(redirectUri.toString());
-                    }
-                });
-    }
-
-    private String[] extractValueFromUrl(String url, String delimiter) {
-        return url.split(delimiter);
-    }
-
-    private Mono<byte[]> getFileAsByte(String url) {
-        return externalWebClient
-                .get()
-                .uri(url)
-                .accept(MediaType.APPLICATION_OCTET_STREAM)
-                .retrieve()
-                .bodyToMono(byte[].class);
-    }
-
-
 }
