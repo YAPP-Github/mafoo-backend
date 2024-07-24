@@ -6,6 +6,7 @@ import kr.mafoo.user.repository.MemberRepository;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
+    @Transactional
     public Mono<MemberEntity> createNewMember(String username, String profileImageUrl) {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
         return memberRepository.save(memberEntity);
