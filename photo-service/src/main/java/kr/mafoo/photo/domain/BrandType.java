@@ -8,6 +8,7 @@ public enum BrandType {
     HARU_FILM(Pattern.compile("http://haru\\d+\\.mx\\d+\\.co\\.kr/.*")),
     DONT_LOOK_UP(Pattern.compile("https://x\\.dontlxxkup\\.kr/.*")),
     MY_FOUR_CUT(Pattern.compile("https://firebasestorage\\.googleapis\\.com:443/v0/b/my4ccu\\.appspot\\.com/.*")),
+    PHOTOGRAY(Pattern.compile("https://pgshort\\.aprd\\.io/.*")),
     ;
 
     private final Pattern urlPattern;
