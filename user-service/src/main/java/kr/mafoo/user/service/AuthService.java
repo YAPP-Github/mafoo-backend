@@ -20,6 +20,7 @@ import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.util.NicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -40,7 +41,7 @@ public class AuthService {
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
 
-
+    @Transactional
     public Mono<AuthToken> loginWithKakao(String kakaoAccessToken) {
         return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
@@ -51,6 +52,7 @@ public class AuthService {
                 ));
     }
 
+    @Transactional
     public Mono<AuthToken> loginWithApple(String identityToken) {
         return getApplePublicKeys()
                 .flatMap(keyObj -> getUserInfoWithAppleAccessToken(keyObj.keys(), identityToken))
@@ -62,6 +64,7 @@ public class AuthService {
                 ));
     }
 
+    @Transactional
     public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
         return Mono
                 .fromCallable(() -> jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
