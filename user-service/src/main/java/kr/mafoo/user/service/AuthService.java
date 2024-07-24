@@ -41,9 +41,8 @@ public class AuthService {
     private final ObjectMapper objectMapper;
 
 
-    public Mono<AuthToken> loginWithKakao(String code) {
-        return getKakaoTokenWithCode(code)
-                .flatMap(this::getUserInfoWithKakaoToken)
+    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken) {
+        return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
