@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service.vendors;
 
+import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
 import kr.mafoo.photo.util.WebClientUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -26,7 +27,8 @@ public class PhotoGrayQrVendor implements QrVendor {
                     String sessionId = extractSessionIdFromQueryString(decodedStr);
                     String imageUrl = String.format("https://pg-qr-resource.aprd.io/%s/image.jpg", sessionId);
                     return WebClientUtil.getBlob(webClient, imageUrl);
-                }); //https://pg-qr-resource.aprd.io/{sessionId}/image.jpg
+                }) //https://pg-qr-resource.aprd.io/{sessionId}/image.jpg
+                .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 
     private String extractIdFromUrl(String url) {

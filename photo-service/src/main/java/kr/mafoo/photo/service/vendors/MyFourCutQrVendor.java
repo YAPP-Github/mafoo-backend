@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service.vendors;
 
+import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
 import kr.mafoo.photo.util.WebClientUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ public class MyFourCutQrVendor implements QrVendor {
 
     @Override
     public Mono<byte[]> extractImageFromQrUrl(String qrUrl) {
-        return WebClientUtil.getBlob(webClient, qrUrl); //just image url
+        return WebClientUtil
+                .getBlob(webClient, qrUrl) //just image url
+                .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 }
