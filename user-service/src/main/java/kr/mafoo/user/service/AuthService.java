@@ -41,11 +41,9 @@ public class AuthService {
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
 
-
     @Transactional
-    public Mono<AuthToken> loginWithKakao(String code) {
-        return getKakaoTokenWithCode(code)
-                .flatMap(this::getUserInfoWithKakaoToken)
+    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken) {
+        return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
