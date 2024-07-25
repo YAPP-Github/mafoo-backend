@@ -32,4 +32,12 @@ public class WebClientUtil {
                 .retrieve()
                 .bodyToMono(byte[].class);
     }
+
+    public static Mono<byte[]> getBlobByAnyMediaType(WebClient client, String url) {
+        return client
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(byte[].class);
+    }
 }

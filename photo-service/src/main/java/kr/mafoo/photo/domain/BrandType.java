@@ -9,6 +9,9 @@ public enum BrandType {
     DONT_LOOK_UP(Pattern.compile("https://x\\.dontlxxkup\\.kr/.*")),
     MY_FOUR_CUT(Pattern.compile("https://firebasestorage\\.googleapis\\.com:443/v0/b/my4ccu\\.appspot\\.com/.*")),
     PHOTOGRAY(Pattern.compile("https://pgshort\\.aprd\\.io/.*")),
+    MONOMANSION(Pattern.compile("https://monomansion\\.net/.*")),
+    PHOTO_SIGNATURE(Pattern.compile("http://photoqr3\\.kr/.*")),
+    PICDOT(Pattern.compile("https://picdot\\.kr/.*"))
     ;
 
     private final Pattern urlPattern;
