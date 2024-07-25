@@ -16,7 +16,7 @@ public class PhotoSignatureQrVendor implements QrVendor {
     public Mono<byte[]> extractImageFromQrUrl(String qrUrl) {
         String imageUrl = qrUrl.replace("index.html", "a.jpg");
         return WebClientUtil
-                .getBlob(webClient, imageUrl)
+                .getBlobByAnyMediaType(webClient, imageUrl)
                 .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 }
