@@ -7,10 +7,12 @@ import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PhotoService {
@@ -66,7 +68,8 @@ public class PhotoService {
                 .findById(photoId)
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
                 .flatMap(photoEntity -> {
-                    if (photoEntity.getOwnerMemberId() == null) {
+
+                    if (!hasOwnerId(photoEntity)) {
                         photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
                     }
 
@@ -89,6 +92,10 @@ public class PhotoService {
                                 });
                     }
                 });
+    }
+
+    private Boolean hasOwnerId(PhotoEntity photoEntity) {
+        return photoEntity.getOwnerMemberId() != null;
     }
 
 }
