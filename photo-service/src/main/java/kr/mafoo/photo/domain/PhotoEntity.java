@@ -62,6 +62,10 @@ public class PhotoEntity implements Persistable<String> {
         return photoId;
     }
 
+    public Boolean hasOwnerMemberId() {
+        return this.getOwnerMemberId() != null;
+    }
+
     public PhotoEntity updateOwnerMemberId(String ownerMemberId) {
         this.ownerMemberId = ownerMemberId;
         return this;

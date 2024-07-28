@@ -69,7 +69,7 @@ public class PhotoService {
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
                 .flatMap(photoEntity -> {
 
-                    if (!hasOwnerId(photoEntity)) {
+                    if (!photoEntity.hasOwnerMemberId()) {
                         photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
                     }
 
@@ -92,10 +92,6 @@ public class PhotoService {
                                 });
                     }
                 });
-    }
-
-    private Boolean hasOwnerId(PhotoEntity photoEntity) {
-        return photoEntity.getOwnerMemberId() != null;
     }
 
 }
