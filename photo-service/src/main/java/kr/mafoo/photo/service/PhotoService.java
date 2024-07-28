@@ -7,11 +7,13 @@ import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PhotoService {
@@ -39,7 +41,7 @@ public class PhotoService {
                 .findById(albumId)
                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                 .flatMapMany(albumEntity -> {
-                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                    if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
@@ -54,7 +56,7 @@ public class PhotoService {
                 .findById(photoId)
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
                 .flatMap(photoEntity -> {
-                    if(!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
+                    if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
@@ -70,7 +72,12 @@ public class PhotoService {
                 .findById(photoId)
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
                 .flatMap(photoEntity -> {
-                    if(!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
+
+                    if (!photoEntity.hasOwnerMemberId()) {
+                        photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
+                    }
+
+                    if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
@@ -78,7 +85,7 @@ public class PhotoService {
                                 .findById(albumId)
                                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                                 .flatMap(albumEntity -> {
-                                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                                    if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
                                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                                         return Mono.error(new AlbumNotFoundException());
                                     } else {
