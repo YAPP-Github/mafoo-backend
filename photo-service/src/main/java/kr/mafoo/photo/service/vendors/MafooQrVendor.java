@@ -12,12 +12,12 @@ import reactor.core.publisher.Mono;
 public class MafooQrVendor implements QrVendor {
     private final WebClient webClient;
     private final static String sampleImageUrl
-            = "https://kr.object.ncloudstorage.com/mafoo//c8dbdc0d-65d6-490b-ac68-c37d99d494bf";
+            = "https://i.ibb.co/VY7s8m1/c8dbdc0d-65d6-490b-ac68-c37d99d494bf.jpg";
 
     @Override
     public Mono<byte[]> extractImageFromQrUrl(String qrUrl) {
         return WebClientUtil
-                .getBlob(webClient, qrUrl) //just image url
+                .getBlobByAnyMediaType(webClient, sampleImageUrl) //just image url
                 .onErrorMap(e -> new PhotoQrUrlExpiredException());
     }
 }
