@@ -33,12 +33,6 @@ public class PhotoController implements PhotoApi {
             String memberId,
             PhotoCreateRequest request
     ){
-
-        // HACK : 프엔 응급 요청으로 더미 응답 추가했습니다. - 추후 삭제 예정
-        if (request.qrUrl().equals("https://mafoo.kr/")) {
-            return Mono.just(new PhotoResponse("id", "https://kr.object.ncloudstorage.com/mafoo//24c576bc-60b0-4e43-af9a-0c3311b97f35", LIFE_FOUR_CUTS, null));
-        }
-
         return photoService
                 .createNewPhoto(request.qrUrl(), memberId)
                 .map(PhotoResponse::fromEntity);

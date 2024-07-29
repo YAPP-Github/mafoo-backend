@@ -24,6 +24,7 @@ public class QrService {
     private final MonoMansionQrVendor monoMansionQrVendor;
     private final PhotoSignatureQrVendor photoSignatureQrVendor;
     private final PicDotQrVendor picDotQrVendor;
+    private final MafooQrVendor mafooQrVendor;
 
 
     public Mono<FileDto> getFileFromQrUrl(String qrUrl) {
@@ -40,6 +41,7 @@ public class QrService {
             case MONOMANSION -> monoMansionQrVendor;
             case PHOTO_SIGNATURE -> photoSignatureQrVendor;
             case PICDOT -> picDotQrVendor;
+            case MAFOO -> mafooQrVendor;
         };
 
         return createFileDto(brandType, qrVendor.extractImageFromQrUrl(qrUrl));
