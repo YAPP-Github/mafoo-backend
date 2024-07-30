@@ -11,7 +11,8 @@ public enum BrandType {
     PHOTOGRAY(Pattern.compile("https://pgshort\\.aprd\\.io/.*")),
     MONOMANSION(Pattern.compile("https://monomansion\\.net/.*")),
     PHOTO_SIGNATURE(Pattern.compile("http://photoqr3\\.kr/.*")),
-    PICDOT(Pattern.compile("https://picdot\\.kr/.*"))
+    PICDOT(Pattern.compile("https://picdot\\.kr/.*")),
+    MAFOO(Pattern.compile("https://mafoo\\.kr/.*"))
     ;
 
     private final Pattern urlPattern;
