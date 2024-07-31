@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: photo-service
+  r2dbc:
+    url: r2dbc:h2:mem:///test;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ''
+  flyway:
+    url: 'jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_DELAY=-1'
+    baseline-on-migrate: true
+    enabled: true
+    user: sa
+    password: ''
+
+app:
+  gateway:
+    endpoint: https://gateway.mafoo.kr
+
+cloud:
+  aws:
+    credentials:
+      access-key: ''
+      secret-key: ''
+    stack:
+      auto: false
+    region:
+      static: kr-standard
+    s3:
+      endpoint: https://kr.object.ncloudstorage.com
+      bucket: ''
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: false
+  zipkin:
+    tracing:
+      endpoint: http://zipkin/api/v2/spans
