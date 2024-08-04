@@ -18,7 +18,7 @@ public class AuthController implements AuthApi {
     @Override
     public Mono<LoginResponse> loginWithKakao(KakaoLoginRequest request) {
         return authService
-                .loginWithKakao(request.code())
+                .loginWithKakao(request.accessToken())
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 
