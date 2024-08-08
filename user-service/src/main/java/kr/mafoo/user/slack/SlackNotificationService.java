@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,36 @@ public class SlackNotificationService {
             ChatPostMessageRequest request = ChatPostMessageRequest
                     .builder()
                     .channel(errorChannel)
+                    .blocks(
+                            asBlocks(
+                                    divider(),
+                                    section(
+                                            section -> section.fields(textObjects)
+                                    )
+                            ))
+                    .build();
+
+            methods.chatPostMessage(request);
+        } catch (SlackApiException | IOException e) {
+            throw new RuntimeException("Can't send Slack Message.", e);
+        }
+    }
+
+    public void sendNewMemberNotification(String memberId, String memberName, LocalDateTime createdAt) {
+        try {
+            List<TextObject> textObjects = new ArrayList<>();
+
+            textObjects.add(markdownText(">*새로운 사용자가 가입했습니다!*\n"));
+            textObjects.add(markdownText("\n"));
+
+            textObjects.add(markdownText("*사용자 ID:* \n`" + memberId + "`\n"));
+            textObjects.add(markdownText("*사용자 이름:* \n`" + memberName + "`\n"));
+            textObjects.add(markdownText("*생성일자:* \n`" + createdAt + "`\n"));
+
+            MethodsClient methods = Slack.getInstance().methods(token);
+            ChatPostMessageRequest request = ChatPostMessageRequest
+                    .builder()
+                    .channel(memberChannel)
                     .blocks(
                             asBlocks(
                                     divider(),
