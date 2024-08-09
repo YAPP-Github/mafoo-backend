@@ -48,3 +48,4 @@ slack:
     token: ${SLACK_TOKEN}
     channel:
       error: ${SLACK_ERROR_CHANNEL}
+      member: ${SLACK_MEMBER_CHANNEL}
