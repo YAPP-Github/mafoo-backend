@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.security.Key;
@@ -42,25 +43,27 @@ public class AuthService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken) {
+    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, ServerWebExchange exchange) {
         return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
                         kakaoLoginInfo.nickname(),
-                        kakaoLoginInfo.profileImageUrl()
+                        kakaoLoginInfo.profileImageUrl(),
+                        exchange
                 ));
     }
 
     @Transactional
-    public Mono<AuthToken> loginWithApple(String identityToken) {
+    public Mono<AuthToken> loginWithApple(String identityToken, ServerWebExchange exchange) {
         return getApplePublicKeys()
                 .flatMap(keyObj -> getUserInfoWithAppleAccessToken(keyObj.keys(), identityToken))
                 .flatMap(appleLoginInfo -> getOrCreateMember(
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
                         NicknameGenerator.generate(),
-                        null
+                        null,
+                        exchange
                 ));
     }
 
@@ -75,10 +78,10 @@ public class AuthService {
                 });
     }
 
-    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl, ServerWebExchange exchange) {
         return socialMemberRepository
                 .findByIdentityProviderAndId(provider, id)
-                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl))
+                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl, exchange))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
                     String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
@@ -86,9 +89,9 @@ public class AuthService {
                 });
     }
 
-    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl, ServerWebExchange exchange) {
         return memberService
-                .createNewMember(username, profileImageUrl)
+                .createNewMember(username, profileImageUrl, exchange)
                 .flatMap(newMember -> socialMemberRepository.save(
                         SocialMemberEntity.newSocialMember(provider, id, newMember.getId())
                 ));

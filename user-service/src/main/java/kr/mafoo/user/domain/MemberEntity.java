@@ -3,7 +3,6 @@ package kr.mafoo.user.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
@@ -24,7 +23,6 @@ public class MemberEntity implements Persistable<String> {
     @Column("name")
     private String name;
 
-    @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
 
@@ -54,6 +52,7 @@ public class MemberEntity implements Persistable<String> {
         member.id = id;
         member.name = name;
         member.profileImageUrl = profileImageUrl;
+        member.createdAt = LocalDateTime.now();
         member.isNew = true;
         return member;
     }
