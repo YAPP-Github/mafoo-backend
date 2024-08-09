@@ -3,7 +3,6 @@ package kr.mafoo.user.service;
 import kr.mafoo.user.domain.MemberEntity;
 import kr.mafoo.user.exception.MemberNotFoundException;
 import kr.mafoo.user.repository.MemberRepository;
-import kr.mafoo.user.slack.SlackNotificationService;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final SlackNotificationService slackNotificationService;
+    private final SlackService slackService;
 
     public Mono<Void> quitMemberByMemberId(String memberId) {
         return memberRepository.deleteMemberById(memberId);
@@ -35,7 +34,7 @@ public class MemberService {
 
         return memberRepository.save(memberEntity)
                 .flatMap(savedMember ->
-                        slackNotificationService.sendNewMemberNotification(
+                        slackService.sendNewMemberNotification(
                                 memberEntity.getId(),
                                 memberEntity.getName(),
                                 memberEntity.getProfileImageUrl(),

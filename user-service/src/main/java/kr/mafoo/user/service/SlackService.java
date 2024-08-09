@@ -1,4 +1,4 @@
-package kr.mafoo.user.slack;
+package kr.mafoo.user.service;
 
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -23,7 +23,7 @@ import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 
 @Service
 @RequiredArgsConstructor
-public class SlackNotificationService {
+public class SlackService {
 
     @Value(value = "${slack.webhook.channel.error}")
     private String errorChannel;
