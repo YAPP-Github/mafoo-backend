@@ -5,6 +5,7 @@ import kr.mafoo.user.controller.dto.request.AppleLoginRequest;
 import kr.mafoo.user.controller.dto.request.KakaoLoginRequest;
 import kr.mafoo.user.controller.dto.request.TokenRefreshRequest;
 import kr.mafoo.user.controller.dto.response.LoginResponse;
+import kr.mafoo.user.domain.AuthToken;
 import kr.mafoo.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class AuthController implements AuthApi {
         String userAgent = getUserAgent(exchange);
         return authService
                 .loginWithKakao(request.accessToken(), userAgent)
-                .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
+                .map(this::toLoginResponse);
     }
 
     @Override
@@ -29,17 +30,22 @@ public class AuthController implements AuthApi {
         String userAgent = getUserAgent(exchange);
         return authService
                 .loginWithApple(request.identityToken(), userAgent)
-                .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
+                .map(this::toLoginResponse);
     }
 
     @Override
     public Mono<LoginResponse> loginWithRefreshToken(TokenRefreshRequest request) {
         return authService
                 .loginWithRefreshToken(request.refreshToken())
-                .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
+                .map(this::toLoginResponse);
     }
 
     private String getUserAgent(ServerWebExchange exchange) {
         return exchange.getRequest().getHeaders().getFirst("User-Agent");
     }
+
+    private LoginResponse toLoginResponse(AuthToken authToken) {
+        return new LoginResponse(authToken.accessToken(), authToken.refreshToken());
+    }
+
 }
