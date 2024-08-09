@@ -7,6 +7,7 @@ import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 public class AlbumService {
     private final AlbumRepository albumRepository;
 
+    @Transactional
     public Mono<AlbumEntity> createNewAlbum(String ownerMemberId, String albumName, AlbumType albumType) {
         AlbumEntity albumEntity = AlbumEntity.newAlbum(IdGenerator.generate(), albumName, albumType, ownerMemberId);
         return albumRepository.save(albumEntity);
@@ -38,6 +40,7 @@ public class AlbumService {
                 });
     }
 
+    @Transactional
     public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
@@ -52,6 +55,7 @@ public class AlbumService {
                 });
     }
 
+    @Transactional
     public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
@@ -66,6 +70,7 @@ public class AlbumService {
                 });
     }
 
+    @Transactional
     public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
@@ -80,6 +85,7 @@ public class AlbumService {
                 });
     }
 
+    @Transactional
     public Mono<Void> increaseAlbumPhotoCount(String albumId, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
@@ -94,6 +100,7 @@ public class AlbumService {
                 });
     }
 
+    @Transactional
     public Mono<Void> decreaseAlbumPhotoCount(String albumId, String requestMemberId) {
 
         if (albumId == null) {

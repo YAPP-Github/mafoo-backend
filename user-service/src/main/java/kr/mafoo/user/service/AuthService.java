@@ -20,10 +20,10 @@ import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.util.NicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.security.Key;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
@@ -40,29 +40,32 @@ public class AuthService {
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
 
-
-    public Mono<AuthToken> loginWithKakao(String code) {
-        return getKakaoTokenWithCode(code)
-                .flatMap(this::getUserInfoWithKakaoToken)
+    @Transactional
+    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, String userAgent) {
+        return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
                         kakaoLoginInfo.nickname(),
-                        kakaoLoginInfo.profileImageUrl()
+                        kakaoLoginInfo.profileImageUrl(),
+                        userAgent
                 ));
     }
 
-    public Mono<AuthToken> loginWithApple(String identityToken) {
+    @Transactional
+    public Mono<AuthToken> loginWithApple(String identityToken, String userAgent) {
         return getApplePublicKeys()
                 .flatMap(keyObj -> getUserInfoWithAppleAccessToken(keyObj.keys(), identityToken))
                 .flatMap(appleLoginInfo -> getOrCreateMember(
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
                         NicknameGenerator.generate(),
-                        null
+                        null,
+                        userAgent
                 ));
     }
 
+    @Transactional
     public Mono<AuthToken> loginWithRefreshToken(String refreshToken){
         return Mono
                 .fromCallable(() -> jwtTokenService.extractUserIdFromRefreshToken(refreshToken))
@@ -73,10 +76,10 @@ public class AuthService {
                 });
     }
 
-    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return socialMemberRepository
                 .findByIdentityProviderAndId(provider, id)
-                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl))
+                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl, userAgent))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
                     String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
@@ -84,9 +87,9 @@ public class AuthService {
                 });
     }
 
-    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return memberService
-                .createNewMember(username, profileImageUrl)
+                .createNewMember(username, profileImageUrl, userAgent)
                 .flatMap(newMember -> socialMemberRepository.save(
                         SocialMemberEntity.newSocialMember(provider, id, newMember.getId())
                 ));

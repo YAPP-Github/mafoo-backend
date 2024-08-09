@@ -5,13 +5,17 @@ import kr.mafoo.user.exception.MemberNotFoundException;
 import kr.mafoo.user.repository.MemberRepository;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final SlackService slackService;
 
     public Mono<Void> quitMemberByMemberId(String memberId) {
         return memberRepository.deleteMemberById(memberId);
@@ -23,8 +27,20 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
-    public Mono<MemberEntity> createNewMember(String username, String profileImageUrl) {
+    @Transactional
+    public Mono<MemberEntity> createNewMember(String username, String profileImageUrl, String userAgent) {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
-        return memberRepository.save(memberEntity);
+
+        return memberRepository.save(memberEntity)
+                .flatMap(savedMember ->
+                        slackService.sendNewMemberNotification(
+                                memberEntity.getId(),
+                                memberEntity.getName(),
+                                memberEntity.getProfileImageUrl(),
+                                memberEntity.getCreatedAt().toString(),
+                                userAgent
+                        )
+                        .then(Mono.just(savedMember))
+                );
     }
 }

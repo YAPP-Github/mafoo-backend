@@ -6,6 +6,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @EnableWebFlux
 @Configuration
@@ -17,7 +18,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Bean("externalWebClient")
     public WebClient externalServiceWebClient() {
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         return WebClient.builder()
+                .uriBuilderFactory(factory)
                 .codecs(clientCodecConfigurer -> {
                     clientCodecConfigurer
                             .defaultCodecs()
