@@ -18,15 +18,17 @@ public class AuthController implements AuthApi {
 
     @Override
     public Mono<LoginResponse> loginWithKakao(KakaoLoginRequest request, ServerWebExchange exchange) {
+        String userAgent = getUserAgent(exchange);
         return authService
-                .loginWithKakao(request.accessToken(), exchange.getRequest().getHeaders().getFirst("User-Agent"))
+                .loginWithKakao(request.accessToken(), userAgent)
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 
     @Override
     public Mono<LoginResponse> loginWithApple(AppleLoginRequest request, ServerWebExchange exchange) {
+        String userAgent = getUserAgent(exchange);
         return authService
-                .loginWithApple(request.identityToken(), exchange.getRequest().getHeaders().getFirst("User-Agent"))
+                .loginWithApple(request.identityToken(), userAgent)
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 
@@ -35,5 +37,9 @@ public class AuthController implements AuthApi {
         return authService
                 .loginWithRefreshToken(request.refreshToken())
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
+    }
+
+    private String getUserAgent(ServerWebExchange exchange) {
+        return exchange.getRequest().getHeaders().getFirst("User-Agent");
     }
 }
