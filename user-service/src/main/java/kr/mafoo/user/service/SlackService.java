@@ -96,10 +96,9 @@ public class SlackService {
                                     section -> section.fields(List.of(userProfileImageMarkdown, userCreatedAtMarkdown))));
 
                     String userAgent = exchange.getRequest().getHeaders().getFirst("User-Agent");
-                    String deviceInfo = extractDeviceInfo(userAgent);
 
                     MarkdownTextObject userUserAgentMarkdown =
-                            MarkdownTextObject.builder().text("`가입 환경`\n" + deviceInfo).build();
+                            MarkdownTextObject.builder().text("`가입 환경`\n" + userAgent).build();
 
                     layoutBlocks.add(
                             section(
@@ -116,28 +115,6 @@ public class SlackService {
                     return methodsClient.chatPostMessage(chatPostMessageRequest);
                 })
                 .then();
-    }
-
-    // 기기 정보를 추출하는 메소드
-    private String extractDeviceInfo(String userAgent) {
-        if (userAgent == null) {
-            return "Unknown device";
-        }
-        userAgent = userAgent.toLowerCase();
-
-        if (userAgent.contains("windows")) {
-            return "Windows PC";
-        } else if (userAgent.contains("mac")) {
-            return "Mac";
-        } else if (userAgent.contains("android")) {
-            return "Android Device";
-        } else if (userAgent.contains("iphone") || userAgent.contains("ipad")) {
-            return "iOS Device";
-        } else if (userAgent.contains("linux")) {
-            return "Linux";
-        } else {
-            return "Unknown device";
-        }
     }
 
 }
