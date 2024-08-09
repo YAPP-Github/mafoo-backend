@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.security.Key;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Base64;
@@ -42,25 +41,27 @@ public class AuthService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken) {
+    public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, String userAgent) {
         return getUserInfoWithKakaoToken(kakaoAccessToken)
                 .flatMap(kakaoLoginInfo -> getOrCreateMember(
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
                         kakaoLoginInfo.nickname(),
-                        kakaoLoginInfo.profileImageUrl()
+                        kakaoLoginInfo.profileImageUrl(),
+                        userAgent
                 ));
     }
 
     @Transactional
-    public Mono<AuthToken> loginWithApple(String identityToken) {
+    public Mono<AuthToken> loginWithApple(String identityToken, String userAgent) {
         return getApplePublicKeys()
                 .flatMap(keyObj -> getUserInfoWithAppleAccessToken(keyObj.keys(), identityToken))
                 .flatMap(appleLoginInfo -> getOrCreateMember(
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
                         NicknameGenerator.generate(),
-                        null
+                        null,
+                        userAgent
                 ));
     }
 
@@ -75,10 +76,10 @@ public class AuthService {
                 });
     }
 
-    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return socialMemberRepository
                 .findByIdentityProviderAndId(provider, id)
-                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl))
+                .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl, userAgent))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
                     String refreshToken = jwtTokenService.generateRefreshToken(socialMember.getMemberId());
@@ -86,9 +87,9 @@ public class AuthService {
                 });
     }
 
-    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl) {
+    private Mono<SocialMemberEntity> createNewSocialMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return memberService
-                .createNewMember(username, profileImageUrl)
+                .createNewMember(username, profileImageUrl, userAgent)
                 .flatMap(newMember -> socialMemberRepository.save(
                         SocialMemberEntity.newSocialMember(provider, id, newMember.getId())
                 ));
