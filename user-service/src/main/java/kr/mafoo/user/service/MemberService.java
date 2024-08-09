@@ -6,9 +6,11 @@ import kr.mafoo.user.repository.MemberRepository;
 import kr.mafoo.user.slack.SlackNotificationService;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberService {
@@ -28,8 +30,15 @@ public class MemberService {
     public Mono<MemberEntity> createNewMember(String username, String profileImageUrl) {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
 
-        slackNotificationService.sendNewMemberNotification(memberEntity.getId(), memberEntity.getName(), memberEntity.getCreatedAt());
-
-        return memberRepository.save(memberEntity);
+        return memberRepository.save(memberEntity)
+                .flatMap(savedMember ->
+                        slackNotificationService.sendNewMemberNotification(
+                                memberEntity.getId(),
+                                memberEntity.getName(),
+                                memberEntity.getProfileImageUrl(),
+                                memberEntity.getCreatedAt().toString()
+                        )
+                        .then(Mono.just(savedMember))
+                );
     }
 }
