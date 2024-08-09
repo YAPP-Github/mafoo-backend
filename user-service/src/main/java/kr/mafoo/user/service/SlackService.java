@@ -10,7 +10,6 @@ import com.slack.api.model.block.composition.TextObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class SlackService {
         }
     }
 
-    public Mono<Void> sendNewMemberNotification(String memberId, String memberName, String memberProfileImageUrl, String memberCreatedAt, ServerWebExchange exchange) {
+    public Mono<Void> sendNewMemberNotification(String memberId, String memberName, String memberProfileImageUrl, String memberCreatedAt, String userAgent) {
         return Mono.fromCallable(() -> {
                     List<LayoutBlock> layoutBlocks = new ArrayList<>();
 
@@ -94,8 +93,6 @@ public class SlackService {
                     layoutBlocks.add(
                             section(
                                     section -> section.fields(List.of(userProfileImageMarkdown, userCreatedAtMarkdown))));
-
-                    String userAgent = exchange.getRequest().getHeaders().getFirst("User-Agent");
 
                     MarkdownTextObject userUserAgentMarkdown =
                             MarkdownTextObject.builder().text("`가입 환경`\n" + userAgent).build();
