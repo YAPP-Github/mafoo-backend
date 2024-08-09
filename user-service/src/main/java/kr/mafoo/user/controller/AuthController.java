@@ -8,6 +8,7 @@ import kr.mafoo.user.controller.dto.response.LoginResponse;
 import kr.mafoo.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -16,16 +17,16 @@ public class AuthController implements AuthApi {
     private final AuthService authService;
 
     @Override
-    public Mono<LoginResponse> loginWithKakao(KakaoLoginRequest request) {
+    public Mono<LoginResponse> loginWithKakao(KakaoLoginRequest request, ServerWebExchange exchange) {
         return authService
-                .loginWithKakao(request.code())
+                .loginWithKakao(request.code(), exchange)
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 
     @Override
-    public Mono<LoginResponse> loginWithApple(AppleLoginRequest request) {
+    public Mono<LoginResponse> loginWithApple(AppleLoginRequest request, ServerWebExchange exchange) {
         return authService
-                .loginWithApple(request.identityToken())
+                .loginWithApple(request.identityToken(), exchange)
                 .map(authToken -> new LoginResponse(authToken.accessToken(), authToken.refreshToken()));
     }
 

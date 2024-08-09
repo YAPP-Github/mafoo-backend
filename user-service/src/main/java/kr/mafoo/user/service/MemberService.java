@@ -8,6 +8,7 @@ import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
-    public Mono<MemberEntity> createNewMember(String username, String profileImageUrl) {
+    public Mono<MemberEntity> createNewMember(String username, String profileImageUrl, ServerWebExchange exchange) {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
 
         return memberRepository.save(memberEntity)
@@ -36,7 +37,8 @@ public class MemberService {
                                 memberEntity.getId(),
                                 memberEntity.getName(),
                                 memberEntity.getProfileImageUrl(),
-                                memberEntity.getCreatedAt().toString()
+                                memberEntity.getCreatedAt().toString(),
+                                exchange
                         )
                         .then(Mono.just(savedMember))
                 );
