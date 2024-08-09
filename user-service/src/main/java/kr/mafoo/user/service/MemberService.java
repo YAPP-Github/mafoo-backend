@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -28,6 +29,7 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
+    @Transactional
     public Mono<MemberEntity> createNewMember(String username, String profileImageUrl, ServerWebExchange exchange) {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
 
