@@ -18,7 +18,7 @@ import static com.slack.api.model.block.composition.BlockCompositions.markdownTe
 
 @Service
 @RequiredArgsConstructor
-public class SlackNotificationService {
+public class SlackService {
 
     @Value(value = "${slack.webhook.token}")
     private String token;
