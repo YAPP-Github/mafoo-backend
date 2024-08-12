@@ -1,6 +1,6 @@
 package kr.mafoo.photo.handler;
 
-import kr.mafoo.photo.slack.SlackNotificationService;
+import kr.mafoo.photo.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import java.net.InetSocketAddress;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private final SlackNotificationService slackNotificationService;
+    private final SlackService slackNotificationService;
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<String>> handleException(ServerWebExchange exchange, Exception ex) {

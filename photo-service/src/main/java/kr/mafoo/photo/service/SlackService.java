@@ -1,4 +1,4 @@
-package kr.mafoo.photo.slack;
+package kr.mafoo.photo.service;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
