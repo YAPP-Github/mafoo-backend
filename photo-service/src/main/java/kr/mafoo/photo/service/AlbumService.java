@@ -48,7 +48,7 @@ public class AlbumService {
     }
 
     public Flux<AlbumEntity> findAllByOwnerMemberId(String ownerMemberId) {
-        return albumRepository.findAllByOwnerMemberId(ownerMemberId);
+        return albumRepository.findAllByOwnerMemberIdOrderByDisplayIndex(ownerMemberId);
     }
 
     public Mono<AlbumEntity> findByAlbumId(String albumId, String requestMemberId) {
