@@ -6,7 +6,7 @@ WITH RankedAlbums AS (
     SELECT
         id,
         owner_member_id,
-        ROW_NUMBER() OVER (PARTITION BY owner_member_id ORDER BY created_at) - 1 AS new_index
+        ROW_NUMBER() OVER (PARTITION BY owner_member_id ORDER BY created_at DESC) - 1 AS new_index
     FROM album
 )
 UPDATE album
