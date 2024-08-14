@@ -19,7 +19,9 @@ public class AlbumService {
     @Transactional
     public Mono<AlbumEntity> createNewAlbum(String ownerMemberId, String albumName, AlbumType albumType) {
         AlbumEntity albumEntity = AlbumEntity.newAlbum(IdGenerator.generate(), albumName, albumType, ownerMemberId);
-        return albumRepository.save(albumEntity);
+        return albumRepository
+                .pushDisplayIndex(ownerMemberId) //전부 인덱스 한칸 밀기
+                .then(albumRepository.save(albumEntity));
     }
 
     public Flux<AlbumEntity> findAllByOwnerMemberId(String ownerMemberId) {

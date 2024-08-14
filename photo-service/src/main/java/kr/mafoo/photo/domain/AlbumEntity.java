@@ -95,6 +95,7 @@ public class AlbumEntity implements Persistable<String> {
         album.ownerMemberId = ownerMemberId;
         album.isNew = true;
         album.photoCount = 0;
+        album.displayIndex = 0L;
         return album;
     }
 }
