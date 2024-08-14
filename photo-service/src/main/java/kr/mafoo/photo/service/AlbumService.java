@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.exception.AlbumIndexIsSameException;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.util.IdGenerator;
@@ -22,6 +23,28 @@ public class AlbumService {
         return albumRepository
                 .pushDisplayIndex(ownerMemberId) //전부 인덱스 한칸 밀기
                 .then(albumRepository.save(albumEntity));
+    }
+
+    @Transactional
+    public Mono<AlbumEntity> moveAlbumDisplayIndex(String albumId, String requestMemberId, Long displayIndex) {
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(album -> {
+                    Long currentDisplayIndex = album.getDisplayIndex();
+                    Mono<Void> pushAlbumIndexPublisher;
+                    if(displayIndex < currentDisplayIndex) {
+                        pushAlbumIndexPublisher = albumRepository
+                                .pushDisplayIndexBetween(requestMemberId, displayIndex, currentDisplayIndex -1);
+                    } else if(displayIndex > currentDisplayIndex) {
+                        pushAlbumIndexPublisher = albumRepository
+                                .popDisplayIndexBetween(requestMemberId, currentDisplayIndex + 1, displayIndex);
+                    } else {
+                        pushAlbumIndexPublisher = Mono.error(new AlbumIndexIsSameException());
+                    }
+                    return pushAlbumIndexPublisher.then(Mono.defer(() -> {
+                        album.setDisplayIndex(displayIndex);
+                        return albumRepository.save(album);
+                    }));
+                });
     }
 
     public Flux<AlbumEntity> findAllByOwnerMemberId(String ownerMemberId) {

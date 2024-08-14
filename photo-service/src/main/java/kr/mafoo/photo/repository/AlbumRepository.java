@@ -13,4 +13,14 @@ public interface AlbumRepository extends R2dbcRepository<AlbumEntity, String> {
     @Modifying
     @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId")
     Mono<Void> pushDisplayIndex(String ownerMemberId);
+
+    @Modifying
+    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId " +
+            "AND display_index BETWEEN :startIndex AND :lastIndex")
+    Mono<Void> pushDisplayIndexBetween(String ownerMemberId, Long startIndex, Long lastIndex);
+
+    @Modifying
+    @Query("UPDATE album SET display_index = display_index -1 WHERE owner_member_id = :ownerMemberId " +
+            "AND display_index BETWEEN :startIndex AND :lastIndex")
+    Mono<Void> popDisplayIndexBetween(String ownerMemberId, Long startIndex, Long lastIndex);
 }
