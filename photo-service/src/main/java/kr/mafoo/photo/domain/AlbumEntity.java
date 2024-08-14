@@ -34,6 +34,9 @@ public class AlbumEntity implements Persistable<String> {
     @Column("owner_member_id")
     private String ownerMemberId;
 
+    @Column("display_index")
+    private Long displayIndex;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
