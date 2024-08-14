@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import org.springframework.validation.annotation.Validated;
@@ -62,6 +63,22 @@ public interface AlbumApi {
             @Valid
             @RequestBody
             AlbumUpdateRequest request
+    );
+
+    @Operation(summary = "앨범 표기 순서 변경", description = "앨범의 표기 순서를 변경합니다.")
+    @PatchMapping("/{albumId}/display-index")
+    Mono<AlbumResponse> updateAlbumDisplayIndex(
+            @RequestMemberId
+            String memberId,
+
+            @ULID
+            @Parameter(description = "앨범 ID", example = "test_album_id")
+            @PathVariable
+            String albumId,
+
+            @Valid
+            @RequestBody
+            AlbumUpdateDisplayIndexRequest request
     );
 
     @Operation(summary = "앨범 삭제", description = "앨범을 삭제합니다.")

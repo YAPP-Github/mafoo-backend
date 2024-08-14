@@ -2,6 +2,7 @@ package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import kr.mafoo.photo.domain.AlbumType;
@@ -52,6 +53,13 @@ public class AlbumController implements AlbumApi {
         return albumService
                 .updateAlbumName(albumId, request.name(), memberId)
                 .then(albumService.updateAlbumType(albumId, albumType, memberId))
+                .map(AlbumResponse::fromEntity);
+    }
+
+    @Override
+    public Mono<AlbumResponse> updateAlbumDisplayIndex(String memberId, String albumId, AlbumUpdateDisplayIndexRequest request) {
+        return albumService
+                .moveAlbumDisplayIndex(albumId, memberId, request.newDisplayIndex())
                 .map(AlbumResponse::fromEntity);
     }
 
