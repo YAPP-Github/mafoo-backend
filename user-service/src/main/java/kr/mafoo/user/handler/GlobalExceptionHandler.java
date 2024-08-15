@@ -1,6 +1,6 @@
 package kr.mafoo.user.handler;
 
-import kr.mafoo.user.slack.SlackNotificationService;
+import kr.mafoo.user.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,11 @@ import java.net.InetSocketAddress;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    private final SlackNotificationService slackNotificationService;
+    private final SlackService slackService;
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<String>> handleException(ServerWebExchange exchange, Exception ex) {
+        String method = exchange.getRequest().getMethod().toString();
         String userAgent = exchange.getRequest().getHeaders().getFirst("User-Agent");
         String proxyIp = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
         InetSocketAddress address = exchange.getRequest().getRemoteAddress();
@@ -28,17 +29,16 @@ public class GlobalExceptionHandler {
         String fullPath = exchange.getRequest().getURI().getPath() +
                 (exchange.getRequest().getURI().getQuery() != null ? "?" + exchange.getRequest().getURI().getQuery() : "");
 
-        logger.error("Exception occurred: {} {} {} ERROR {} {}", exchange.getRequest().getMethod(), fullPath, originIp, ex.getMessage(), userAgent);
+        logger.error("Exception occurred: {} {} {} ERROR {} {}", method, fullPath, originIp, ex.getMessage(), userAgent);
 
-        slackNotificationService.sendErrorNotification(
-                ex,
-                exchange.getRequest().getMethod().toString(),
-                exchange.getRequest().getURI().toString(),
-                HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-                System.currentTimeMillis(), // or appropriate execution time
-                exchange.getRequest().getHeaders().getFirst("User-Agent")
+        return slackService.sendErrorNotification(
+                method,
+                fullPath,
+                originIp,
+                userAgent,
+                ex.getMessage()
+        ).then(
+                Mono.just(new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR))
         );
-
-        return Mono.just(new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }
