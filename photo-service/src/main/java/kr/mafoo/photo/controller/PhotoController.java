@@ -54,12 +54,9 @@ public class PhotoController implements PhotoApi {
             String memberId,
             PhotoListUpdateAlbumIdRequest request
     ){
-        return Flux.fromArray(request.photoIdList())
-                .flatMap(photoId ->
-                        photoService
-                                .updatePhotoAlbumId(photoId, request.albumId(), memberId)
-                                .map(PhotoResponse::fromEntity)
-                );
+        return photoService
+                .updatePhotoListAlbumId(request.photoIdList(), request.albumId(), memberId)
+                .map(PhotoResponse::fromEntity);
     }
 
 
