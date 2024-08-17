@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
+import kr.mafoo.photo.controller.dto.request.PhotoListUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +42,7 @@ public interface PhotoApi {
             PhotoCreateRequest request
     );
 
-    @Operation(summary = "사진 앨범 수정", description = "사진을 다른 앨범으로 이동시킵니다.")
+    @Operation(summary = "사진 앨범 단건 수정", description = "사진 한 개를 다른 앨범으로 이동시킵니다.")
     @PatchMapping("/{photoId}/album")
     Mono<PhotoResponse> updatePhotoAlbum(
             @RequestMemberId
@@ -55,6 +56,17 @@ public interface PhotoApi {
             @Valid
             @RequestBody
             PhotoUpdateAlbumIdRequest request
+    );
+
+    @Operation(summary = "사진 앨범 n건 수정", description = "사진 여러 개를 다른 앨범으로 이동시킵니다.")
+    @PatchMapping("/album")
+    Flux<PhotoResponse> updatePhotoListAlbum(
+            @RequestMemberId
+            String memberId,
+
+            @Valid
+            @RequestBody
+            PhotoListUpdateAlbumIdRequest request
     );
 
     @Operation(summary = "사진 삭제", description = "사진을 삭제합니다.")
