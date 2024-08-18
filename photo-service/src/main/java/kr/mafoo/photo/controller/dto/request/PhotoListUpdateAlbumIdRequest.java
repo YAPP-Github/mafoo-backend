@@ -7,7 +7,7 @@ import kr.mafoo.photo.annotation.ULID;
 public record PhotoListUpdateAlbumIdRequest(
 
         @Schema(description = "사진 ID 목록")
-        String[] photoIdList,
+        String[] photoIds,
 
         @ULID
         @Schema(description = "앨범 ID", example = "test_album_id")
