@@ -2,7 +2,7 @@ package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.PhotoApi;
 import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoListUpdateAlbumIdRequest;
+import kr.mafoo.photo.controller.dto.request.PhotoBulkUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import kr.mafoo.photo.service.PhotoService;
@@ -50,12 +50,12 @@ public class PhotoController implements PhotoApi {
     }
 
     @Override
-    public Flux<PhotoResponse> updatePhotoListAlbum(
+    public Flux<PhotoResponse> updatePhotoBulkAlbum(
             String memberId,
-            PhotoListUpdateAlbumIdRequest request
+            PhotoBulkUpdateAlbumIdRequest request
     ){
         return photoService
-                .updatePhotoListAlbumId(request.photoIdList(), request.albumId(), memberId)
+                .updatePhotoBulkAlbumId(request.photoIds(), request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 

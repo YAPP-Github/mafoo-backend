@@ -67,7 +67,7 @@ public class PhotoService {
     }
 
     @Transactional
-    public Flux<PhotoEntity> updatePhotoListAlbumId(String[] photoIds, String albumId, String requestMemberId) {
+    public Flux<PhotoEntity> updatePhotoBulkAlbumId(String[] photoIds, String albumId, String requestMemberId) {
         return Flux.fromArray(photoIds)
                 .flatMap(photoId ->
                         this.updatePhotoAlbumId(photoId, albumId, requestMemberId)
