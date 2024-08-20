@@ -13,4 +13,12 @@ public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
     @Modifying
     @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex")
     Mono<Void> popDisplayIndexGreaterThan(String albumId, int startIndex);
+
+    @Modifying
+    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex")
+    Mono<Void> popDisplayIndexBetween(String albumId, int startIndex, int endIndex);
+
+    @Modifying
+    @Query("UPDATE photo SET display_index = display_index + 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex")
+    Mono<Void> pushDisplayIndexBetween(String albumId, int startIndex, int endIndex);
 }

@@ -104,4 +104,27 @@ public class PhotoService {
                 });
     }
 
+    @Transactional
+    public Mono<PhotoEntity> updatePhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
+        return photoRepository
+                .findById(photoId)
+                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
+                .flatMap(photoEntity -> albumRepository
+                        .findById(photoEntity.getAlbumId())
+                        .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
+                        .flatMap(albumEntity -> {
+
+                            if (photoEntity.getDisplayIndex() < newIndex) {
+                                return photoRepository
+                                        .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, newIndex)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(newIndex)));
+                            } else {
+                                return photoRepository
+                                        .pushDisplayIndexBetween(photoEntity.getAlbumId(), newIndex, photoEntity.getDisplayIndex() - 1)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(newIndex)));
+                            }
+
+                        }));
+    }
+
 }
