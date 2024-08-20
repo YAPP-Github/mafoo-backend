@@ -8,6 +8,7 @@ import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
 import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
+import kr.mafoo.photo.controller.dto.request.PhotoUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,22 @@ public interface PhotoApi {
             @Valid
             @RequestBody
             PhotoUpdateAlbumIdRequest request
+    );
+
+    @Operation(summary = "사진 표시 순서 변경", description = "사진의 표시 순서를 변경합니다.")
+    @PatchMapping("/{photoId}/display-index")
+    Mono<PhotoResponse> updatePhotoDisplayIndex(
+            @RequestMemberId
+            String memberId,
+
+            @ULID
+            @Parameter(description = "사진 ID", example = "test_photo_id")
+            @PathVariable
+            String photoId,
+
+            @Valid
+            @RequestBody
+            PhotoUpdateDisplayIndexRequest request
     );
 
     @Operation(summary = "사진 삭제", description = "사진을 삭제합니다.")
