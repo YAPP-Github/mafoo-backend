@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
+import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
@@ -113,6 +114,10 @@ public class PhotoService {
                         .findById(photoEntity.getAlbumId())
                         .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                         .flatMap(albumEntity -> {
+
+                            if (photoEntity.getDisplayIndex().equals(newIndex)) {
+                                return Mono.error(new PhotoDisplayIndexIsSameException());
+                            }
 
                             if (photoEntity.getDisplayIndex() < newIndex) {
                                 return photoRepository
