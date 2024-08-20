@@ -1,9 +1,16 @@
 package kr.mafoo.photo.repository;
 
 import kr.mafoo.photo.domain.PhotoEntity;
+import org.springframework.data.r2dbc.repository.Modifying;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
     Flux<PhotoEntity> findAllByAlbumIdOrderByDisplayIndexDesc(String ownerAlbumId);
+
+    @Modifying
+    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex")
+    Mono<Void> popDisplayIndexGreaterThan(String albumId, int startIndex);
 }
