@@ -91,8 +91,13 @@ public class PhotoService {
                                         return Mono.error(new AlbumNotFoundException());
                                     } else {
                                         return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                                                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
                                                 .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
-                                                .then(photoRepository.save(photoEntity.updateAlbumId(albumId)));
+                                                .then(photoRepository.save(
+                                                        photoEntity.updateAlbumId(albumId)
+                                                                .updateDisplayIndex(albumEntity.getPhotoCount())
+                                                        )
+                                                );
                                     }
                                 });
                     }

@@ -79,6 +79,11 @@ public class PhotoEntity implements Persistable<String> {
         return this;
     }
 
+    public PhotoEntity updateDisplayIndex(Integer displayIndex) {
+        this.displayIndex = displayIndex;
+        return this;
+    }
+
     public static PhotoEntity newPhoto(String photoId, String photoUrl, BrandType brandType, String ownerMemberId) {
         PhotoEntity photo = new PhotoEntity();
         photo.photoId = photoId;
