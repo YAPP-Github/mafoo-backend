@@ -32,6 +32,9 @@ public class PhotoEntity implements Persistable<String> {
     @Column("album_id")
     private String albumId;
 
+    @Column("display_index")
+    private Integer displayIndex;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
