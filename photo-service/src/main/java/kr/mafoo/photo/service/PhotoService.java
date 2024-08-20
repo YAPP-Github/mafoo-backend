@@ -3,6 +3,7 @@ package kr.mafoo.photo.service;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
+import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
@@ -117,6 +118,10 @@ public class PhotoService {
 
                             if (photoEntity.getDisplayIndex().equals(newIndex)) {
                                 return Mono.error(new PhotoDisplayIndexIsSameException());
+                            }
+
+                            if (newIndex < 0 || newIndex >= albumEntity.getPhotoCount()) {
+                                return Mono.error(new PhotoDisplayIndexNotValidException());
                             }
 
                             if (photoEntity.getDisplayIndex() < newIndex) {
