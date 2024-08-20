@@ -70,6 +70,14 @@ public class PhotoService {
     }
 
     @Transactional
+    public Flux<PhotoEntity> updatePhotoBulkAlbumId(String[] photoIds, String albumId, String requestMemberId) {
+        return Flux.fromArray(photoIds)
+                .flatMap(photoId ->
+                        this.updatePhotoAlbumId(photoId, albumId, requestMemberId)
+                );
+    }
+
+    @Transactional
     public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
         return photoRepository
                 .findById(photoId)
@@ -96,10 +104,10 @@ public class PhotoService {
                                                 .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
                                                 .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
                                                 .then(photoRepository.save(
-                                                        photoEntity.updateAlbumId(albumId)
+                                                        photoEntity
+                                                                .updateAlbumId(albumId)
                                                                 .updateDisplayIndex(albumEntity.getPhotoCount())
-                                                        )
-                                                );
+                                                        ));
                                     }
                                 });
                     }

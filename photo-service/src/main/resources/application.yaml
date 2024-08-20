@@ -41,3 +41,9 @@ management:
   zipkin:
     tracing:
       endpoint: http://zipkin/api/v2/spans
+
+slack:
+  webhook:
+    token: ${SLACK_TOKEN}
+    channel:
+      error: ${SLACK_ERROR_CHANNEL}

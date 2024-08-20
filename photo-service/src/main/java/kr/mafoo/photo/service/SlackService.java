@@ -1,4 +1,4 @@
-package kr.mafoo.user.service;
+package kr.mafoo.photo.service;
 
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
@@ -20,11 +20,11 @@ import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 @RequiredArgsConstructor
 public class SlackService {
 
+    @Value(value = "${slack.webhook.token}")
+    private String token;
+
     @Value(value = "${slack.webhook.channel.error}")
     private String errorChannel;
-
-    @Value(value = "${slack.webhook.channel.member}")
-    private String memberChannel;
 
     private final MethodsClient methodsClient;
 
@@ -81,67 +81,6 @@ public class SlackService {
                             .builder()
                             .text("예상하지 못한 에러 발생 알림")
                             .channel(errorChannel)
-                            .blocks(layoutBlocks)
-                            .build();
-
-            return methodsClient.chatPostMessage(chatPostMessageRequest);
-
-        }).then();
-    }
-
-    public Mono<Void> sendNewMemberNotification(String memberId, String memberName, String memberProfileImageUrl, String memberCreatedAt, String userAgent) {
-        return Mono.fromCallable(() -> {
-            List<LayoutBlock> layoutBlocks = new ArrayList<>();
-
-            // Header 삽입
-            layoutBlocks.add(
-                    Blocks.header(
-                            headerBlockBuilder ->
-                                    headerBlockBuilder.text(plainText("🎉 신규 사용자 가입"))
-                    )
-            );
-
-            layoutBlocks.add(divider());
-
-            // Content 삽입
-            MarkdownTextObject userIdMarkdown =
-                    MarkdownTextObject.builder().text("`사용자 ID`\n" + memberId).build();
-
-            MarkdownTextObject userNameMarkdown =
-                    MarkdownTextObject.builder().text("`사용자 닉네임`\n" + memberName).build();
-
-            layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(userIdMarkdown, userNameMarkdown))
-                    )
-            );
-
-            MarkdownTextObject userProfileImageMarkdown =
-                    MarkdownTextObject.builder().text("`프로필 이미지`\n" + memberProfileImageUrl).build();
-
-            MarkdownTextObject userCreatedAtMarkdown =
-                    MarkdownTextObject.builder().text("`가입 일자`\n" + memberCreatedAt).build();
-
-            layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(userProfileImageMarkdown, userCreatedAtMarkdown))
-                    )
-            );
-
-            MarkdownTextObject userUserAgentMarkdown =
-                    MarkdownTextObject.builder().text("`가입 환경`\n" + userAgent).build();
-
-            layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(userUserAgentMarkdown))
-                    )
-            );
-
-            ChatPostMessageRequest chatPostMessageRequest =
-                    ChatPostMessageRequest
-                            .builder()
-                            .text("신규 사용자 가입 알림")
-                            .channel(memberChannel)
                             .blocks(layoutBlocks)
                             .build();
 
