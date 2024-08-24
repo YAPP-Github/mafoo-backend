@@ -2,6 +2,7 @@ package kr.mafoo.photo.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -43,6 +44,7 @@ public class PhotoEntity implements Persistable<String> {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
+    @Setter
     @Transient
     private boolean isNew = false;
 
@@ -92,6 +94,9 @@ public class PhotoEntity implements Persistable<String> {
         photo.ownerMemberId = ownerMemberId;
         photo.displayIndex = 0;
         photo.isNew = true;
+
+        photo.createdAt = LocalDateTime.now();
+        photo.updatedAt = LocalDateTime.now();
         return photo;
     }
 }

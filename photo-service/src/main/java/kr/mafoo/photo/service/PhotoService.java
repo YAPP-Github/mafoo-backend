@@ -16,6 +16,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.LimitedDataBufferList;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,7 +45,6 @@ public class PhotoService {
                 );
     }
 
-    @Transactional
     public Flux<PhotoEntity> uploadPhoto(Flux<FilePart> files, String requestMemberId) {
         return files
                 .parallel()
@@ -60,14 +60,15 @@ public class PhotoService {
                                     DataBufferUtils.release(dataBuffer);
                                     return bytes;
                                 })
-                                .flatMap(bytes -> objectStorageService.uploadFile(bytes)
-                                        .flatMap(photoUrl -> {
-                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, requestMemberId);
-                                            return photoRepository.save(photoEntity);
-                                        }))
                                 .subscribeOn(Schedulers.boundedElastic())
 
-                ).sequential();
+                )
+                .sequential()
+                .flatMap(objectStorageService::uploadFile)
+                .flatMap(photoUrl -> {
+                    PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, requestMemberId);
+                    return photoRepository.save(photoEntity);
+                });
     }
 
     public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
@@ -109,7 +110,6 @@ public class PhotoService {
                 );
     }
 
-    @Transactional
     public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
         return photoRepository
                 .findById(photoId)

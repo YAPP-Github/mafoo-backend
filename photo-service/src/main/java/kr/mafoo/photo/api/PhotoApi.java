@@ -55,6 +55,19 @@ public interface PhotoApi {
             Flux<FilePart> request
     );
 
+    @Operation(summary = "사진 파일로 업로드", description = "사진을 직접 업로드합니다.")
+    @PostMapping(value = "/files-mafoo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    Flux<PhotoResponse> uploadPhotoMafoo(
+            @RequestMemberId
+            String memberId,
+
+            @RequestPart("files")
+            Flux<FilePart> request,
+
+            @RequestPart("albumName")
+            String albumName
+    );
+
     @Operation(summary = "사진 앨범 단건 수정", description = "사진 한 개를 다른 앨범으로 이동시킵니다.")
     @PatchMapping(value = "/{photoId}/album")
     Mono<PhotoResponse> updatePhotoAlbum(
