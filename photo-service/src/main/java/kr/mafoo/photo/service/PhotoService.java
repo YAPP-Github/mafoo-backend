@@ -2,6 +2,8 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
+import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
+import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
@@ -45,7 +47,7 @@ public class PhotoService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return photoRepository.findAllByAlbumId(albumId);
+                        return photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
                     }
                 });
     }
@@ -60,8 +62,9 @@ public class PhotoService {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
-                        return photoRepository.deleteById(photoId)
-                                .then(albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId));
+                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
+                                .then(photoRepository.deleteById(photoId));
                     }
                 });
     }
@@ -88,22 +91,64 @@ public class PhotoService {
                     if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
+                    } else {
+                        return albumRepository
+                                .findById(albumId)
+                                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
+                                .flatMap(albumEntity -> {
+                                    if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                                        // 내 앨범이 아니면 그냥 없는 앨범 처리
+                                        return Mono.error(new AlbumNotFoundException());
+                                    } else {
+                                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                                                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
+                                                .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
+                                                .then(photoRepository.save(
+                                                        photoEntity
+                                                                .updateAlbumId(albumId)
+                                                                .updateDisplayIndex(albumEntity.getPhotoCount())
+                                                        ));
+                                    }
+                                });
                     }
-
-                    return albumRepository
-                            .findById(albumId)
-                            .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                            .flatMap(albumEntity -> {
-                                if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                                    // 내 앨범이 아니면 그냥 없는 앨범 처리
-                                    return Mono.error(new AlbumNotFoundException());
-                                }
-
-                                return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
-                                        .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
-                                        .then(photoRepository.save(photoEntity.updateAlbumId(albumId)));
-                            });
                 });
+    }
+
+    @Transactional
+    public Mono<PhotoEntity> updatePhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
+        return photoRepository
+                .findById(photoId)
+                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
+                .flatMap(photoEntity -> albumRepository
+                        .findById(photoEntity.getAlbumId())
+                        .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
+                        .flatMap(albumEntity -> {
+
+                            int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
+
+                            if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                                return Mono.error(new AlbumNotFoundException());
+                            }
+
+                            if (photoEntity.getDisplayIndex().equals(targetIndex)) {
+                                return Mono.error(new PhotoDisplayIndexIsSameException());
+                            }
+
+                            if (targetIndex < 0 || targetIndex >= albumEntity.getPhotoCount()) {
+                                return Mono.error(new PhotoDisplayIndexNotValidException());
+                            }
+
+                            if (photoEntity.getDisplayIndex() < targetIndex) {
+                                return photoRepository
+                                        .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                            } else {
+                                return photoRepository
+                                        .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                            }
+
+                        }));
     }
 
 }

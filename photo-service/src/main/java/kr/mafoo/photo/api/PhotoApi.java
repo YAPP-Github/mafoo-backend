@@ -9,6 +9,7 @@ import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
 import kr.mafoo.photo.controller.dto.request.PhotoBulkUpdateAlbumIdRequest;
 import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
+import kr.mafoo.photo.controller.dto.request.PhotoUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,7 @@ public interface PhotoApi {
             @RequestBody
             PhotoUpdateAlbumIdRequest request
     );
-
+  
     @Operation(summary = "사진 앨범 n건 수정", description = "사진 여러 개를 다른 앨범으로 이동시킵니다.")
     @PatchMapping("/bulk/album")
     Flux<PhotoResponse> updatePhotoBulkAlbum(
@@ -67,6 +68,22 @@ public interface PhotoApi {
             @Valid
             @RequestBody
             PhotoBulkUpdateAlbumIdRequest request
+    );
+
+    @Operation(summary = "사진 표시 순서 변경", description = "사진의 표시 순서를 변경합니다.")
+    @PatchMapping("/{photoId}/display-index")
+    Mono<PhotoResponse> updatePhotoDisplayIndex(
+            @RequestMemberId
+            String memberId,
+
+            @ULID
+            @Parameter(description = "사진 ID", example = "test_photo_id")
+            @PathVariable
+            String photoId,
+
+            @Valid
+            @RequestBody
+            PhotoUpdateDisplayIndexRequest request
     );
 
     @Operation(summary = "사진 삭제", description = "사진을 삭제합니다.")

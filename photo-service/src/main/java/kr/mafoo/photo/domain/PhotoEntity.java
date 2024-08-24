@@ -32,6 +32,9 @@ public class PhotoEntity implements Persistable<String> {
     @Column("album_id")
     private String albumId;
 
+    @Column("display_index")
+    private Integer displayIndex;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
@@ -73,6 +76,11 @@ public class PhotoEntity implements Persistable<String> {
 
     public PhotoEntity updateAlbumId(String albumId) {
         this.albumId = albumId;
+        return this;
+    }
+
+    public PhotoEntity updateDisplayIndex(Integer displayIndex) {
+        this.displayIndex = displayIndex;
         return this;
     }
 
