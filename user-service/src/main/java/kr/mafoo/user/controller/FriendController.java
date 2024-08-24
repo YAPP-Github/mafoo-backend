@@ -2,6 +2,8 @@ package kr.mafoo.user.controller;
 
 import kr.mafoo.user.api.FriendApi;
 import kr.mafoo.user.controller.dto.request.BreakFriendRequest;
+import kr.mafoo.user.controller.dto.request.MakeFriendRequest;
+import kr.mafoo.user.controller.dto.response.FriendInvitationResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +29,17 @@ public class FriendController implements FriendApi {
                 .breakFriend(memberId, breakFriendRequest.memberId());
     }
 
+    @Override
+    public Mono<Void> makeFriend(String memberId, MakeFriendRequest makeFriendRequest) {
+        return friendService
+                .makeFriend(memberId, makeFriendRequest.invitationId())
+                .mapNotNull(entity -> null);
+    }
 
+    @Override
+    public Mono<FriendInvitationResponse> createFriendInvitationId(String memberId) {
+        return friendService
+                .generateInvitationId(memberId)
+                .map(entity -> new FriendInvitationResponse(entity.getId()));
+    }
 }

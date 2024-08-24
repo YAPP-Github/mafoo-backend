@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.controller.dto.request.BreakFriendRequest;
+import kr.mafoo.user.controller.dto.request.MakeFriendRequest;
+import kr.mafoo.user.controller.dto.response.FriendInvitationResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +31,18 @@ public interface FriendApi {
     Mono<Void> breakFriend(
             @RequestMemberId @Parameter(hidden = true) String memberId,
             @RequestBody BreakFriendRequest breakFriendRequest
+    );
+
+    @Operation(summary = "친구 맺기", description = "친구를 맺어요요")
+    @PostMapping("/make-friend")
+    Mono<Void> makeFriend(
+            @RequestMemberId @Parameter(hidden = true) String memberId,
+            @RequestBody MakeFriendRequest makeFriendRequest
+    );
+
+    @Operation(summary = "친구 초대 id 발급하기", description = "친구 초대 id를 만들어요")
+    @PostMapping("/invitation-id")
+    Mono<FriendInvitationResponse> createFriendInvitationId(
+            @RequestMemberId @Parameter(hidden = true) String memberId
     );
 }
