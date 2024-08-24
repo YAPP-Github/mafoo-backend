@@ -16,10 +16,7 @@ public record PhotoResponse(
         BrandType brand,
 
         @Schema(description = "앨범 ID", example = "test_album_id")
-        String albumId,
-
-        @Schema(description = "사진 표시 인덱스", example = "photo_display_index")
-        Integer displayIndex
+        String albumId
 ) {
         public static PhotoResponse fromEntity(
                 PhotoEntity entity
@@ -28,8 +25,7 @@ public record PhotoResponse(
                         entity.getPhotoId(),
                         entity.getPhotoUrl(),
                         entity.getBrand(),
-                        entity.getAlbumId(),
-                        entity.getDisplayIndex()
+                        entity.getAlbumId()
                 );
         }
 }
