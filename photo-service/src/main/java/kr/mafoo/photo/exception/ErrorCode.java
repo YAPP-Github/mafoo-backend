@@ -18,6 +18,9 @@ public enum ErrorCode {
     PHOTO_DISPLAY_INDEX_IS_SAME("PE0004", "옮기려는 대상 사진 인덱스가 같습니다"),
     PHOTO_DISPLAY_INDEX_NOT_VALID("PE0005", "옮기려는 대상 사진 인덱스가 유효하지 않습니다"),
 
+    PERMISSION_NOT_FOUND("PME0001", "권한을 찾을 수 없습니다"),
+    CANNOT_MAKE_PERMISSION_MYSELF("PM0002", "자기 자신의 권한을 생성할 수 없습니다"),
+
     ;
     private final String code;
     private final String message;
