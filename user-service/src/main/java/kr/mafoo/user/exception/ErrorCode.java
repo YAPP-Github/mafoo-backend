@@ -15,6 +15,7 @@ public enum ErrorCode {
     TOKEN_INVALID("AU0003", "토큰이 유효하지 않습니다"),
 
     INVITATION_NOT_VALID("FR0001", "초대 ID가 유효하지 않습니다"),
+    CANNOT_MAKE_FRIEND_MYSELF("FR0002", "자기 자신과 친구가 될 수 없습니다"),
     ;
     private final String code;
     private final String message;

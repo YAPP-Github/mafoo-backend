@@ -33,7 +33,7 @@ public interface FriendApi {
             @RequestBody BreakFriendRequest breakFriendRequest
     );
 
-    @Operation(summary = "친구 맺기", description = "친구를 맺어요요")
+    @Operation(summary = "친구 맺기", description = "친구를 맺어요")
     @PostMapping("/make-friend")
     Mono<Void> makeFriend(
             @RequestMemberId @Parameter(hidden = true) String memberId,

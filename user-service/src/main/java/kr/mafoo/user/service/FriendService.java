@@ -3,6 +3,7 @@ package kr.mafoo.user.service;
 import kr.mafoo.user.domain.FriendEntity;
 import kr.mafoo.user.domain.FriendInvitationEntity;
 import kr.mafoo.user.domain.MemberEntity;
+import kr.mafoo.user.exception.CannotBeFriendMyselfException;
 import kr.mafoo.user.exception.InvitationNotValidException;
 import kr.mafoo.user.repository.FriendInvitationRepository;
 import kr.mafoo.user.repository.FriendRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,9 @@ public class FriendService {
         return friendInvitationRepository.findById(invitationId)
                 .switchIfEmpty(Mono.error(new InvitationNotValidException()))
                 .flatMap(invitationEntity -> {
+                    if(fromMemberId.equals(invitationEntity.getFromMemberId())) {
+                        return Mono.error(new CannotBeFriendMyselfException());
+                    }
                     FriendEntity friendEntity = FriendEntity.newFriend(
                             IdGenerator.generate(), fromMemberId, invitationEntity.getFromMemberId()
                     );
@@ -82,7 +85,6 @@ public class FriendService {
                 .flatMap(id -> friendInvitationRepository.existsById(id)
                         .flatMap(exists -> exists
                                 ? Mono.defer(this::generateUniqueInvitationId) // ID가 존재하면 재귀적으로 호출
-                                : Mono.just(id))) // ID가 존재하지 않으면 반환
-                .subscribeOn(Schedulers.boundedElastic()); // Blocking 호출을 위한 스케줄러
+                                : Mono.just(id)));
     }
 }
