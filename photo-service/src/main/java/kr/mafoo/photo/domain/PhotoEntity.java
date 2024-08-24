@@ -90,6 +90,7 @@ public class PhotoEntity implements Persistable<String> {
         photo.photoUrl = photoUrl;
         photo.brand = brandType;
         photo.ownerMemberId = ownerMemberId;
+        photo.displayIndex = 0;
         photo.isNew = true;
         return photo;
     }
