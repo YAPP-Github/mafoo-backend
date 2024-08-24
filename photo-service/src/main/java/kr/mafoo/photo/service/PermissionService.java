@@ -5,6 +5,7 @@ import kr.mafoo.photo.domain.PermissionEntity;
 import kr.mafoo.photo.domain.PermissionType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.CannotMakePermissionMyselfException;
+import kr.mafoo.photo.exception.PermissionAlreadyExistsException;
 import kr.mafoo.photo.exception.PermissionNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PermissionRepository;
@@ -48,7 +49,14 @@ public class PermissionService {
             return Mono.error(new CannotMakePermissionMyselfException());
         }
 
-        return permissionRepository.save(PermissionEntity.newPermission(IdGenerator.generate(), PermissionType.valueOf(permissionType), permissionMemberId, albumId));
+        return checkPermissionExists(albumId, permissionMemberId)
+                .flatMap(permissionExists -> {
+                    if (!permissionExists) {
+                        return permissionRepository.save(PermissionEntity.newPermission(IdGenerator.generate(), PermissionType.valueOf(permissionType), permissionMemberId, albumId));
+                    } else {
+                        return Mono.error(new PermissionAlreadyExistsException());
+                    }
+                });
     }
 
     @Transactional(readOnly = true)
@@ -100,6 +108,14 @@ public class PermissionService {
                             return permissionRepository.save(permissionEntity.updateType(permissionType));
                         })
                 );
+    }
+
+    public Mono<Boolean> checkPermissionExists(String albumId, String requestMemberId) {
+        return permissionRepository.existsByAlbumIdAndMemberId(albumId, requestMemberId);
+    }
+
+    public Mono<Boolean> checkPermissionExistsByType(String albumId, String requestMemberId, PermissionType type) {
+        return permissionRepository.existsByAlbumIdAndMemberIdAndType(albumId, requestMemberId, type);
     }
 
 }
