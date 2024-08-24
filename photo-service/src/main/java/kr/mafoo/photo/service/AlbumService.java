@@ -75,7 +75,10 @@ public class AlbumService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return albumRepository.deleteById(albumId);
+                        return albumRepository
+                                .deleteById(albumId)
+                                .then(albumRepository.popDisplayIndexBetween(
+                                        requestMemberId, albumEntity.getDisplayIndex(), Integer.MAX_VALUE));
                     }
                 });
     }
