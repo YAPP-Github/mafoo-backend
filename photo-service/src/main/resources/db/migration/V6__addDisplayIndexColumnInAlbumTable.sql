@@ -1,5 +1,5 @@
 ALTER TABLE `album`
-    ADD `display_index` INTEGER NOT NULL DEFAULT 0 COMMENT '표기순' after `owner_member_id`;
+    ADD `display_index` INTEGER NOT NULL DEFAULT 0 COMMENT '표시순' after `owner_member_id`;
 CREATE INDEX `idx_album_display_index` ON `album`(`display_index`);
 
 WITH RankedAlbums AS (
