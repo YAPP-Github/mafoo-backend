@@ -124,22 +124,28 @@ public class PhotoService {
                         .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                         .flatMap(albumEntity -> {
 
-                            if (photoEntity.getDisplayIndex().equals(newIndex)) {
+                            int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
+
+                            if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
+                                return Mono.error(new AlbumNotFoundException());
+                            }
+
+                            if (photoEntity.getDisplayIndex().equals(targetIndex)) {
                                 return Mono.error(new PhotoDisplayIndexIsSameException());
                             }
 
-                            if (newIndex < 0 || newIndex >= albumEntity.getPhotoCount()) {
+                            if (targetIndex < 0 || targetIndex >= albumEntity.getPhotoCount()) {
                                 return Mono.error(new PhotoDisplayIndexNotValidException());
                             }
 
-                            if (photoEntity.getDisplayIndex() < newIndex) {
+                            if (photoEntity.getDisplayIndex() < targetIndex) {
                                 return photoRepository
-                                        .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, newIndex)
-                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(newIndex)));
+                                        .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
                             } else {
                                 return photoRepository
-                                        .pushDisplayIndexBetween(photoEntity.getAlbumId(), newIndex, photoEntity.getDisplayIndex() - 1)
-                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(newIndex)));
+                                        .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
+                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
                             }
 
                         }));
