@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.exception.AlbumIndexIsSameException;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.util.IdGenerator;
@@ -19,11 +20,35 @@ public class AlbumService {
     @Transactional
     public Mono<AlbumEntity> createNewAlbum(String ownerMemberId, String albumName, AlbumType albumType) {
         AlbumEntity albumEntity = AlbumEntity.newAlbum(IdGenerator.generate(), albumName, albumType, ownerMemberId);
-        return albumRepository.save(albumEntity);
+        return albumRepository
+                .pushDisplayIndex(ownerMemberId) //전부 인덱스 한칸 밀기
+                .then(albumRepository.save(albumEntity));
+    }
+
+    @Transactional
+    public Mono<AlbumEntity> moveAlbumDisplayIndex(String albumId, String requestMemberId, Integer displayIndex) {
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(album -> {
+                    Integer currentDisplayIndex = album.getDisplayIndex();
+                    Mono<Void> pushAlbumIndexPublisher;
+                    if(displayIndex < currentDisplayIndex) {
+                        pushAlbumIndexPublisher = albumRepository
+                                .pushDisplayIndexBetween(requestMemberId, displayIndex, currentDisplayIndex -1);
+                    } else if(displayIndex > currentDisplayIndex) {
+                        pushAlbumIndexPublisher = albumRepository
+                                .popDisplayIndexBetween(requestMemberId, currentDisplayIndex + 1, displayIndex);
+                    } else {
+                        pushAlbumIndexPublisher = Mono.error(new AlbumIndexIsSameException());
+                    }
+                    return pushAlbumIndexPublisher.then(Mono.defer(() -> {
+                        album.setDisplayIndex(displayIndex);
+                        return albumRepository.save(album);
+                    }));
+                });
     }
 
     public Flux<AlbumEntity> findAllByOwnerMemberId(String ownerMemberId) {
-        return albumRepository.findAllByOwnerMemberId(ownerMemberId);
+        return albumRepository.findAllByOwnerMemberIdOrderByDisplayIndex(ownerMemberId);
     }
 
     public Mono<AlbumEntity> findByAlbumId(String albumId, String requestMemberId) {
@@ -50,7 +75,10 @@ public class AlbumService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return albumRepository.deleteById(albumId);
+                        return albumRepository
+                                .deleteById(albumId)
+                                .then(albumRepository.popDisplayIndexBetween(
+                                        requestMemberId, albumEntity.getDisplayIndex(), Integer.MAX_VALUE));
                     }
                 });
     }
