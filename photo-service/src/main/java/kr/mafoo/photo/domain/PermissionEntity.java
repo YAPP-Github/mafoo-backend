@@ -59,6 +59,11 @@ public class PermissionEntity implements Persistable<String> {
         return permissionId;
     }
 
+    public PermissionEntity updateType(String type) {
+        this.type = PermissionType.valueOf(type);
+        return this;
+    }
+
     public static PermissionEntity newPermission(String permissionId, PermissionType type, String memberId, String albumId) {
         PermissionEntity permission = new PermissionEntity();
         permission.permissionId = permissionId;
