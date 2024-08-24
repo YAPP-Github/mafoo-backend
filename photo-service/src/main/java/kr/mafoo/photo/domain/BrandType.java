@@ -12,7 +12,8 @@ public enum BrandType {
     MONOMANSION(Pattern.compile("https://monomansion\\.net/.*")),
     PHOTO_SIGNATURE(Pattern.compile("http://photoqr3\\.kr/.*")),
     PICDOT(Pattern.compile("https://picdot\\.kr/.*")),
-    MAFOO(Pattern.compile("https://mafoo\\.kr/.*"))
+    MAFOO(Pattern.compile("https://mafoo\\.kr/.*")),
+    EXTERNAL(Pattern.compile("https://mafoo"))
     ;
 
     private final Pattern urlPattern;
