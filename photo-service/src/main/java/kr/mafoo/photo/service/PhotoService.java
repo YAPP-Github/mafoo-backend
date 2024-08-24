@@ -1,6 +1,7 @@
 package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.AlbumEntity;
+import kr.mafoo.photo.domain.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.*;
 import kr.mafoo.photo.repository.AlbumRepository;
@@ -8,10 +9,15 @@ import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.LimitedDataBufferList;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +40,32 @@ public class PhotoService {
                             return photoRepository.save(photoEntity);
                         })
                 );
+    }
+
+    @Transactional
+    public Flux<PhotoEntity> uploadPhoto(Flux<FilePart> files, String requestMemberId) {
+        return files
+                .parallel()
+                .flatMap(filePart ->
+                        filePart.content()
+                                .collect(() -> new LimitedDataBufferList(-31), LimitedDataBufferList::add)
+                                .filter(list -> !list.isEmpty())
+                                .map(list -> list.get(0).factory().join(list))
+                                .doOnDiscard(DataBuffer.class, DataBufferUtils::release)
+                                .map(dataBuffer -> {
+                                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(bytes);
+                                    DataBufferUtils.release(dataBuffer);
+                                    return bytes;
+                                })
+                                .flatMap(bytes -> objectStorageService.uploadFile(bytes)
+                                        .flatMap(photoUrl -> {
+                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, requestMemberId);
+                                            return photoRepository.save(photoEntity);
+                                        }))
+                                .subscribeOn(Schedulers.boundedElastic())
+
+                ).sequential();
     }
 
     @Transactional(readOnly = true)
@@ -81,7 +113,7 @@ public class PhotoService {
                         if (!photoEntity.hasOwnerMemberId()) {
                             photoEntity.updateOwnerMemberId(requestMemberId);
                         }
-
+                      
                         return albumService.checkAlbumFullAccessPermission(albumId, requestMemberId)
                                 .flatMap(albumEntity -> photoRepository.save(photoEntity.updateAlbumId(albumId)));
                     }

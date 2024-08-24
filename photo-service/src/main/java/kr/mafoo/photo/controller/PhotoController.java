@@ -8,6 +8,7 @@ import kr.mafoo.photo.controller.dto.request.PhotoUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import kr.mafoo.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,6 +40,13 @@ public class PhotoController implements PhotoApi {
     }
 
     @Override
+    public Flux<PhotoResponse> uploadPhoto(String memberId, Flux<FilePart> request) {
+        return photoService
+                .uploadPhoto(request, memberId)
+                .map(PhotoResponse::fromEntity);
+    }
+
+    @Override
     public Mono<PhotoResponse> updatePhotoAlbum(
             String memberId,
             String photoId,
@@ -48,7 +56,7 @@ public class PhotoController implements PhotoApi {
                 .updatePhotoAlbumId(photoId, request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
-  
+
     @Override
     public Flux<PhotoResponse> updatePhotoBulkAlbum(
             String memberId,

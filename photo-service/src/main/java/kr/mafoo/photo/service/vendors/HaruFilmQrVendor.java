@@ -18,7 +18,7 @@ public class HaruFilmQrVendor implements QrVendor {
         String albumCode = urlValueList[1];
 
         String baseUrl = urlValueList[0] + "/base_api?command=albumdn&albumCode=";
-        String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24 hours";
+        String imageUrl = baseUrl + albumCode + "&type=photo&file_name=output.jpg&max=10&limit=+24%20hours";
 
         // TODO : 추후 비디오 URL 추가 예정
         // String videoUrl = baseUrl + albumCode + "&type=video&max=10&limit=+24 hours";

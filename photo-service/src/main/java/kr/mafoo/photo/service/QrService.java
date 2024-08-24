@@ -42,6 +42,7 @@ public class QrService {
             case PHOTO_SIGNATURE -> photoSignatureQrVendor;
             case PICDOT -> picDotQrVendor;
             case MAFOO -> mafooQrVendor;
+            case EXTERNAL -> throw new RuntimeException();
         };
 
         return createFileDto(brandType, qrVendor.extractImageFromQrUrl(qrUrl));
