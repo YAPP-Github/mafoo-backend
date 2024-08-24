@@ -20,6 +20,8 @@ public enum ErrorCode {
 
     PERMISSION_NOT_FOUND("PME0001", "권한을 찾을 수 없습니다"),
     CANNOT_MAKE_PERMISSION_MYSELF("PM0002", "자기 자신의 권한을 생성할 수 없습니다"),
+    PERMISSION_NOT_ALLOWED("PE0003", "권한이 허용되지 않았습니다"),
+    PERMISSION_ALREADY_EXISTS("PE0004", "동일한 권한이 이미 존재합니다")
 
     ;
     private final String code;
