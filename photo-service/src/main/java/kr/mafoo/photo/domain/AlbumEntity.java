@@ -35,7 +35,7 @@ public class AlbumEntity implements Persistable<String> {
     private String ownerMemberId;
 
     @Column("display_index")
-    private Long displayIndex;
+    private Integer displayIndex;
 
     @CreatedDate
     @Column("created_at")
@@ -95,7 +95,7 @@ public class AlbumEntity implements Persistable<String> {
         album.ownerMemberId = ownerMemberId;
         album.isNew = true;
         album.photoCount = 0;
-        album.displayIndex = 0L;
+        album.displayIndex = 0;
         return album;
     }
 }

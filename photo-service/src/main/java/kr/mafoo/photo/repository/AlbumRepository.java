@@ -17,10 +17,10 @@ public interface AlbumRepository extends R2dbcRepository<AlbumEntity, String> {
     @Modifying
     @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId " +
             "AND display_index BETWEEN :startIndex AND :lastIndex")
-    Mono<Void> pushDisplayIndexBetween(String ownerMemberId, Long startIndex, Long lastIndex);
+    Mono<Void> pushDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
 
     @Modifying
     @Query("UPDATE album SET display_index = display_index -1 WHERE owner_member_id = :ownerMemberId " +
             "AND display_index BETWEEN :startIndex AND :lastIndex")
-    Mono<Void> popDisplayIndexBetween(String ownerMemberId, Long startIndex, Long lastIndex);
+    Mono<Void> popDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
 }

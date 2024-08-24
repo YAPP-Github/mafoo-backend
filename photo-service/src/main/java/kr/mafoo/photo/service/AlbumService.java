@@ -26,10 +26,10 @@ public class AlbumService {
     }
 
     @Transactional
-    public Mono<AlbumEntity> moveAlbumDisplayIndex(String albumId, String requestMemberId, Long displayIndex) {
+    public Mono<AlbumEntity> moveAlbumDisplayIndex(String albumId, String requestMemberId, Integer displayIndex) {
         return findByAlbumId(albumId, requestMemberId)
                 .flatMap(album -> {
-                    Long currentDisplayIndex = album.getDisplayIndex();
+                    Integer currentDisplayIndex = album.getDisplayIndex();
                     Mono<Void> pushAlbumIndexPublisher;
                     if(displayIndex < currentDisplayIndex) {
                         pushAlbumIndexPublisher = albumRepository

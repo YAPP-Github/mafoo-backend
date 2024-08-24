@@ -9,6 +9,6 @@ public record AlbumUpdateDisplayIndexRequest(
         @NotNull
         @Min(0)
         @Schema(description = "대상 인덱스", example = "1")
-        Long newDisplayIndex
+        Integer newDisplayIndex
 ) {
 }
