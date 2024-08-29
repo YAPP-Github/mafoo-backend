@@ -16,7 +16,10 @@ public record PhotoResponse(
         BrandType brand,
 
         @Schema(description = "앨범 ID", example = "test_album_id")
-        String albumId
+        String albumId,
+
+        @Schema(description = "앨범 생성일")
+        String createdAt
 ) {
         public static PhotoResponse fromEntity(
                 PhotoEntity entity
@@ -25,7 +28,8 @@ public record PhotoResponse(
                         entity.getPhotoId(),
                         entity.getPhotoUrl(),
                         entity.getBrand(),
-                        entity.getAlbumId()
+                        entity.getAlbumId(),
+                        entity.getCreatedAt().toString()
                 );
         }
 }
