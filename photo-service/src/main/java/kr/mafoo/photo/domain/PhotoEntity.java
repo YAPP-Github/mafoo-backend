@@ -35,11 +35,9 @@ public class PhotoEntity implements Persistable<String> {
     @Column("display_index")
     private Integer displayIndex;
 
-    @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
@@ -92,6 +90,8 @@ public class PhotoEntity implements Persistable<String> {
         photo.ownerMemberId = ownerMemberId;
         photo.displayIndex = 0;
         photo.isNew = true;
+        photo.createdAt = LocalDateTime.now();
+        photo.updatedAt = LocalDateTime.now();
         return photo;
     }
 }
