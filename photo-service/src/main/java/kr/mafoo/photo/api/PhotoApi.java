@@ -31,7 +31,11 @@ public interface PhotoApi {
             @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @RequestParam
-            String albumId
+            String albumId,
+
+            @Parameter(description = "정렬 종류", example = "ASC | DESC")
+            @RequestParam(required = false)
+            String sort
     );
 
     @Operation(summary = "사진 생성", description = "사진을 생성합니다.")
