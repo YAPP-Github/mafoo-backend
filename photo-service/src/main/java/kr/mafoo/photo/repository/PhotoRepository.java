@@ -10,6 +10,10 @@ import reactor.core.publisher.Mono;
 public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
     Flux<PhotoEntity> findAllByAlbumIdOrderByDisplayIndexDesc(String ownerAlbumId);
 
+    Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtDesc(String ownerAlbumId);
+
+    Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtAsc(String ownerAlbumId);
+
     @Modifying
     @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex")
     Mono<Void> popDisplayIndexGreaterThan(String albumId, int startIndex);

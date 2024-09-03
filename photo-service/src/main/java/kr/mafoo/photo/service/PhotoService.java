@@ -70,7 +70,7 @@ public class PhotoService {
                 ).sequential();
     }
 
-    public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
+    public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId, String sort) {
         return albumRepository
                 .findById(albumId)
                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
@@ -79,7 +79,13 @@ public class PhotoService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
+                        String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
+
+                        return switch (sortMethod) {
+                            case "ASC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
+                            case "DESC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtDesc(albumId);
+                            default -> photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
+                        };
                     }
                 });
     }
