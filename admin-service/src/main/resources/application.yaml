@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: admin-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
