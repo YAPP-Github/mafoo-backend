@@ -14,6 +14,12 @@ spring:
             allowedHeaders: '*'
             allowedMethods: '*'
       routes:
+        - id: admin-service
+          uri: http://admin-service
+          predicates:
+            - Path=/admin/**
+          filters:
+            - RewritePath=/admin/(?<segment>/?.*), /$\{segment}
         - id: user-service-swagger
           uri: http://user-service
           predicates:
