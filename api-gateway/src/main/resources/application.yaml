@@ -19,6 +19,7 @@ spring:
           predicates:
             - Path=/admin/**
           filters:
+            - AdminAuthenticationFilter
             - RewritePath=/admin/(?<segment>/?.*), /$\{segment}
         - id: user-service-swagger
           uri: http://user-service
