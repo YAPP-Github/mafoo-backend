@@ -7,3 +7,8 @@ management:
     web:
       exposure:
         include: health,metrics,prometheus
+
+app:
+  url:
+    photo-service: http://photo-service
+    user-service: http://user-service
