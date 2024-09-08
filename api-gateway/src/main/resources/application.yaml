@@ -33,6 +33,13 @@ spring:
             - Path=/user/v1/auth/**
           filters:
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: user-service-admin
+          uri: http://user-service
+          predicates:
+            - AdminAuthenticationFilter
+            - Path=/user/v1/admin/**
+          filters:
+            - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service-swagger
           uri: http://photo-service
           predicates:
