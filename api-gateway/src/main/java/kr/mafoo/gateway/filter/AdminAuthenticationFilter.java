@@ -47,6 +47,7 @@ public class AdminAuthenticationFilter extends AbstractGatewayFilterFactory<Obje
         return webClient.get()
                 .uri("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + token)
                 .retrieve()
+                .onStatus(status -> status.value() == 401, res -> Mono.error(new RuntimeException("AUTH")))
                 .bodyToMono(Map.class)
                 .flatMap(userInfo -> {
                     if (userInfo.containsKey("id")) {
@@ -56,7 +57,9 @@ public class AdminAuthenticationFilter extends AbstractGatewayFilterFactory<Obje
                         }
                     }
                     return createSimpleErrorResponse(exchange, "AU0004", "인증에 실패했습니다");
-                });
+                })
+                .onErrorResume(error -> error.getMessage().equals("AUTH"),
+                        error -> createSimpleErrorResponse(exchange, "AU0004", "인증에 실패했습니다"));
     }
 
     private Mono<Void> createSimpleErrorResponse(ServerWebExchange exchange, String code, String message) {
