@@ -28,7 +28,7 @@ public class AlbumEntity implements Persistable<String> {
     @Column("type")
     private AlbumType type;
 
-    @Column("photoCount")
+    @Column("photo_count")
     private Integer photoCount;
 
     @Column("owner_member_id")
