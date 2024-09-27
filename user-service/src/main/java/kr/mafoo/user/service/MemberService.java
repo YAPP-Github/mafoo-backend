@@ -3,6 +3,7 @@ package kr.mafoo.user.service;
 import kr.mafoo.user.domain.MemberEntity;
 import kr.mafoo.user.exception.MemberNotFoundException;
 import kr.mafoo.user.repository.MemberRepository;
+import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,14 @@ import reactor.core.publisher.Mono;
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final SocialMemberRepository socialMemberRepository;
     private final SlackService slackService;
 
     public Mono<Void> quitMemberByMemberId(String memberId) {
-        return memberRepository.deleteMemberById(memberId);
+        return socialMemberRepository
+                .findByMemberId(memberId)
+                .flatMap(socialMemberRepository::delete)
+                .then(memberRepository.deleteMemberById(memberId));
     }
 
     public Mono<MemberEntity> getMemberByMemberId(String memberId) {
