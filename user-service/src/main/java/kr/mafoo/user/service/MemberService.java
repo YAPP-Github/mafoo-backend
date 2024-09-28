@@ -19,10 +19,10 @@ public class MemberService {
     private final SocialMemberRepository socialMemberRepository;
     private final SlackService slackService;
 
+    @Transactional
     public Mono<Void> quitMemberByMemberId(String memberId) {
         return socialMemberRepository
-                .findByMemberId(memberId)
-                .flatMap(socialMemberRepository::delete)
+                .deleteSocialMemberByMemberId(memberId)
                 .then(memberRepository.deleteMemberById(memberId));
     }
 
