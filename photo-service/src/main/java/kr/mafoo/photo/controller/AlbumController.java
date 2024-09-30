@@ -48,7 +48,11 @@ public class AlbumController implements AlbumApi {
     }
 
     @Override
-    public Mono<AlbumResponse> updateAlbum(String memberId, String albumId, AlbumUpdateRequest request) {
+    public Mono<AlbumResponse> updateAlbum(
+            String memberId,
+            String albumId,
+            AlbumUpdateRequest request
+    ) {
         AlbumType albumType = AlbumType.valueOf(request.type());
         return albumService
                 .updateAlbumName(albumId, request.name(), memberId)
@@ -57,7 +61,11 @@ public class AlbumController implements AlbumApi {
     }
 
     @Override
-    public Mono<AlbumResponse> updateAlbumDisplayIndex(String memberId, String albumId, AlbumUpdateDisplayIndexRequest request) {
+    public Mono<AlbumResponse> updateAlbumDisplayIndex(
+            String memberId,
+            String albumId,
+            AlbumUpdateDisplayIndexRequest request
+    ) {
         return albumService
                 .moveAlbumDisplayIndex(albumId, memberId, request.newDisplayIndex())
                 .map(AlbumResponse::fromEntity);
