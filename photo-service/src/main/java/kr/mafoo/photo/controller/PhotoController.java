@@ -22,10 +22,11 @@ public class PhotoController implements PhotoApi {
     @Override
     public Flux<PhotoResponse> getPhotos(
             String memberId,
-            String albumId
+            String albumId,
+            String sort
     ){
         return photoService
-                .findAllByAlbumId(albumId, memberId)
+                .findAllByAlbumId(albumId, memberId, sort)
                 .map(PhotoResponse::fromEntity);
     }
 
