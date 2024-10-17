@@ -1,7 +1,9 @@
 package kr.mafoo.photo.service;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,10 @@ import reactor.core.publisher.Mono;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import java.net.URL;
+import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +49,31 @@ public class ObjectStorageService {
         });
     }
 
+    public Mono<String []> getPreSignedUrls(String[] fileNames, String memberId) {
+        return Mono.fromCallable(() ->
+                Stream.of(fileNames)
+                        .map(fileName -> generatePresignedUrl(fileName, memberId).toString())
+                        .toArray(String[]::new)
+        );
+    }
+
+    private URL generatePresignedUrl(String fileName, String memberId) {
+
+        String newFileName = UUID.randomUUID() + "_" + fileName;
+
+        String filePath = String.format("%s/photo/%s", memberId, newFileName);
+
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 30;
+        expiration.setTime(expTimeMillis);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, filePath)
+                        .withMethod(HttpMethod.PUT)
+                        .withExpiration(expiration);
+
+        return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+    }
 
 }
