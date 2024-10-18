@@ -28,6 +28,7 @@ cloud:
     s3:
       endpoint: https://kr.object.ncloudstorage.com
       bucket: ${NCP_BUCKET}
+      presigned-url-expiration: 1800000
 
 management:
   endpoints:
