@@ -29,6 +29,9 @@ public class ObjectStorageService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
+    @Value("${cloud.aws.s3.presigned-url-expiration}")
+    private long urlExpiration; // Expiration time in milliseconds
+
     public Mono<String> uploadFile(byte[] fileByte) {
         String keyName = "/" + UUID.randomUUID();
 
@@ -65,7 +68,7 @@ public class ObjectStorageService {
 
         Date expiration = new Date();
         long expTimeMillis = expiration.getTime();
-        expTimeMillis += 1000 * 60 * 30;
+        expTimeMillis += urlExpiration; // Use the configured expiration time
         expiration.setTime(expTimeMillis);
 
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
