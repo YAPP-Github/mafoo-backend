@@ -30,7 +30,7 @@ public class ObjectStorageService {
     private String bucketName;
 
     @Value("${cloud.aws.s3.presigned-url-expiration}")
-    private long urlExpiration; // Expiration time in milliseconds
+    private long presignedUrlExpiration;
 
     public Mono<String> uploadFile(byte[] fileByte) {
         String keyName = "/" + UUID.randomUUID();
@@ -52,7 +52,7 @@ public class ObjectStorageService {
         });
     }
 
-    public Mono<String []> getPreSignedUrls(String[] fileNames, String memberId) {
+    public Mono<String[]> getPreSignedUrls(String[] fileNames, String memberId) {
         return Mono.fromCallable(() ->
                 Stream.of(fileNames)
                         .map(fileName -> generatePresignedUrl(fileName, memberId).toString())
@@ -61,22 +61,12 @@ public class ObjectStorageService {
     }
 
     private URL generatePresignedUrl(String fileName, String memberId) {
+        String filePath = String.format("%s/photo/%s_%s", memberId, UUID.randomUUID(), fileName);
+        Date expiration = new Date(System.currentTimeMillis() + presignedUrlExpiration);
 
-        String newFileName = UUID.randomUUID() + "_" + fileName;
-
-        String filePath = String.format("%s/photo/%s", memberId, newFileName);
-
-        Date expiration = new Date();
-        long expTimeMillis = expiration.getTime();
-        expTimeMillis += urlExpiration; // Use the configured expiration time
-        expiration.setTime(expTimeMillis);
-
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucketName, filePath)
-                        .withMethod(HttpMethod.PUT)
-                        .withExpiration(expiration);
-
-        return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
+                .withMethod(HttpMethod.PUT)
+                .withExpiration(expiration));
     }
 
 }
