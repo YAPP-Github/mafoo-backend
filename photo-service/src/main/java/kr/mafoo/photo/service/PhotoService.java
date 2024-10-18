@@ -21,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import static kr.mafoo.photo.domain.BrandType.EXTERNAL;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,7 +50,7 @@ public class PhotoService {
     public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String requestMemberId) {
         return Flux.fromArray(fileUrls)
                 .flatMap(fileUrl ->
-                        this.createNewPhoto(fileUrl, EXTERNAL, requestMemberId)
+                        this.createNewPhoto(fileUrl, BrandType.EXTERNAL, requestMemberId)
                 );
     }
 
@@ -78,7 +77,7 @@ public class PhotoService {
                                 })
                                 .flatMap(bytes -> objectStorageService.uploadFile(bytes)
                                         .flatMap(photoUrl -> {
-                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, EXTERNAL, requestMemberId);
+                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, requestMemberId);
                                             return photoRepository.save(photoEntity);
                                         }))
                                 .subscribeOn(Schedulers.boundedElastic())
