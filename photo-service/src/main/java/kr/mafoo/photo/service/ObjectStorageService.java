@@ -74,4 +74,14 @@ public class ObjectStorageService {
                 .withExpiration(expiration));
     }
 
+    public Mono<Void> setObjectPublicRead(String filePath) {
+        return Mono.fromRunnable(() -> {
+            try {
+                amazonS3Client.setObjectAcl(bucketName, filePath, CannedAccessControlList.PublicRead);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to set ACL to PublicRead for the file: " + filePath, e);
+            }
+        });
+    }
+
 }
