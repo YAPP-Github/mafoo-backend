@@ -48,7 +48,7 @@ public class ObjectStorageService {
 
                 return "https://kr.object.ncloudstorage.com/" + bucketName + "/" + keyName;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to upload image to object storage: ", e);
             }
         });
     }
