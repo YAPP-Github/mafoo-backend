@@ -48,7 +48,7 @@ public class ObjectStorageService {
 
                 return "https://kr.object.ncloudstorage.com/" + bucketName + "/" + keyName;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to upload image to object storage: ", e);
             }
         });
     }
@@ -72,6 +72,16 @@ public class ObjectStorageService {
         return amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(expiration));
+    }
+
+    public Mono<Void> setObjectPublicRead(String filePath) {
+        return Mono.fromRunnable(() -> {
+            try {
+                amazonS3Client.setObjectAcl(bucketName, filePath, CannedAccessControlList.PublicRead);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to set ACL to PublicRead for the file: " + filePath, e);
+            }
+        });
     }
 
 }

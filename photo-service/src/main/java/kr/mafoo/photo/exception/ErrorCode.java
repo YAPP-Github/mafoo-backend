@@ -18,7 +18,7 @@ public enum ErrorCode {
     PHOTO_DISPLAY_INDEX_IS_SAME("PE0004", "옮기려는 대상 사진 인덱스가 같습니다"),
     PHOTO_DISPLAY_INDEX_NOT_VALID("PE0005", "옮기려는 대상 사진 인덱스가 유효하지 않습니다"),
 
-    PRE_SIGNED_URL_EXCEED_MAXIMUM("OE0005", "한 번에 생성할 수 있는 Pre-signed url 최대치를 초과했습니다"),
+    PRE_SIGNED_URL_EXCEED_MAXIMUM("OE0001", "한 번에 생성할 수 있는 Pre-signed url 최대치를 초과했습니다"),
 
     ;
     private final String code;

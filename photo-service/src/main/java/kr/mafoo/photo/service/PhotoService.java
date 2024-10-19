@@ -38,19 +38,15 @@ public class PhotoService {
         return qrService
                 .getFileFromQrUrl(qrUrl)
                 .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
-                        .flatMap(photoUrl -> {
-                            this.createNewPhoto(photoUrl, fileDto.type(), requestMemberId);
-                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, fileDto.type(), requestMemberId);
-                            return photoRepository.save(photoEntity);
-                        })
+                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), requestMemberId))
                 );
     }
 
     @Transactional
     public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String requestMemberId) {
         return Flux.fromArray(fileUrls)
-                .flatMap(fileUrl ->
-                        this.createNewPhoto(fileUrl, BrandType.EXTERNAL, requestMemberId)
+                .flatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
+                        .then(createNewPhoto(fileUrl, BrandType.EXTERNAL, requestMemberId))
                 );
     }
 
