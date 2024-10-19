@@ -15,8 +15,8 @@ import reactor.core.publisher.Mono;
 public interface ObjectStorageApi {
 
     @Operation(summary = "Pre-signed Url 요청", description = "Pre-signed Url 목록을 발급합니다.")
-    @GetMapping
-    Mono<PreSignedUrlResponse> getPreSignedUrls(
+    @PostMapping
+    Mono<PreSignedUrlResponse> createPreSignedUrls(
             @RequestMemberId
             String memberId,
 

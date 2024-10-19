@@ -52,7 +52,7 @@ public class ObjectStorageService {
         });
     }
 
-    public Mono<String[]> getPreSignedUrls(String[] fileNames, String memberId) {
+    public Mono<String[]> createPreSignedUrls(String[] fileNames, String memberId) {
         return Mono.fromCallable(() ->
                 Stream.of(fileNames)
                         .map(fileName -> generatePresignedUrl(fileName, memberId).toString())

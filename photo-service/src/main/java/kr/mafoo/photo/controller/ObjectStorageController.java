@@ -15,12 +15,12 @@ public class ObjectStorageController implements ObjectStorageApi {
     private final ObjectStorageService objectStorageService;
 
     @Override
-    public Mono<PreSignedUrlResponse> getPreSignedUrls(
+    public Mono<PreSignedUrlResponse> createPreSignedUrls(
             String memberId,
             ObjectStoragePreSignedUrlRequest request
     ) {
         return objectStorageService
-                .getPreSignedUrls(request.fileNames(), memberId)
+                .createPreSignedUrls(request.fileNames(), memberId)
                 .map(PreSignedUrlResponse::fromStringArray);
     }
 }
