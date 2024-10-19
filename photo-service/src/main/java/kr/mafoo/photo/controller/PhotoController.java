@@ -27,6 +27,16 @@ public class PhotoController implements PhotoApi {
     }
 
     @Override
+    public Mono<PhotoResponse> uploadQrPhotoOriginal(
+            String memberId,
+            PhotoQrUploadRequest request
+    ){
+        return photoService
+                .createNewPhotoByQrUrl(request.qrUrl(), memberId)
+                .map(PhotoResponse::fromEntity);
+    }
+
+    @Override
     public Mono<PhotoResponse> uploadQrPhoto(
             String memberId,
             PhotoQrUploadRequest request

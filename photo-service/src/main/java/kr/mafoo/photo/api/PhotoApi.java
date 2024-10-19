@@ -31,6 +31,17 @@ public interface PhotoApi {
             String albumId
     );
 
+    @Operation(summary = "(수정 이전) QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
+    @PostMapping(value = "")
+    Mono<PhotoResponse> uploadQrPhotoOriginal(
+            @RequestMemberId
+            String memberId,
+
+            @Valid
+            @RequestBody
+            PhotoQrUploadRequest request
+    );
+
     @Operation(summary = "QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
     @PostMapping(value = "/qr")
     Mono<PhotoResponse> uploadQrPhoto(
