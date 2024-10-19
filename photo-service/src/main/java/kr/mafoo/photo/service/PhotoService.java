@@ -46,7 +46,7 @@ public class PhotoService {
     public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String requestMemberId) {
         return Flux.fromArray(fileUrls)
                 .flatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
-                        .then(createNewPhoto(fileUrl, BrandType.EXTERNAL, requestMemberId))
+                        .flatMap(fileLink -> createNewPhoto(fileLink, BrandType.EXTERNAL, requestMemberId))
                 );
     }
 
