@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
-import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoBulkUpdateAlbumIdRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoUpdateDisplayIndexRequest;
+import kr.mafoo.photo.controller.dto.request.*;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -38,15 +35,37 @@ public interface PhotoApi {
             String sort
     );
 
-    @Operation(summary = "사진 생성", description = "사진을 생성합니다.")
-    @PostMapping
-    Mono<PhotoResponse> createPhoto(
+    @Operation(summary = "(수정 이전) QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
+    @PostMapping(value = "")
+    Mono<PhotoResponse> uploadQrPhotoOriginal(
             @RequestMemberId
             String memberId,
 
             @Valid
             @RequestBody
-            PhotoCreateRequest request
+            PhotoQrUploadRequest request
+    );
+
+    @Operation(summary = "QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
+    @PostMapping(value = "/qr")
+    Mono<PhotoResponse> uploadQrPhoto(
+            @RequestMemberId
+            String memberId,
+
+            @Valid
+            @RequestBody
+            PhotoQrUploadRequest request
+    );
+
+    @Operation(summary = "파일(url) 사진 n건 업로드", description = "파일(url)을 사용해 사진을 업로드합니다.")
+    @PostMapping(value = "/file-urls")
+    Flux<PhotoResponse> uploadFileUrlPhoto(
+            @RequestMemberId
+            String memberId,
+
+            @Valid
+            @RequestBody
+            PhotoFileUrlUploadRequest request
     );
 
     @Operation(summary = "사진 파일로 업로드", description = "사진을 직접 업로드합니다.")

@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -33,15 +34,29 @@ public class PhotoService {
     private final ObjectStorageService objectStorageService;
 
     @Transactional
-    public Mono<PhotoEntity> createNewPhoto(String qrUrl, String requestMemberId) {
+    public Mono<PhotoEntity> createNewPhotoByQrUrl(String qrUrl, String requestMemberId) {
         return qrService
                 .getFileFromQrUrl(qrUrl)
                 .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
                         .flatMap(photoUrl -> {
+                            this.createNewPhoto(photoUrl, fileDto.type(), requestMemberId);
                             PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, fileDto.type(), requestMemberId);
                             return photoRepository.save(photoEntity);
                         })
                 );
+    }
+
+    @Transactional
+    public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String requestMemberId) {
+        return Flux.fromArray(fileUrls)
+                .flatMap(fileUrl ->
+                        this.createNewPhoto(fileUrl, BrandType.EXTERNAL, requestMemberId)
+                );
+    }
+
+    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String requestMemberId) {
+        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, requestMemberId);
+        return photoRepository.save(photoEntity);
     }
 
     @Transactional
