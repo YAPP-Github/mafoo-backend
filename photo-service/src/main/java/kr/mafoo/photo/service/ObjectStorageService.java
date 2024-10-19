@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import kr.mafoo.photo.exception.PreSignedUrlExceedMaximum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -53,11 +54,15 @@ public class ObjectStorageService {
     }
 
     public Mono<String[]> createPreSignedUrls(String[] fileNames, String memberId) {
-        return Mono.fromCallable(() ->
-                Stream.of(fileNames)
-                        .map(fileName -> generatePresignedUrl(fileName, memberId).toString())
-                        .toArray(String[]::new)
-        );
+        return Mono.fromCallable(() -> {
+            if (fileNames.length > 30) {
+                throw new PreSignedUrlExceedMaximum();
+            }
+
+            return Stream.of(fileNames)
+                    .map(fileName -> generatePresignedUrl(fileName, memberId).toString())
+                    .toArray(String[]::new);
+        });
     }
 
     private URL generatePresignedUrl(String fileName, String memberId) {
