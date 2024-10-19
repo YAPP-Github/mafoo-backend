@@ -66,7 +66,7 @@ public class ObjectStorageService {
     }
 
     private URL generatePresignedUrl(String fileName, String memberId) {
-        String filePath = String.format("%s/photo/%s_%s", memberId, UUID.randomUUID(), fileName);
+        String filePath = String.format("%s/%s/photo/%s_%s", bucketName, memberId, UUID.randomUUID(), fileName);
         Date expiration = new Date(System.currentTimeMillis() + presignedUrlExpiration);
 
         return amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
