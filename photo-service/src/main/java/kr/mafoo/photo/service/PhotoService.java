@@ -38,11 +38,7 @@ public class PhotoService {
         return qrService
                 .getFileFromQrUrl(qrUrl)
                 .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
-                        .flatMap(photoUrl -> {
-                            this.createNewPhoto(photoUrl, fileDto.type(), requestMemberId);
-                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, fileDto.type(), requestMemberId);
-                            return photoRepository.save(photoEntity);
-                        })
+                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), requestMemberId))
                 );
     }
 
