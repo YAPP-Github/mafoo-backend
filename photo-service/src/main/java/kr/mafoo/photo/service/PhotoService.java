@@ -19,6 +19,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,24 +37,34 @@ public class PhotoService {
         return qrService
                 .getFileFromQrUrl(qrUrl)
                 .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
-                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), null, requestMemberId))
+                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), requestMemberId))
                 );
     }
 
     @Transactional
-    public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String albumId, String requestMemberId) {
+    public Flux<PhotoEntity> createNewPhotoFileUrls(String[] fileUrls, String albumId, String requestMemberId) {
         return albumService.findByAlbumId(albumId, requestMemberId)
-                .flatMap(albumEntity -> albumService.increaseAlbumPhotoCount(albumId, fileUrls.length, requestMemberId))
-                .thenMany(
-                        Flux.fromArray(fileUrls)
-                                .flatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
-                                        .flatMap(fileLink -> createNewPhoto(fileLink, BrandType.EXTERNAL, albumId, requestMemberId))
-                                )
-                );
+                .flatMapMany(albumEntity -> {
+                    AtomicInteger displayIndex = new AtomicInteger(albumEntity.getPhotoCount());
+
+                    return Flux.fromArray(fileUrls)
+                            .concatMap(fileUrl ->
+                                    createNewPhotoFileUrl(fileUrl, BrandType.EXTERNAL, albumId, displayIndex.getAndIncrement(), requestMemberId)
+                            );
+                });
     }
 
-    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String albumId, String requestMemberId) {
-        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, albumId, requestMemberId);
+    private Mono<PhotoEntity> createNewPhotoFileUrl(String fileUrl, BrandType type, String albumId, Integer displayIndex, String requestMemberId) {
+        return objectStorageService.setObjectPublicRead(fileUrl)
+                .flatMap(fileLink -> {
+                    PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), fileLink, type, albumId, displayIndex, requestMemberId);
+                    return albumService.increaseAlbumPhotoCount(albumId, 1, requestMemberId)
+                            .then(photoRepository.save(photoEntity));
+                });
+    }
+
+    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String requestMemberId) {
+        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, null, 0, requestMemberId);
         return photoRepository.save(photoEntity);
     }
 
@@ -74,7 +86,7 @@ public class PhotoService {
                                 })
                                 .flatMap(bytes -> objectStorageService.uploadFile(bytes)
                                         .flatMap(photoUrl -> {
-                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, null, requestMemberId);
+                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, null, 0, requestMemberId);
                                             return photoRepository.save(photoEntity);
                                         }))
                                 .subscribeOn(Schedulers.boundedElastic())
