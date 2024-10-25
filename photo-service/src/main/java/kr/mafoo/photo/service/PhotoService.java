@@ -83,9 +83,11 @@ public class PhotoService {
     }
 
     public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId, String sort) {
+        String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
+
         return albumService.findByAlbumId(albumId, requestMemberId)
                 .thenMany(
-                        switch (sort) {
+                        switch (sortMethod) {
                             case "ASC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
                             case "DESC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtDesc(albumId);
                             default -> photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
