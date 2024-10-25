@@ -74,7 +74,7 @@ public class WebExceptionHandler {
     private Mono<ResponseEntity<String>> handleExceptionInternal(ServerWebExchange exchange, Exception exception, HttpStatus status) {
         String method = extractMethod(exchange);
         String userAgent = extractUserAgent(exchange);
-        String fullPath = extractFullPath(exchange);
+        String fullPath = extractURI(exchange);
         String originIp = extractOriginIp(exchange);
 
         return extractRequestBody(exchange).flatMap(requestBody -> {
@@ -99,11 +99,19 @@ public class WebExceptionHandler {
         return exchange.getRequest().getHeaders().getFirst("User-Agent");
     }
 
-    private String extractFullPath(ServerWebExchange exchange) {
+    private String extractURI(ServerWebExchange exchange) {
         var request = exchange.getRequest();
+
+        String scheme = request.getURI().getScheme();
+        String host = request.getURI().getHost();
+        int port = request.getURI().getPort();
         String fullPath = request.getURI().getRawPath();
         String query = request.getURI().getQuery();
-        return (query != null && !query.isEmpty()) ? fullPath + "?" + query : fullPath;
+
+        String baseUrl = (port != -1) ? host + ":" + port : host;
+        String uriWithHost = scheme + "://" + baseUrl + fullPath;
+
+        return (query != null && !query.isEmpty()) ? uriWithHost + "?" + query : uriWithHost;
     }
 
     private String extractOriginIp(ServerWebExchange exchange) {
