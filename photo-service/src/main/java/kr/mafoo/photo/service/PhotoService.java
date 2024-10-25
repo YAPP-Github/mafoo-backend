@@ -98,7 +98,10 @@ public class PhotoService {
                 .findById(photoId)
                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
                 .flatMap(photoEntity -> {
-                    if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
+                    if (!photoEntity.hasOwnerMemberId()) {
+                        return photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
+                    }
+                    else if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
@@ -120,27 +123,14 @@ public class PhotoService {
     @Transactional
     public Flux<PhotoEntity> updatePhotoBulkAlbumId(String[] photoIds, String albumId, String requestMemberId) {
         return Flux.fromArray(photoIds)
-                .flatMap(photoId ->
-                        this.updatePhotoAlbumId(photoId, albumId, requestMemberId)
-                );
+                .concatMap(photoId -> this.updatePhotoAlbumId(photoId, albumId, requestMemberId));
     }
 
     @Transactional
     public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
-        return photoRepository
-                .findById(photoId)
-                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
-                .flatMap(photoEntity -> {
-
-                    if (!photoEntity.hasOwnerMemberId()) {
-                        photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
-                    }
-
-                    if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 사진이 아니면 그냥 없는 사진 처리
-                        return Mono.error(new PhotoNotFoundException());
-                    } else {
-                        return albumService.findByAlbumId(albumId, requestMemberId)
+        return findByPhotoId(photoId, requestMemberId)
+                .flatMap(photoEntity ->
+                        albumService.findByAlbumId(albumId, requestMemberId)
                                 .flatMap(albumEntity ->
                                         albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), 1, requestMemberId)
                                                 .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
@@ -150,9 +140,8 @@ public class PhotoService {
                                                                 .updateAlbumId(albumId)
                                                                 .updateDisplayIndex(albumEntity.getPhotoCount())
                                                 ))
-                                );
-                    }
-                });
+                                )
+                );
     }
 
     @Transactional
