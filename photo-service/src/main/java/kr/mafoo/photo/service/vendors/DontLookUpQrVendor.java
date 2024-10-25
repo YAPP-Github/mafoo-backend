@@ -15,7 +15,7 @@ public class DontLookUpQrVendor implements QrVendor {
 
     @Override
     public Mono<byte[]> extractImageFromQrUrl(String qrUrl) {
-        String imageName = qrUrl.split(".kr/image/")[1];
+        String imageName = qrUrl.split(".kr/h/")[1];
 
         String baseUrl = "https://x.dontlxxkup.kr/uploads/";
         String imageUrl = baseUrl + imageName;
