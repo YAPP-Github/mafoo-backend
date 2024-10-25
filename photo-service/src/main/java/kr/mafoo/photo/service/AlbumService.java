@@ -114,7 +114,7 @@ public class AlbumService {
     }
 
     @Transactional
-    public Mono<Void> increaseAlbumPhotoCount(String albumId, String requestMemberId) {
+    public Mono<Void> increaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
         return albumRepository
                 .findById(albumId)
                 .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
@@ -123,13 +123,13 @@ public class AlbumService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return albumRepository.save(albumEntity.increasePhotoCount()).then();
+                        return albumRepository.save(albumEntity.increasePhotoCount(count)).then();
                     }
                 });
     }
 
     @Transactional
-    public Mono<Void> decreaseAlbumPhotoCount(String albumId, String requestMemberId) {
+    public Mono<Void> decreaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
 
         if (albumId == null) {
             return Mono.empty();
@@ -143,7 +143,7 @@ public class AlbumService {
                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                         return Mono.error(new AlbumNotFoundException());
                     } else {
-                        return albumRepository.save(albumEntity.decreasePhotoCount()).then();
+                        return albumRepository.save(albumEntity.decreasePhotoCount(count)).then();
                     }
                 });
     }

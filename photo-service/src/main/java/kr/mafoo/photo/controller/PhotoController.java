@@ -53,7 +53,7 @@ public class PhotoController implements PhotoApi {
             PhotoFileUrlUploadRequest request
     ){
         return photoService
-                .createNewPhotoFileUrl(request.fileUrls(), memberId)
+                .createNewPhotoFileUrl(request.fileUrls(), request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 

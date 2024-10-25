@@ -38,20 +38,25 @@ public class PhotoService {
         return qrService
                 .getFileFromQrUrl(qrUrl)
                 .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
-                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), requestMemberId))
+                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), null, requestMemberId))
                 );
     }
 
     @Transactional
-    public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String requestMemberId) {
-        return Flux.fromArray(fileUrls)
-                .flatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
-                        .flatMap(fileLink -> createNewPhoto(fileLink, BrandType.EXTERNAL, requestMemberId))
+    public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String albumId, String requestMemberId) {
+
+        return albumService.findByAlbumId(albumId, requestMemberId)
+                .flatMap(albumEntity -> albumService.increaseAlbumPhotoCount(albumId, fileUrls.length, requestMemberId))
+                .thenMany(
+                        Flux.fromArray(fileUrls)
+                                .flatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
+                                        .flatMap(fileLink -> createNewPhoto(fileLink, BrandType.EXTERNAL, albumId, requestMemberId))
+                                )
                 );
     }
 
-    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String requestMemberId) {
-        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, requestMemberId);
+    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String albumId, String requestMemberId) {
+        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, albumId, requestMemberId);
         return photoRepository.save(photoEntity);
     }
 
@@ -73,7 +78,7 @@ public class PhotoService {
                                 })
                                 .flatMap(bytes -> objectStorageService.uploadFile(bytes)
                                         .flatMap(photoUrl -> {
-                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, requestMemberId);
+                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, null, requestMemberId);
                                             return photoRepository.save(photoEntity);
                                         }))
                                 .subscribeOn(Schedulers.boundedElastic())
@@ -111,7 +116,7 @@ public class PhotoService {
                         // 내 사진이 아니면 그냥 없는 사진 처리
                         return Mono.error(new PhotoNotFoundException());
                     } else {
-                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), 1, requestMemberId)
                                 .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
                                 .then(photoRepository.deleteById(photoId));
                     }
@@ -149,9 +154,9 @@ public class PhotoService {
                                         // 내 앨범이 아니면 그냥 없는 앨범 처리
                                         return Mono.error(new AlbumNotFoundException());
                                     } else {
-                                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), requestMemberId)
+                                        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), 1, requestMemberId)
                                                 .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
-                                                .then(albumService.increaseAlbumPhotoCount(albumId, requestMemberId))
+                                                .then(albumService.increaseAlbumPhotoCount(albumId, 1, requestMemberId))
                                                 .then(photoRepository.save(
                                                         photoEntity
                                                                 .updateAlbumId(albumId)
