@@ -41,7 +41,6 @@ public class PhotoService {
 
     @Transactional
     public Flux<PhotoEntity> createNewPhotoFileUrl(String[] fileUrls, String albumId, String requestMemberId) {
-
         return albumService.findByAlbumId(albumId, requestMemberId)
                 .flatMap(albumEntity -> albumService.increaseAlbumPhotoCount(albumId, fileUrls.length, requestMemberId))
                 .thenMany(
@@ -158,9 +157,7 @@ public class PhotoService {
 
     @Transactional
     public Mono<PhotoEntity> updatePhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
-        return photoRepository
-                .findById(photoId)
-                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
+        return findByPhotoId(photoId, requestMemberId)
                 .flatMap(photoEntity -> albumService.findByAlbumId(photoEntity.getAlbumId(), requestMemberId)
                         .flatMap(albumEntity -> {
                             int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
