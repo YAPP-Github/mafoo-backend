@@ -106,6 +106,20 @@ public class PhotoService {
                 });
     }
 
+    public Mono<PhotoEntity> findByPhotoId(String photoId, String requestMemberId) {
+        return photoRepository
+                .findById(photoId)
+                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
+                .flatMap(photoEntity -> {
+                    if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
+                        // 내 사진이 아니면 그냥 없는 사진 처리
+                        return Mono.error(new PhotoNotFoundException());
+                    } else {
+                        return Mono.just(photoEntity);
+                    }
+                });
+    }
+
     @Transactional
     public Mono<Void> deletePhotoById(String photoId, String requestMemberId) {
         return photoRepository
