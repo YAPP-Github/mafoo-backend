@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import kr.mafoo.photo.controller.dto.response.ErrorResponse;
 import kr.mafoo.photo.exception.DomainException;
 import kr.mafoo.photo.exception.ErrorCode;
+import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
 import kr.mafoo.photo.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -59,6 +60,26 @@ public class WebExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(response);
+    }
+
+    @ExceptionHandler(PhotoBrandNotExistsException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handlePhotoBrandNotExistsException(ServerWebExchange exchange, PhotoBrandNotExistsException exception) {
+        String method = extractMethod(exchange);
+        String userAgent = extractUserAgent(exchange);
+        String fullPath = extractURI(exchange);
+        String originIp = extractOriginIp(exchange);
+
+        return extractRequestBody(exchange).flatMap(requestBody -> {
+            logException(method, fullPath, originIp, userAgent, exception);
+
+            return slackService.sendQrRelatedErrorNotification(
+                    method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
+            ).then(Mono.just(
+                    ResponseEntity
+                            .badRequest()
+                            .body(ErrorResponse.fromErrorCode(exception.getErrorCode()))
+            ));
+        });
     }
 
     @ExceptionHandler(ResponseStatusException.class)
