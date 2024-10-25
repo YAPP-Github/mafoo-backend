@@ -147,28 +147,29 @@ public class PhotoService {
     @Transactional
     public Mono<PhotoEntity> updatePhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
         return findByPhotoId(photoId, requestMemberId)
-                .flatMap(photoEntity -> albumService.findByAlbumId(photoEntity.getAlbumId(), requestMemberId)
-                        .flatMap(albumEntity -> {
-                            int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
+                .flatMap(photoEntity ->
+                        albumService.findByAlbumId(photoEntity.getAlbumId(), requestMemberId)
+                                .flatMap(albumEntity -> {
+                                    int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
 
-                            if (photoEntity.getDisplayIndex().equals(targetIndex)) {
-                                return Mono.error(new PhotoDisplayIndexIsSameException());
-                            }
+                                    if (photoEntity.getDisplayIndex().equals(targetIndex)) {
+                                        return Mono.error(new PhotoDisplayIndexIsSameException());
+                                    }
 
-                            if (targetIndex < 0 || targetIndex >= albumEntity.getPhotoCount()) {
-                                return Mono.error(new PhotoDisplayIndexNotValidException());
-                            }
+                                    if (targetIndex < 0 || targetIndex >= albumEntity.getPhotoCount()) {
+                                        return Mono.error(new PhotoDisplayIndexNotValidException());
+                                    }
 
-                            if (photoEntity.getDisplayIndex() < targetIndex) {
-                                return photoRepository
-                                        .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
-                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
-                            } else {
-                                return photoRepository
-                                        .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
-                                        .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
-                            }
-                        })
+                                    if (photoEntity.getDisplayIndex() < targetIndex) {
+                                        return photoRepository
+                                                .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
+                                                .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                                    } else {
+                                        return photoRepository
+                                                .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
+                                                .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                                    }
+                                })
                 );
     }
 
