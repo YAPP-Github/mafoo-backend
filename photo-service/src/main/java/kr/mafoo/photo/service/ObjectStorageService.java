@@ -39,7 +39,7 @@ public class ObjectStorageService {
     private long presignedUrlExpiration;
 
     public Mono<String> uploadFile(byte[] fileByte) {
-        String keyName = "qr/" + UUID.randomUUID();
+        String keyName = "qr/" + UUID.randomUUID() + ".jpeg";
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(fileByte.length);
@@ -71,7 +71,8 @@ public class ObjectStorageService {
     }
 
     private URL generatePresignedUrl(String fileName, String memberId) {
-        String filePath = String.format("%s/photo/%s_%s", memberId, UUID.randomUUID(), fileName);
+        String fileType = extractFileType(fileName);
+        String filePath = String.format("%s/photo/%s.%s", memberId, UUID.randomUUID(), fileType);
         Date expiration = new Date(System.currentTimeMillis() + presignedUrlExpiration);
 
         return amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
@@ -90,6 +91,10 @@ public class ObjectStorageService {
                 throw new RuntimeException("Failed to set ACL to PublicRead for the file: " + keyName, e);
             }
         });
+    }
+
+    private String extractFileType(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
     private String generateFileLink(String keyName) {
