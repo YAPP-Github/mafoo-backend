@@ -67,85 +67,39 @@ public class AlbumService {
 
     @Transactional
     public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return albumRepository
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(albumEntity ->
+                        albumRepository
                                 .deleteById(albumId)
                                 .then(albumRepository.popDisplayIndexBetween(
-                                        requestMemberId, albumEntity.getDisplayIndex(), Integer.MAX_VALUE));
-                    }
-                });
+                                        requestMemberId, albumEntity.getDisplayIndex(), Integer.MAX_VALUE))
+                );
     }
 
     @Transactional
     public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName, String requestMemberId) {
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return albumRepository.save(albumEntity.updateName(albumName));
-                    }
-                });
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(albumEntity -> albumRepository.save(albumEntity.updateName(albumName)));
     }
 
     @Transactional
     public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType, String requestMemberId) {
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return albumRepository.save(albumEntity.updateType(albumType));
-                    }
-                });
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(albumEntity -> albumRepository.save(albumEntity.updateType(albumType)));
     }
 
     @Transactional
-    public Mono<Void> increaseAlbumPhotoCount(String albumId, String requestMemberId) {
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return albumRepository.save(albumEntity.increasePhotoCount()).then();
-                    }
-                });
+    public Mono<AlbumEntity> increaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
+        return findByAlbumId(albumId, requestMemberId)
+                .flatMap(albumEntity -> albumRepository.save(albumEntity.increasePhotoCount(count)));
     }
 
     @Transactional
-    public Mono<Void> decreaseAlbumPhotoCount(String albumId, String requestMemberId) {
-
-        if (albumId == null) {
-            return Mono.empty();
-        }
-
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if (!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return albumRepository.save(albumEntity.decreasePhotoCount()).then();
-                    }
-                });
+    public Mono<AlbumEntity> decreaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
+        return Mono.justOrEmpty(albumId)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(id -> findByAlbumId(id, requestMemberId))
+                .flatMap(albumEntity -> albumRepository.save(albumEntity.decreasePhotoCount(count)));
     }
 
 }

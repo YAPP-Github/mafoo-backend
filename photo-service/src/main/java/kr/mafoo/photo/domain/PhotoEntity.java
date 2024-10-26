@@ -82,13 +82,14 @@ public class PhotoEntity implements Persistable<String> {
         return this;
     }
 
-    public static PhotoEntity newPhoto(String photoId, String photoUrl, BrandType brandType, String ownerMemberId) {
+    public static PhotoEntity newPhoto(String photoId, String photoUrl, BrandType brandType, String albumId, Integer displayIndex, String ownerMemberId) {
         PhotoEntity photo = new PhotoEntity();
         photo.photoId = photoId;
         photo.photoUrl = photoUrl;
         photo.brand = brandType;
         photo.ownerMemberId = ownerMemberId;
-        photo.displayIndex = 0;
+        photo.albumId = albumId;
+        photo.displayIndex = displayIndex;
         photo.isNew = true;
         photo.createdAt = LocalDateTime.now();
         photo.updatedAt = LocalDateTime.now();
