@@ -49,3 +49,20 @@ slack:
     channel:
       error: ${SLACK_ERROR_CHANNEL}
       qr: ${SLACK_QR_ERROR_CHANNEL}
+
+recap:
+  tmp:
+    dir: ${RECAP_TMP_DIR}
+    file:
+      download: ${RECAP_DOWNLOAD_FILE}
+      photo: ${RECAP_PHOTO_FILE}
+      video: ${RECAP_VIDEO_FILE}
+      chip: ${RECAP_CHIP_IMAGE_FILE}
+      frame: ${RECAP_FRAME_FILE}
+  src:
+    background: ${RECAP_BACKGROUND_SOURCE}
+    icon: ${RECAP_ICON_SOURCE}
+    font:
+      aggro-m: ${FONT_AGGRO_M}
+      aggro-b: ${FONT_AGGRO_B}
+      pretendard: ${FONT_PRETENDARD}
