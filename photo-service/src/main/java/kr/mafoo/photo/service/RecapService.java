@@ -46,26 +46,24 @@ public class RecapService {
 
     private final AlbumService albumService;
     private final PhotoService photoService;
+    private final MemberService memberService;
 
     private final ObjectStorageService objectStorageService;
     private final Graphics2dService graphics2dService;
     private final FFmpegExecutor ffmpegExecutor;
     private final LocalFileService localFileService;
 
-    public Mono<String> createRecap(String albumId, String requestMemberId, String sort) {
+    public Mono<String> createRecap(String albumId, String requestMemberId, String sort, String token) {
 
         String recapId = IdGenerator.generate();
 
         return albumService.findByAlbumId(albumId, requestMemberId)
                 .flatMap(albumEntity -> {
-                    String albumName = albumEntity.getName();
                     String albumType = String.valueOf(albumEntity.getType());
 
-                    // temp
-                    String memberName = "시금치파슷하";
-
-                    return graphics2dService.generateAlbumChipForRecap(recapId, albumName, albumType)
-                            .then(generateRecapFrame(recapId, memberName, albumType))
+                    return graphics2dService.generateAlbumChipForRecap(recapId, albumEntity.getName(), albumType)
+                            .then(memberService.getMemberInfo(token))
+                            .flatMap(memberInfo -> generateRecapFrame(recapId, memberInfo.name(), albumType))
                             .then(photoService.findAllByAlbumId(albumId, requestMemberId, sort)
                                 .collectList()
                                 .flatMap(photoEntities -> {
@@ -78,8 +76,7 @@ public class RecapService {
                             )
                             .flatMap(downloadedPath -> generateRecapPhotos(downloadedPath, recapId))
                             .then(Mono.defer(() -> generateRecapVideo(recapId)))
-                            .flatMap(objectStorageService::uploadFileFromPath)
-                            ;
+                            .flatMap(objectStorageService::uploadFileFromPath);
                 })
                 .flatMap(recapUploadedPath ->
                         localFileService.deleteSimilarNameFileForPath(dirPath, recapId)

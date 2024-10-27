@@ -1,6 +1,7 @@
 package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.RecapApi;
+import kr.mafoo.photo.controller.dto.request.RecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
 import kr.mafoo.photo.service.RecapService;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,11 @@ public class RecapController implements RecapApi {
     @Override
     public Mono<RecapResponse> createRecap(
             String memberId,
-            String albumId,
-            String sort
+            RecapCreateRequest request,
+            String sort,
+            String authorizationToken
     ) {
-        return recapService.createRecap(albumId, memberId, sort)
+        return recapService.createRecap(request.albumId(), memberId, sort, authorizationToken)
                 .map(RecapResponse::fromString);
     }
 

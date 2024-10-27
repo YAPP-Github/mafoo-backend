@@ -27,7 +27,10 @@ public interface RecapApi {
 
             @Parameter(description = "정렬 종류", example = "ASC | DESC")
             @RequestParam(required = false)
-            String sort
+            String sort,
+
+            @RequestHeader("Authorization")
+            String authorizationToken
     );
 
 }
