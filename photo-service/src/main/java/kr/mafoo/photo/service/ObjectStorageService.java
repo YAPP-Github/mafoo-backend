@@ -67,6 +67,31 @@ public class ObjectStorageService {
         });
     }
 
+    public Mono<String> uploadFileFromPath(String filePath) {
+        return Mono.fromCallable(() -> {
+            File file = new File(filePath);
+            String keyName = "recap/" + file.getName();
+
+            if (!file.exists() || !file.isFile()) {
+                throw new IllegalArgumentException("Invalid file path: " + filePath);
+            }
+
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.length());
+            objectMetadata.setContentType("application/octet-stream");
+
+            try (InputStream inputStream = FileUtils.openInputStream(file)) {
+                amazonS3Client.putObject(
+                        new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata)
+                                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+                return generateFileLink(keyName);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload file to object storage: " + filePath, e);
+            }
+        });
+    }
+
     public Mono<String[]> createPreSignedUrls(String[] fileNames, String memberId) {
         return Mono.fromCallable(() -> {
             if (fileNames.length > 30) {
