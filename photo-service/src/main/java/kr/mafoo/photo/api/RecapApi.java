@@ -3,8 +3,9 @@ package kr.mafoo.photo.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
-import kr.mafoo.photo.annotation.ULID;
+import kr.mafoo.photo.controller.dto.request.RecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +21,9 @@ public interface RecapApi {
             @RequestMemberId
             String memberId,
 
-            @ULID
-            @Parameter(description = "앨범 ID", example = "test_album_id")
-            @RequestParam
-            String albumId,
+            @Valid
+            @RequestBody
+            RecapCreateRequest request,
 
             @Parameter(description = "정렬 종류", example = "ASC | DESC")
             @RequestParam(required = false)
