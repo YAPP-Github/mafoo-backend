@@ -44,6 +44,9 @@ public class RecapService {
     @Value("${recap.tmp.file.video}")
     private String videoPath;
 
+    @Value("${recap.max-size}")
+    private int recapImageMaxSize;
+
     private final AlbumService albumService;
     private final PhotoService photoService;
     private final MemberService memberService;
@@ -68,6 +71,7 @@ public class RecapService {
                                 .collectList()
                                 .flatMap(photoEntities -> {
                                     List<String> photoUrls = photoEntities.stream()
+                                            .limit(recapImageMaxSize)
                                             .map(PhotoEntity::getPhotoUrl)
                                             .toList();
 

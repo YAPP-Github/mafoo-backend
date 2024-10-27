@@ -54,6 +54,7 @@ ffmpeg:
   path: ${FFMPEG_PATH}
 
 recap:
+  max-size: 15
   tmp:
     dir: ${RECAP_TMP_DIR}
     file:
