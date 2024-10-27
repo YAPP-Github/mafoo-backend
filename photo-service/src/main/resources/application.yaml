@@ -50,6 +50,9 @@ slack:
       error: ${SLACK_ERROR_CHANNEL}
       qr: ${SLACK_QR_ERROR_CHANNEL}
 
+ffmpeg:
+  path: ${FFMPEG_PATH}
+
 recap:
   tmp:
     dir: ${RECAP_TMP_DIR}
