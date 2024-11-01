@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import kr.mafoo.photo.exception.PreSignedUrlBannedFileType;
 import kr.mafoo.photo.exception.PreSignedUrlExceedMaximum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
@@ -93,25 +95,35 @@ public class ObjectStorageService {
     }
 
     public Mono<String[]> createPreSignedUrls(String[] fileNames, String memberId) {
-        return Mono.fromCallable(() -> {
-            if (fileNames.length > 30) {
-                throw new PreSignedUrlExceedMaximum();
-            }
+        if (fileNames.length > 30) {
+            return Mono.error(new PreSignedUrlExceedMaximum());
+        }
 
-            return Stream.of(fileNames)
-                    .map(fileName -> generatePresignedUrl(fileName, memberId).toString())
-                    .toArray(String[]::new);
-        });
+        return Flux.fromArray(fileNames)
+                .flatMap(fileName -> generatePresignedUrlForImage(fileName, memberId)
+                        .map(URL::toString))
+                .collectList()
+                .map(list -> list.toArray(new String[0]));
     }
 
-    private URL generatePresignedUrl(String fileName, String memberId) {
-        String fileType = extractFileType(fileName);
-        String filePath = String.format("%s/photo/%s.%s", memberId, UUID.randomUUID(), fileType);
-        Date expiration = new Date(System.currentTimeMillis() + presignedUrlExpiration);
+    private Mono<URL> generatePresignedUrlForImage(String fileName, String memberId) {
+        List<String> allowedFileTypes = List.of("jpg", "jpeg", "png");
 
-        return amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
-                .withMethod(HttpMethod.PUT)
-                .withExpiration(expiration));
+        return extractFileType(fileName)
+                .flatMap(fileType -> {
+                    if (allowedFileTypes.contains(fileType)) {
+                        String filePath = String.format("%s/photo/%s.%s", memberId, UUID.randomUUID(), fileType);
+                        Date expiration = new Date(System.currentTimeMillis() + presignedUrlExpiration);
+
+                        return Mono.just(
+                                amazonS3Client.generatePresignedUrl(new GeneratePresignedUrlRequest(bucketName, filePath)
+                                        .withMethod(HttpMethod.PUT)
+                                        .withExpiration(expiration))
+                        );
+                    } else {
+                        return Mono.error(new PreSignedUrlBannedFileType());
+                    }
+                });
     }
 
     public Mono<String> setObjectPublicRead(String filePath) {
@@ -127,8 +139,10 @@ public class ObjectStorageService {
         });
     }
 
-    private String extractFileType(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    private Mono<String> extractFileType(String fileName) {
+        return Mono.just(
+                fileName.substring(fileName.lastIndexOf(".") + 1)
+        );
     }
 
     private String generateFileLink(String keyName) {
