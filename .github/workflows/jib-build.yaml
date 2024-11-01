@@ -58,6 +58,7 @@ jobs:
           IMAGE_NAME: ${{ inputs.image-name }}
           IMAGE_TAG: ${{ inputs.image-tag }}
           SERVER_PORT: ${{ inputs.server-port }}
+          RECAP_SRC_URL: ${{ inputs.recap-src-url }}
         run: |
           cd ${{ inputs.module-path }} && \
           chmod +x gradlew && ./gradlew jib
