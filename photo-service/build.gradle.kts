@@ -53,7 +53,7 @@ jib {
 	val imageTag: String? = System.getenv("IMAGE_TAG")
 	val serverPort: String = System.getenv("SERVER_PORT") ?: "8080"
 	from {
-		image = "amazoncorretto:17-alpine3.17-jdk"
+		image = "custom-base-image"
 	}
 	to {
 		image = imageName
