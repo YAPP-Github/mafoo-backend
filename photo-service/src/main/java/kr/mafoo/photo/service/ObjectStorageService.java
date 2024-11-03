@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import kr.mafoo.photo.exception.PreSignedUrlBannedFileType;
 import kr.mafoo.photo.exception.PreSignedUrlExceedMaximum;
+import kr.mafoo.photo.service.properties.RecapProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -46,8 +46,7 @@ public class ObjectStorageService {
     @Value("${cloud.aws.s3.presigned-url-expiration}")
     private long presignedUrlExpiration;
 
-    @Value("${recap.tmp.file.download}")
-    private String localDownloadPath;
+    private final RecapProperties recapProperties;
 
     public Mono<String> uploadFile(byte[] fileByte) {
         String keyName = "qr/" + UUID.randomUUID() + ".jpeg";
@@ -155,7 +154,7 @@ public class ObjectStorageService {
                 List<String> downloadedPaths = IntStream.range(0, fileUrls.size())
                         .mapToObj(i -> {
                             try {
-                                String downloadedPath = String.format(localDownloadPath, recapId, i + 1);
+                                String downloadedPath = recapProperties.getDownloadFilePath(recapId, i+1);
                                 FileUtils.copyURLToFile(new URL(fileUrls.get(i)), new File(downloadedPath));
 
                                 return downloadedPath;

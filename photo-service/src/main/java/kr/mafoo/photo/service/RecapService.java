@@ -1,6 +1,7 @@
 package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.PhotoEntity;
+import kr.mafoo.photo.service.properties.RecapProperties;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,32 +21,11 @@ import net.bramp.ffmpeg.FFmpegExecutor;
 @Service
 public class RecapService {
 
-    @Value("${recap.src.background}")
-    private String backgroundPath;
-
-    @Value("${recap.src.font.aggro-m}")
-    private String fontAggroMPath;
-
-    @Value("${recap.src.font.aggro-b}")
-    private String fontAggroBPath;
-
-    @Value("${recap.tmp.dir}")
-    private String dirPath;
-
-    @Value("${recap.tmp.file.chip}")
-    private String chipPath;
-
-    @Value("${recap.tmp.file.frame}")
-    private String framePath;
-
-    @Value("${recap.tmp.file.photo}")
-    private String photoPath;
-
-    @Value("${recap.tmp.file.video}")
-    private String videoPath;
-
     @Value("${recap.max-size}")
     private int recapImageMaxSize;
+
+    @Value("${recap.path.tmp}")
+    private String tmpPath;
 
     private final AlbumService albumService;
     private final PhotoService photoService;
@@ -55,6 +35,8 @@ public class RecapService {
     private final Graphics2dService graphics2dService;
     private final FFmpegExecutor ffmpegExecutor;
     private final LocalFileService localFileService;
+
+    private final RecapProperties recapProperties;
 
     public Mono<String> createRecap(String albumId, String requestMemberId, String sort, String token) {
 
@@ -83,7 +65,7 @@ public class RecapService {
                             .flatMap(objectStorageService::uploadFileFromPath);
                 })
                 .flatMap(recapUploadedPath ->
-                        localFileService.deleteSimilarNameFileForPath(dirPath, recapId)
+                        localFileService.deleteSimilarNameFileForPath(tmpPath, recapId)
                                 .thenReturn(recapUploadedPath)
                 );
     }
@@ -91,9 +73,7 @@ public class RecapService {
     private Mono<String> generateRecapFrame(String recapId, String memberName, String albumType) {
         return Mono.fromCallable(() -> {
             try {
-                String recapBackgroundPath = String.format(backgroundPath, albumType);
-                String recapChipPath = String.format(chipPath, recapId);
-                String recapFramePath = String.format(framePath, recapId);
+                String recapFramePath = recapProperties.getFrameFilePath(recapId);
                 String recapCreatedDate = DateTimeFormatter.ofPattern("yyyy.MM.dd").format(LocalDate.now());
 
                 FFmpegBuilder builder = new FFmpegBuilder()
@@ -104,12 +84,12 @@ public class RecapService {
                                         "[0][chip]overlay=188:H-h-120[bg_w_chip]; " +
                                         "[bg_w_chip]drawtext=fontfile=%s:text='@%s님의 RECAP':fontcolor=white@0.7:fontsize=72:x=(w-tw)/2:y=208[bg_w_title]; " +
                                         "[bg_w_title]drawtext=fontfile=%s:text='%s':fontcolor=white:fontsize=72:x=w-tw-188:y=h-th-180;",
-                                        fontAggroBPath, memberName,
-                                        fontAggroMPath, recapCreatedDate
+                                        recapProperties.getAggroBFontPath(), memberName,
+                                        recapProperties.getAggroMFontPath(), recapCreatedDate
                                 )
                         )
-                        .addInput(recapBackgroundPath)
-                        .addInput(recapChipPath)
+                        .addInput(recapProperties.getBackgroundPath(albumType))
+                        .addInput(recapProperties.getChipFilePath(recapId))
                         .addOutput(recapFramePath)
                         .done();
 
@@ -126,10 +106,9 @@ public class RecapService {
     private Mono<Void> generateRecapPhotos(List<String> downloadedPath, String recapId) {
 
         return Mono.fromRunnable(() -> {
-            String recapFramePath = String.format(framePath, recapId);
 
             FFmpegBuilder builder = new FFmpegBuilder()
-                    .addInput(recapFramePath);
+                    .addInput(recapProperties.getFrameFilePath(recapId));
 
             for (String path : downloadedPath) {
                 builder.addInput(path);
@@ -145,8 +124,8 @@ public class RecapService {
             builder.addExtraArgs("-filter_complex", filterComplex.toString());
 
             for (int outputIndex = 1; outputIndex <= downloadedPath.size(); outputIndex++) {
-                builder.addOutput(String.format(photoPath, recapId, outputIndex))
-                        .addExtraArgs("-map", String.format("[final%d]", outputIndex));
+                builder.addOutput(recapProperties.getPhotoFilePath(recapId, outputIndex))
+                    .addExtraArgs("-map", String.format("[final%d]", outputIndex));
             }
 
             ffmpegExecutor.createJob(builder).run();
@@ -156,11 +135,11 @@ public class RecapService {
     private Mono<String> generateRecapVideo(String recapId) {
         return Mono.fromCallable(() -> {
             try {
-                String recapVideoPath = String.format(videoPath, recapId);
+                String recapVideoPath = recapProperties.getVideoFilePath(recapId);
 
                 FFmpegBuilder builder = new FFmpegBuilder()
                         .addExtraArgs("-r", "2")
-                        .addInput(photoPath.replace("%s", recapId))
+                    .addInput(recapProperties.getPhotoFilePath(recapId))
                         .addOutput(recapVideoPath)
                         .done();
 

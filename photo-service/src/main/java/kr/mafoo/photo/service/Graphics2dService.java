@@ -1,6 +1,7 @@
 package kr.mafoo.photo.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import kr.mafoo.photo.service.properties.RecapProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -15,16 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class Graphics2dService {
 
-    @Value("${recap.src.font.pretendard}")
-    private String fontPretendardPath;
-
-    @Value("${recap.src.icon}")
-    private String iconPath;
-
-    @Value("${recap.tmp.file.chip}")
-    private String chipPath;
+    private final RecapProperties recapProperties;
 
     public Mono<Void> generateAlbumChipForRecap(String recapId, String albumName, String albumType) {
 
@@ -45,7 +40,7 @@ public class Graphics2dService {
         int paddingTopBottom = 22;
         int iconTextSpacing = 8;
         int borderThickness = 2;
-        Font font = new Font(fontPretendardPath, Font.BOLD, 36);
+        Font font = new Font(recapProperties.getPretendardFontPath(), Font.BOLD, 36);
 
         FontMetrics metrics = getCachedFontMetrics(font);
         BufferedImage icon = getCachedIcon(albumType);
@@ -118,7 +113,7 @@ public class Graphics2dService {
     }
 
     private String generateAlbumChipImagePath(String recapId) {
-        return String.format(chipPath, recapId);
+        return recapProperties.getChipFilePath(recapId);
     }
 
     private FontMetrics getCachedFontMetrics(Font font) {
@@ -134,7 +129,7 @@ public class Graphics2dService {
 
     private BufferedImage getCachedIcon(String iconType) throws IOException {
         if (!iconCache.containsKey(iconType)) {
-            BufferedImage icon = ImageIO.read(new File(String.format(iconPath, iconType)));
+            BufferedImage icon = ImageIO.read(new File(recapProperties.getIconPath(iconType)));
             iconCache.put(iconType, icon);
         }
         return iconCache.get(iconType);

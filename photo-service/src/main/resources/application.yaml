@@ -51,22 +51,10 @@ slack:
       qr: ${SLACK_QR_ERROR_CHANNEL}
 
 ffmpeg:
-  path: ${FFMPEG_PATH}
+  path: /usr/bin/ffmpeg
 
 recap:
   max-size: 15
-  tmp:
-    dir: ${RECAP_TMP_DIR}
-    file:
-      download: ${RECAP_DOWNLOAD_FILE}
-      photo: ${RECAP_PHOTO_FILE}
-      video: ${RECAP_VIDEO_FILE}
-      chip: ${RECAP_CHIP_IMAGE_FILE}
-      frame: ${RECAP_FRAME_FILE}
-  src:
-    background: ${RECAP_BACKGROUND_SOURCE}
-    icon: ${RECAP_ICON_SOURCE}
-    font:
-      aggro-m: ${FONT_AGGRO_M}
-      aggro-b: ${FONT_AGGRO_B}
-      pretendard: ${FONT_PRETENDARD}
+  path:
+    tmp: /usr/bin/recap/tmp/
+    src: /usr/bin/recap/src/
