@@ -52,7 +52,6 @@ jib {
 	val imageName: String? = System.getenv("IMAGE_NAME")
 	val imageTag: String? = System.getenv("IMAGE_TAG")
 	val serverPort: String = System.getenv("SERVER_PORT") ?: "8080"
-	val recapSrcUrl: String? = System.getenv("RECAP_SRC_URL")
 	from {
 		image = "custom-base-image"
 	}
@@ -61,9 +60,6 @@ jib {
 		tags = setOf(imageTag, "latest")
 	}
 	container {
-		environment = mapOf(
-			"RECAP_SRC_URL" to recapSrcUrl
-		)
 		jvmFlags =
 			listOf(
 				"-Dspring.profiles.active=$activeProfile",
