@@ -5,6 +5,7 @@ import kr.mafoo.photo.controller.dto.request.RecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
 import kr.mafoo.photo.service.RecapService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -19,8 +20,10 @@ public class RecapController implements RecapApi {
             String memberId,
             RecapCreateRequest request,
             String sort,
-            String authorizationToken
+            ServerHttpRequest serverHttpRequest
     ) {
+        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
+
         return recapService.createRecap(request.albumId(), memberId, sort, authorizationToken)
                 .map(RecapResponse::fromString);
     }

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.controller.dto.request.RecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -29,8 +30,7 @@ public interface RecapApi {
             @RequestParam(required = false)
             String sort,
 
-            @RequestHeader("Authorization")
-            String authorizationToken
+            ServerHttpRequest serverHttpRequest
     );
 
 }
