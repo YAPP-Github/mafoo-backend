@@ -85,7 +85,7 @@ public class RecapService {
                                         "[1]scale=w=-1:h=176[chip]; " +
                                         "[0][chip]overlay=188:H-h-120[bg_w_chip]; " +
                                         "[bg_w_chip]drawtext=fontfile=%s:text='@%s님의 RECAP':fontcolor=white@0.7:fontsize=72:x=(w-tw)/2:y=208[bg_w_title]; " +
-                                        "[bg_w_title]drawtext=fontfile=%s:text='%s':fontcolor=white:fontsize=72:x=w-tw-188:y=h-th-180;",
+                                        "[bg_w_title]drawtext=fontfile=%s:text='%s':fontcolor=white:fontsize=72:x=w-tw-188:y=h-th-180",
                                         recapProperties.getAggroBFontPath(), memberName,
                                         recapProperties.getAggroMFontPath(), recapCreatedDate
                                 )
