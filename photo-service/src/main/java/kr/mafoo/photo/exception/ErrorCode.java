@@ -19,7 +19,9 @@ public enum ErrorCode {
     PHOTO_DISPLAY_INDEX_NOT_VALID("PE0005", "옮기려는 대상 사진 인덱스가 유효하지 않습니다"),
 
     PRE_SIGNED_URL_EXCEED_MAXIMUM("OE0001", "한 번에 생성할 수 있는 Pre-signed url 최대치를 초과했습니다"),
-    PRE_SIGNED_URL_BANNED_FILE_TYPE("OE0002", "Pre-signed url 발급이 허용되지 않는 파일 형식입니다")
+    PRE_SIGNED_URL_BANNED_FILE_TYPE("OE0002", "Pre-signed url 발급이 허용되지 않는 파일 형식입니다"),
+
+    MAFOO_USER_API_FAILED("MUE0001", "마푸의 user-service API 호출이 실패했습니다")
 
     ;
     private final String code;
