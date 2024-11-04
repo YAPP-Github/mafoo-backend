@@ -78,6 +78,7 @@ public class RecapService {
                 String recapCreatedDate = DateTimeFormatter.ofPattern("yyyy.MM.dd").format(LocalDate.now());
 
                 FFmpegBuilder builder = new FFmpegBuilder()
+                        .addExtraArgs("-loglevel", "debug")
                         .addExtraArgs(
                                 "-filter_complex",
                                 String.format(
@@ -107,29 +108,38 @@ public class RecapService {
     private Mono<Void> generateRecapPhotos(List<String> downloadedPath, String recapId) {
 
         return Mono.fromRunnable(() -> {
-
-            FFmpegBuilder builder = new FFmpegBuilder()
+            try {
+                FFmpegBuilder builder = new FFmpegBuilder()
+                    .addExtraArgs("-loglevel", "debug")
                     .addInput(recapProperties.getFrameFilePath(recapId));
 
-            for (String path : downloadedPath) {
-                builder.addInput(path);
+                for (String path : downloadedPath) {
+                    builder.addInput(path);
+                }
+
+                StringBuilder filterComplex = new StringBuilder();
+
+                for (int inputIndex = 1; inputIndex <= downloadedPath.size(); inputIndex++) {
+                    filterComplex.append(String.format(
+                        "[%d]scale='min(1200,iw)':'min(1776,ih)':force_original_aspect_ratio=decrease[photo_scaled_%d]; ",
+                        inputIndex, inputIndex));
+                    filterComplex.append(String.format(
+                        "[recap_bg][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d];",
+                        inputIndex, inputIndex));
+                }
+
+                builder.addExtraArgs("-filter_complex", filterComplex.toString());
+
+                for (int outputIndex = 1; outputIndex <= downloadedPath.size(); outputIndex++) {
+                    builder.addOutput(recapProperties.getPhotoFilePath(recapId, outputIndex))
+                        .addExtraArgs("-map", String.format("[final%d]", outputIndex));
+                }
+
+                ffmpegExecutor.createJob(builder).run();
+            } catch (Exception e) {
+                log.error("Failed to generate recap photos", e);
+                throw new RuntimeException("Failed to generate recap photos", e);
             }
-
-            StringBuilder filterComplex = new StringBuilder();
-
-            for (int inputIndex = 1; inputIndex <= downloadedPath.size(); inputIndex++) {
-                filterComplex.append(String.format("[%d]scale='min(1200,iw)':'min(1776,ih)':force_original_aspect_ratio=decrease[photo_scaled_%d]; ", inputIndex, inputIndex));
-                filterComplex.append(String.format("[recap_bg][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d];", inputIndex, inputIndex));
-            }
-
-            builder.addExtraArgs("-filter_complex", filterComplex.toString());
-
-            for (int outputIndex = 1; outputIndex <= downloadedPath.size(); outputIndex++) {
-                builder.addOutput(recapProperties.getPhotoFilePath(recapId, outputIndex))
-                    .addExtraArgs("-map", String.format("[final%d]", outputIndex));
-            }
-
-            ffmpegExecutor.createJob(builder).run();
         }).then();
     }
 
@@ -139,8 +149,9 @@ public class RecapService {
                 String recapVideoPath = recapProperties.getVideoFilePath(recapId);
 
                 FFmpegBuilder builder = new FFmpegBuilder()
+                        .addExtraArgs("-loglevel", "debug")
                         .addExtraArgs("-r", "2")
-                    .addInput(recapProperties.getPhotoFilePath(recapId))
+                        .addInput(recapProperties.getPhotoFilePath(recapId))
                         .addOutput(recapVideoPath)
                         .done();
 
