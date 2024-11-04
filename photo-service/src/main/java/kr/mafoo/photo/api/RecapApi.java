@@ -30,6 +30,7 @@ public interface RecapApi {
             @RequestParam(required = false)
             String sort,
 
+            // Authorization Header를 받아올 목적
             ServerHttpRequest serverHttpRequest
     );
 
