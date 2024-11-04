@@ -99,7 +99,7 @@ public class RecapService {
                 return recapFramePath;
             } catch (Exception e) {
                 log.error("Failed to generate recap frame", e);
-                throw new RuntimeException("Failed to generate recap_frame", e);
+                throw new RuntimeException("Failed to generate recap frame", e);
             }
         });
     }
