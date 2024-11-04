@@ -123,9 +123,14 @@ public class RecapService {
                     filterComplex.append(String.format(
                         "[%d]scale='min(1200,iw)':'min(1776,ih)':force_original_aspect_ratio=decrease[photo_scaled_%d]; ",
                         inputIndex, inputIndex));
+
                     filterComplex.append(String.format(
-                        "[recap_bg][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d];",
+                        "[recap_bg][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d]",
                         inputIndex, inputIndex));
+
+                    if (inputIndex < downloadedPath.size()) {
+                        filterComplex.append(";");
+                    }
                 }
 
                 builder.addExtraArgs("-filter_complex", filterComplex.toString());
