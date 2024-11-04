@@ -53,7 +53,7 @@ jib {
 	val imageTag: String? = System.getenv("IMAGE_TAG")
 	val serverPort: String = System.getenv("SERVER_PORT") ?: "8080"
 	from {
-		image = "spinachpasta/custom-base-image:latest"
+		image = "spinachpasta/photo-service-base:latest"
 	}
 	to {
 		image = imageName
