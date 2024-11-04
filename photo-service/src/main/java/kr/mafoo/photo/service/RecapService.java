@@ -125,7 +125,7 @@ public class RecapService {
                         inputIndex, inputIndex));
 
                     filterComplex.append(String.format(
-                        "[recap_bg][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d]",
+                        "[0][photo_scaled_%d]overlay=(W-w)/2:(H-h)/2+80[final%d]",
                         inputIndex, inputIndex));
 
                     if (inputIndex < downloadedPath.size()) {
