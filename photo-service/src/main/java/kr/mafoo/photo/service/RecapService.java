@@ -78,7 +78,7 @@ public class RecapService {
                 String recapCreatedDate = DateTimeFormatter.ofPattern("yyyy.MM.dd").format(LocalDate.now());
 
                 FFmpegBuilder builder = new FFmpegBuilder()
-                        .addExtraArgs("-loglevel", "debug")
+//                        .addExtraArgs("-loglevel", "debug")
                         .addExtraArgs(
                                 "-filter_complex",
                                 String.format(
@@ -110,7 +110,7 @@ public class RecapService {
         return Mono.fromRunnable(() -> {
             try {
                 FFmpegBuilder builder = new FFmpegBuilder()
-                    .addExtraArgs("-loglevel", "debug")
+//                    .addExtraArgs("-loglevel", "debug")
                     .addInput(recapProperties.getFrameFilePath(recapId));
 
                 for (String path : downloadedPath) {
@@ -154,7 +154,7 @@ public class RecapService {
                 String recapVideoPath = recapProperties.getVideoFilePath(recapId);
 
                 FFmpegBuilder builder = new FFmpegBuilder()
-                        .addExtraArgs("-loglevel", "debug")
+//                        .addExtraArgs("-loglevel", "debug")
                         .addExtraArgs("-r", "2")
                         .addInput(recapProperties.getPhotoFilePath(recapId))
                         .addOutput(recapVideoPath)
