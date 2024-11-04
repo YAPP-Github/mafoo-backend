@@ -67,7 +67,8 @@ public class RecapService {
                 .flatMap(recapUploadedPath ->
                         localFileService.deleteSimilarNameFileForPath(tmpPath, recapId)
                                 .thenReturn(recapUploadedPath)
-                );
+                )
+                .doOnError(e -> localFileService.deleteSimilarNameFileForPath(tmpPath, recapId));
     }
 
     private Mono<String> generateRecapFrame(String recapId, String memberName, String albumType) {
