@@ -54,7 +54,7 @@ ffmpeg:
   path: /usr/bin/ffmpeg
 
 recap:
-  max-size: 15
+  max-size: 5
   path:
     tmp: /usr/bin/recap/tmp/
     src: /usr/bin/recap/src/
