@@ -20,15 +20,15 @@ import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 @RequiredArgsConstructor
 public class SlackService {
 
-    @Value(value = "${slack.webhook.token}")
-    private String token;
-
     @Value(value = "${slack.webhook.channel.error}")
     private String errorChannel;
 
+    @Value(value = "${slack.webhook.channel.qr}")
+    private String qrErrorChannel;
+
     private final MethodsClient methodsClient;
 
-    public Mono<Void> sendErrorNotification(String method, String uri, String originIp, String userAgent, String message) {
+    public Mono<Void> sendNotification(String channel, String headerText, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
         return Mono.fromCallable(() -> {
             List<LayoutBlock> layoutBlocks = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class SlackService {
             layoutBlocks.add(
                     Blocks.header(
                             headerBlockBuilder ->
-                                    headerBlockBuilder.text(plainText("🚨 예상하지 못한 에러 발생"))
+                                    headerBlockBuilder.text(plainText(headerText))
                     )
             );
 
@@ -52,6 +52,15 @@ public class SlackService {
             layoutBlocks.add(
                     section(
                             section -> section.fields(List.of(errorMethodMarkdown, errorUriMarkdown))
+                    )
+            );
+
+            MarkdownTextObject requestBodyMarkdown =
+                    MarkdownTextObject.builder().text("`요청 바디`\n" + requestBody).build();
+
+            layoutBlocks.add(
+                    section(
+                            section -> section.fields(List.of(requestBodyMarkdown))
                     )
             );
 
@@ -79,8 +88,8 @@ public class SlackService {
             ChatPostMessageRequest chatPostMessageRequest =
                     ChatPostMessageRequest
                             .builder()
-                            .text("예상하지 못한 에러 발생 알림")
-                            .channel(errorChannel)
+                            .text("에러 발생 알림")
+                            .channel(channel)  // 동적으로 채널 선택
                             .blocks(layoutBlocks)
                             .build();
 
@@ -89,4 +98,11 @@ public class SlackService {
         }).then();
     }
 
+    public Mono<Void> sendErrorNotification(String method, String uri, String requestBody, String originIp, String userAgent, String message) {
+        return sendNotification(errorChannel, "🚨 예상하지 못한 에러 발생", method, uri, requestBody, originIp, userAgent, message);
+    }
+
+    public Mono<Void> sendQrRelatedErrorNotification(String method, String uri, String requestBody, String originIp, String userAgent, String message) {
+        return sendNotification(qrErrorChannel, "📸 지원하지 않는 QR 브랜드 에러 발생", method, uri, requestBody, originIp, userAgent, message);
+    }
 }

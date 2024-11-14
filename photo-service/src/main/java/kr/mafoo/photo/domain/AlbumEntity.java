@@ -28,7 +28,7 @@ public class AlbumEntity implements Persistable<String> {
     @Column("type")
     private AlbumType type;
 
-    @Column("photoCount")
+    @Column("photo_count")
     private Integer photoCount;
 
     @Column("owner_member_id")
@@ -77,13 +77,13 @@ public class AlbumEntity implements Persistable<String> {
         return this;
     }
 
-    public AlbumEntity increasePhotoCount() {
-        this.photoCount += 1;
+    public AlbumEntity increasePhotoCount(int count) {
+        this.photoCount += count;
         return this;
     }
 
-    public AlbumEntity decreasePhotoCount() {
-        this.photoCount -= 1;
+    public AlbumEntity decreasePhotoCount(int count) {
+        this.photoCount -= count;
         return this;
     }
 

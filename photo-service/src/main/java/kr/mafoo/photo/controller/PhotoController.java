@@ -1,10 +1,7 @@
 package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.PhotoApi;
-import kr.mafoo.photo.controller.dto.request.PhotoCreateRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoBulkUpdateAlbumIdRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoUpdateAlbumIdRequest;
-import kr.mafoo.photo.controller.dto.request.PhotoUpdateDisplayIndexRequest;
+import kr.mafoo.photo.controller.dto.request.*;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import kr.mafoo.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
@@ -22,20 +19,41 @@ public class PhotoController implements PhotoApi {
     @Override
     public Flux<PhotoResponse> getPhotos(
             String memberId,
-            String albumId
+            String albumId,
+            String sort
     ){
         return photoService
-                .findAllByAlbumId(albumId, memberId)
+                .findAllByAlbumId(albumId, memberId, sort)
                 .map(PhotoResponse::fromEntity);
     }
 
     @Override
-    public Mono<PhotoResponse> createPhoto(
+    public Mono<PhotoResponse> uploadQrPhotoOriginal(
             String memberId,
-            PhotoCreateRequest request
+            PhotoQrUploadRequest request
     ){
         return photoService
-                .createNewPhoto(request.qrUrl(), memberId)
+                .createNewPhotoByQrUrl(request.qrUrl(), memberId)
+                .map(PhotoResponse::fromEntity);
+    }
+
+    @Override
+    public Mono<PhotoResponse> uploadQrPhoto(
+            String memberId,
+            PhotoQrUploadRequest request
+    ){
+        return photoService
+                .createNewPhotoByQrUrl(request.qrUrl(), memberId)
+                .map(PhotoResponse::fromEntity);
+    }
+
+    @Override
+    public Flux<PhotoResponse> uploadFileUrlPhoto(
+            String memberId,
+            PhotoFileUrlUploadRequest request
+    ){
+        return photoService
+                .createNewPhotoFileUrls(request.fileUrls(), request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 

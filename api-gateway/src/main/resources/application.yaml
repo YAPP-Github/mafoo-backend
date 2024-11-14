@@ -9,11 +9,18 @@ spring:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowedOrigins: 'http://localhost:3000,https://mafoo.kr,https://dev.mafoo.kr,https://gateway.mafoo.kr,https://gateway-dev.mafoo.kr'
+            allowedOrigins: 'http://localhost:3000,https://mafoo.kr,https://dev.mafoo.kr,https://gateway.mafoo.kr,https://gateway-dev.mafoo.kr,https://admin.mafoo.kr'
             allow-credentials: true
             allowedHeaders: '*'
             allowedMethods: '*'
       routes:
+        - id: admin-service
+          uri: http://admin-service
+          predicates:
+            - Path=/admin/**
+          filters:
+            - AdminAuthenticationFilter
+            - RewritePath=/admin/(?<segment>/?.*), /$\{segment}
         - id: user-service-swagger
           uri: http://user-service
           predicates:
@@ -25,6 +32,13 @@ spring:
           predicates:
             - Path=/user/v1/auth/**
           filters:
+            - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: user-service-admin
+          uri: http://user-service
+          predicates:
+            - Path=/user/v1/admin/**
+          filters:
+            - AdminAuthenticationFilter
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
         - id: photo-service-swagger
           uri: http://photo-service
@@ -39,6 +53,13 @@ spring:
           filters:
             - JWTAuthenticationFilter
             - RewritePath=/user/(?<segment>/?.*), /$\{segment}
+        - id: photo-service-admin
+          uri: http://photo-service
+          predicates:
+            - Path=/photo/v1/admin/**
+          filters:
+            - AdminAuthenticationFilter
+            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
         - id: photo-service-add-photo
           uri: http://photo-service
           predicates:

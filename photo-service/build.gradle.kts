@@ -40,6 +40,7 @@ dependencies {
 	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
 	implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
 	implementation("com.slack.api:slack-api-client:1.40.3")
+	implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
 }
 
 tasks.withType<Test> {
@@ -52,7 +53,7 @@ jib {
 	val imageTag: String? = System.getenv("IMAGE_TAG")
 	val serverPort: String = System.getenv("SERVER_PORT") ?: "8080"
 	from {
-		image = "amazoncorretto:17-alpine3.17-jdk"
+		image = "spinachpasta/photo-service-base:latest"
 	}
 	to {
 		image = imageName

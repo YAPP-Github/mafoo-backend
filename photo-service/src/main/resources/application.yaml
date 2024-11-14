@@ -28,6 +28,7 @@ cloud:
     s3:
       endpoint: https://kr.object.ncloudstorage.com
       bucket: ${NCP_BUCKET}
+      presigned-url-expiration: 1800000
 
 management:
   endpoints:
@@ -47,3 +48,13 @@ slack:
     token: ${SLACK_TOKEN}
     channel:
       error: ${SLACK_ERROR_CHANNEL}
+      qr: ${SLACK_QR_ERROR_CHANNEL}
+
+ffmpeg:
+  path: /usr/bin/ffmpeg
+
+recap:
+  max-size: 5
+  path:
+    tmp: /usr/bin/recap/tmp/
+    src: /usr/bin/recap/src/

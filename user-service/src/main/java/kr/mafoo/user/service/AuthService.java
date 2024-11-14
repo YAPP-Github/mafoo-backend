@@ -6,6 +6,11 @@ import com.nimbusds.jose.jwk.JWK;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.Set;
 import kr.mafoo.user.config.properties.AppleOAuthProperties;
 import kr.mafoo.user.config.properties.KakaoOAuthProperties;
 import kr.mafoo.user.controller.dto.response.AppleKeyListResponse;
@@ -24,11 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-
 @RequiredArgsConstructor
 @Service
 public class AuthService {
@@ -39,6 +39,8 @@ public class AuthService {
     private final KakaoOAuthProperties kakaoOAuthProperties;
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
+
+    private final static String DEFAULT_PROFILE_IMG_URL = "https://www.gravatar.com/avatar/?d=identicon";
 
     @Transactional
     public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, String userAgent) {
@@ -60,7 +62,7 @@ public class AuthService {
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
                         NicknameGenerator.generate(),
-                        null,
+                        DEFAULT_PROFILE_IMG_URL,
                         userAgent
                 ));
     }
@@ -157,8 +159,8 @@ public class AuthService {
                     .build()
                     .parseSignedClaims(identityToken);
 
-            String client = claims.getPayload().get("aud", String.class);
-            if (!client.equals(appleOAuthProperties.clientId())) {
+            Set<String> audienceList = claims.getPayload().get("aud", Set.class);
+            if (audienceList == null || !audienceList.contains(appleOAuthProperties.clientId())) {
                 throw new RuntimeException();
             }
 

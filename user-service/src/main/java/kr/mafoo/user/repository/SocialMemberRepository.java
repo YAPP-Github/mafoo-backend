@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono;
 
 public interface SocialMemberRepository extends R2dbcRepository<SocialMemberEntity, SocialMemberEntityKey> {
     Mono<SocialMemberEntity> findByIdentityProviderAndId(IdentityProvider identityProvider, String id);
+    Mono<Void> deleteSocialMemberByMemberId(String memberId);
 }
