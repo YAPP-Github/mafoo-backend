@@ -1,7 +1,10 @@
 package kr.mafoo.photo.service;
 
-import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.BrandType;
+import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
+import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
+
+import kr.mafoo.photo.domain.enums.BrandType;
+import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;

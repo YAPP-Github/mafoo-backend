@@ -1,4 +1,4 @@
-package kr.mafoo.photo.domain;
+package kr.mafoo.photo.domain.enums;
 
 public enum AlbumType {
     HEART,

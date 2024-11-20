@@ -2,7 +2,7 @@ package kr.mafoo.photo.controller.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.domain.enums.AlbumType;
 
 @Schema(description = "앨범 응답")
 public record AlbumResponse(

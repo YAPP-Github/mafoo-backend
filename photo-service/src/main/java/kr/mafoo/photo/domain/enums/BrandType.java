@@ -1,7 +1,9 @@
-package kr.mafoo.photo.domain;
+package kr.mafoo.photo.domain.enums;
 
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public enum BrandType {
     LIFE_FOUR_CUTS(Pattern.compile("https://api\\.life4cut\\.net/.*")),
     PHOTOISM(Pattern.compile("https://qr\\.seobuk\\.kr/.*")),
@@ -13,14 +15,10 @@ public enum BrandType {
     PHOTO_SIGNATURE(Pattern.compile("http://photoqr3\\.kr/.*")),
     PICDOT(Pattern.compile("https://picdot\\.kr/.*")),
     MAFOO(Pattern.compile("https://mafoo\\.kr/.*")),
-    EXTERNAL(Pattern.compile("https://mafoo"))
+    EXTERNAL(Pattern.compile("https://mafoo")),
     ;
 
     private final Pattern urlPattern;
-
-    private BrandType(Pattern urlPattern) {
-        this.urlPattern = urlPattern;
-    }
 
     public boolean matches(String qrUrl) {
         return urlPattern.matcher(qrUrl).matches();

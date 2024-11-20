@@ -1,5 +1,6 @@
 package kr.mafoo.photo.domain;
 
+import kr.mafoo.photo.domain.enums.AlbumType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

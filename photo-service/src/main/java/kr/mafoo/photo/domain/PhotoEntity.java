@@ -1,5 +1,6 @@
 package kr.mafoo.photo.domain;
 
+import kr.mafoo.photo.domain.enums.BrandType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;

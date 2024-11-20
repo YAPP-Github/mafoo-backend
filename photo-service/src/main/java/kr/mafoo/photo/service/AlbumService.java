@@ -1,7 +1,10 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
+import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
+
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.exception.AlbumIndexIsSameException;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PermissionNotAllowedException;

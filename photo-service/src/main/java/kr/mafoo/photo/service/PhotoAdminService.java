@@ -1,7 +1,7 @@
 package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.controller.dto.response.PageResponse;
-import kr.mafoo.photo.domain.BrandType;
+import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.repository.PhotoRepository;
 import lombok.RequiredArgsConstructor;
