@@ -1,4 +1,4 @@
-package kr.mafoo.photo.service.properties;
+package kr.mafoo.photo.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;

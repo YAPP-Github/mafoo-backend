@@ -3,7 +3,7 @@ package kr.mafoo.photo.service;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.DOWNLOAD_ACCESS;
 
 import kr.mafoo.photo.domain.PhotoEntity;
-import kr.mafoo.photo.service.properties.RecapProperties;
+import kr.mafoo.photo.util.RecapProperties;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

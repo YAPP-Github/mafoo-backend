@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import kr.mafoo.photo.exception.PreSignedUrlBannedFileType;
 import kr.mafoo.photo.exception.PreSignedUrlExceedMaximum;
-import kr.mafoo.photo.service.properties.RecapProperties;
+import kr.mafoo.photo.util.RecapProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
