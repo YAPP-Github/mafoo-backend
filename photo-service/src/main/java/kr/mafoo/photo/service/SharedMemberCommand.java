@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class SharedMemberCommend {
+public class SharedMemberCommand {
 
     private final SharedMemberRepository sharedMemberRepository;
 

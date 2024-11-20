@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 public class SharedMemberService {
 
     private final SharedMemberQuery sharedMemberQuery;
-    private final SharedMemberCommend sharedMemberCommend;
+    private final SharedMemberCommand sharedMemberCommand;
 
     private final AlbumPermissionQuery albumPermissionQuery;
     private final MemberService memberService;
@@ -36,7 +36,7 @@ public class SharedMemberService {
         return albumPermissionQuery.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
             .then(sharedMemberQuery.findByAlbumIdAndMemberId(albumId, sharingMemberId)
                 .switchIfEmpty(
-                    sharedMemberCommend.addSharedMember(albumId, permissionLevel, sharingMemberId)
+                    sharedMemberCommand.addSharedMember(albumId, permissionLevel, sharingMemberId)
                 )
                 .flatMap(existingMember -> Mono.error(new SharedMemberDuplicatedException()))
             );
@@ -47,10 +47,10 @@ public class SharedMemberService {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> {
                 if (sharedMember.getMemberId().equals(requestMemberId)) {
-                    return sharedMemberCommend.removeSharedMember(sharedMember);
+                    return sharedMemberCommand.removeSharedMember(sharedMember);
                 } else {
                     return albumPermissionQuery.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
-                        .then(sharedMemberCommend.removeSharedMember(sharedMember));
+                        .then(sharedMemberCommand.removeSharedMember(sharedMember));
                 }
             });
     }
@@ -59,7 +59,7 @@ public class SharedMemberService {
     public Mono<SharedMemberEntity> modifySharedMemberShareStatus(String sharedMemberId, String newShareStatus, String requestMemberId) {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> albumPermissionQuery.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
-                .then(sharedMemberCommend.modifySharedMemberShareStatus(sharedMember, newShareStatus))
+                .then(sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, newShareStatus))
             );
     }
 
@@ -67,7 +67,7 @@ public class SharedMemberService {
     public Mono<SharedMemberEntity> modifySharedMemberPermissionLevel(String sharedMemberId, String newPermissionLevel, String requestMemberId) {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> albumPermissionQuery.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
-                .then(sharedMemberCommend.modifySharedMemberPermissionLevel(sharedMember, newPermissionLevel))
+                .then(sharedMemberCommand.modifySharedMemberPermissionLevel(sharedMember, newPermissionLevel))
             );
     }
 
