@@ -11,6 +11,7 @@ import kr.mafoo.photo.controller.dto.request.SharedMemberUpdatePermissionRequest
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdateStatusRequest;
 import kr.mafoo.photo.controller.dto.response.SharedMemberDetailResponse;
 import kr.mafoo.photo.controller.dto.response.SharedMemberResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -29,7 +30,10 @@ public interface SharedMemberApi {
             @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @RequestParam
-            String albumId
+            String albumId,
+
+            // Authorization Header를 받아올 목적
+            ServerHttpRequest serverHttpRequest
     );
 
     @Operation(summary = "공유 사용자 생성", description = "공유 사용자를 생성합니다.")
