@@ -17,7 +17,7 @@ public class AlbumService {
     private final AlbumQuery albumQuery;
     private final AlbumCommand albumCommand;
 
-    private final AlbumPermissionQuery albumPermissionQuery;
+    private final AlbumPermissionVerifier albumPermissionVerifier;
 
     @Transactional(readOnly = true)
     public Flux<AlbumEntity> findAlbumListByMemberId(String memberId) {
@@ -26,7 +26,7 @@ public class AlbumService {
 
     @Transactional(readOnly = true)
     public Mono<AlbumEntity> findAlbumById(String albumId, String memberId) {
-        return albumPermissionQuery.verifyOwnershipOrAccessPermission(albumId, memberId, VIEW_ACCESS)
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, memberId, VIEW_ACCESS)
             .then(albumQuery.findById(albumId));
     }
 
@@ -37,13 +37,13 @@ public class AlbumService {
 
     @Transactional
     public Mono<AlbumEntity> modifyAlbumNameAndType(String albumId, String newAlbumName, String newAlbumType, String requestMemberId) {
-        return albumPermissionQuery.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
             .flatMap(album -> albumCommand.modifyAlbumNameAndType(album, newAlbumName, newAlbumType));
     }
 
     @Transactional
     public Mono<AlbumEntity> modifyAlbumOwnership(String albumId, String newOwnerMemberId, String requestMemberId) {
-        return albumPermissionQuery.verifyOwnership(albumId, requestMemberId)
+        return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
             .flatMap(album -> albumCommand.modifyAlbumOwnership(album, newOwnerMemberId)
                 // TODO : 앨범 내부 사진 소유자를 새로운 앨범 소유자로 변경
             );
@@ -51,7 +51,7 @@ public class AlbumService {
 
     @Transactional
     public Mono<Void> removeAlbum(String albumId, String requestMemberId) {
-        return albumPermissionQuery.verifyOwnership(albumId, requestMemberId)
+        return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
             .flatMap(albumCommand::removeAlbum);
     }
 

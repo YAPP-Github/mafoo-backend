@@ -31,6 +31,14 @@ public class AlbumCommand {
         return albumRepository.save(album.updateOwnerMemberId(newOwnerMemberId));
     }
 
+    public Mono<AlbumEntity> increaseAlbumPhotoCount(AlbumEntity album, int count) {
+        return albumRepository.save(album.increasePhotoCount(count));
+    }
+
+    public Mono<AlbumEntity> decreaseAlbumPhotoCount(AlbumEntity album, int count) {
+        return albumRepository.save(album.decreasePhotoCount(count));
+    }
+
     public Mono<Void> removeAlbum(AlbumEntity album) {
         return albumRepository.delete(album);
     }

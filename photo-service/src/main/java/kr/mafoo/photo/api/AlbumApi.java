@@ -66,24 +66,24 @@ public interface AlbumApi {
             AlbumUpdateNameAndTypeRequest request
     );
 
-    @Operation(summary = "[DEPRECATED] 앨범 표시 순서 변경", description = "앨범의 표시 순서를 변경합니다.")
-    @PatchMapping("/{albumId}/display-index")
-    Mono<AlbumResponse> updateAlbumDisplayIndex(
-            @RequestMemberId
-            String memberId,
-
-            @ULID
-            @Parameter(description = "앨범 ID", example = "test_album_id")
-            @PathVariable
-            String albumId,
-
-            @Valid
-            @RequestBody
-            AlbumUpdateDisplayIndexRequest request
-    );
+//    @Operation(summary = "[DEPRECATED] 앨범 표시 순서 변경", description = "앨범의 표시 순서를 변경합니다.")
+//    @PatchMapping("/{albumId}/display-index")
+//    Mono<AlbumResponse> updateAlbumDisplayIndex(
+//            @RequestMemberId
+//            String memberId,
+//
+//            @ULID
+//            @Parameter(description = "앨범 ID", example = "test_album_id")
+//            @PathVariable
+//            String albumId,
+//
+//            @Valid
+//            @RequestBody
+//            AlbumUpdateDisplayIndexRequest request
+//    );
 
     @Operation(summary = "앨범 소유자 변경", description = "앨범의 소유자를 변경합니다.")
-    @PatchMapping("/{albumId}/display-index")
+    @PatchMapping("/{albumId}/ownership")
     Mono<AlbumResponse> updateAlbumOwnerShip(
             @RequestMemberId
             String memberId,

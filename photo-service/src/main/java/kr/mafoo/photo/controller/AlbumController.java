@@ -48,14 +48,14 @@ public class AlbumController implements AlbumApi {
     }
 
     // tmp. deprecated
-    @Override
-    public Mono<AlbumResponse> updateAlbumDisplayIndex(
-            String memberId,
-            String albumId,
-            AlbumUpdateDisplayIndexRequest request
-    ) {
-        return Mono.empty();
-    }
+//    @Override
+//    public Mono<AlbumResponse> updateAlbumDisplayIndex(
+//            String memberId,
+//            String albumId,
+//            AlbumUpdateDisplayIndexRequest request
+//    ) {
+//        return Mono.empty();
+//    }
 
     @Override
     public Mono<AlbumResponse> updateAlbumNameAndType(
