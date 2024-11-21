@@ -1,7 +1,7 @@
 package kr.mafoo.photo.repository;
 
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.domain.enums.AlbumType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;

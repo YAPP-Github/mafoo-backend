@@ -1,6 +1,6 @@
 package kr.mafoo.photo.service;
 
-import kr.mafoo.photo.service.properties.RecapProperties;
+import kr.mafoo.photo.util.RecapProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;

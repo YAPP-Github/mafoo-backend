@@ -1,8 +1,6 @@
 package kr.mafoo.photo.controller.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.mafoo.photo.domain.BrandType;
-import kr.mafoo.photo.domain.PhotoEntity;
 
 @Schema(description = "Pre-signed Url 응답")
 public record PreSignedUrlResponse(

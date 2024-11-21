@@ -23,6 +23,9 @@ public class MemberEntity implements Persistable<String> {
     @Column("name")
     private String name;
 
+    @Column("serial_number")
+    private Integer serialNumber;
+
     @Column("created_at")
     private LocalDateTime createdAt;
 

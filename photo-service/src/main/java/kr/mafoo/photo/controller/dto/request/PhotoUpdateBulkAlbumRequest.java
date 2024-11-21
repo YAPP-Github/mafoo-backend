@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.mafoo.photo.annotation.ULID;
 
-@Schema(description = "사진 앨범 수정 요청")
-public record PhotoBulkUpdateAlbumIdRequest(
+@Schema(description = "사진 n건 앨범 수정 요청")
+public record PhotoUpdateBulkAlbumRequest(
 
         @ArraySchema(
                 schema = @Schema(description = "사진 ID 목록"),

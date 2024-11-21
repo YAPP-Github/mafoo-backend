@@ -1,5 +1,6 @@
 package kr.mafoo.photo.domain;
 
+import kr.mafoo.photo.domain.enums.BrandType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -35,9 +36,11 @@ public class PhotoEntity implements Persistable<String> {
     @Column("display_index")
     private Integer displayIndex;
 
+    @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
@@ -91,8 +94,6 @@ public class PhotoEntity implements Persistable<String> {
         photo.albumId = albumId;
         photo.displayIndex = displayIndex;
         photo.isNew = true;
-        photo.createdAt = LocalDateTime.now();
-        photo.updatedAt = LocalDateTime.now();
         return photo;
     }
 }

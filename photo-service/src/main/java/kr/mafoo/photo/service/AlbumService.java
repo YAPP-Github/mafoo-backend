@@ -1,11 +1,9 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
+import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
+
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
-import kr.mafoo.photo.exception.AlbumIndexIsSameException;
-import kr.mafoo.photo.exception.AlbumNotFoundException;
-import kr.mafoo.photo.repository.AlbumRepository;
-import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,91 +13,46 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 public class AlbumService {
-    private final AlbumRepository albumRepository;
 
-    @Transactional
-    public Mono<AlbumEntity> createNewAlbum(String ownerMemberId, String albumName, AlbumType albumType) {
-        AlbumEntity albumEntity = AlbumEntity.newAlbum(IdGenerator.generate(), albumName, albumType, ownerMemberId);
-        return albumRepository
-                .pushDisplayIndex(ownerMemberId) //전부 인덱스 한칸 밀기
-                .then(albumRepository.save(albumEntity));
+    private final AlbumQuery albumQuery;
+    private final AlbumCommand albumCommand;
+
+    private final AlbumPermissionVerifier albumPermissionVerifier;
+
+    @Transactional(readOnly = true)
+    public Flux<AlbumEntity> findAlbumListByMemberId(String memberId) {
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public Mono<AlbumEntity> findAlbumById(String albumId, String memberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, memberId, VIEW_ACCESS)
+            .then(albumQuery.findById(albumId));
     }
 
     @Transactional
-    public Mono<AlbumEntity> moveAlbumDisplayIndex(String albumId, String requestMemberId, Integer displayIndex) {
-        return findByAlbumId(albumId, requestMemberId)
-                .flatMap(album -> {
-                    Integer currentDisplayIndex = album.getDisplayIndex();
-                    Mono<Void> pushAlbumIndexPublisher;
-                    if(displayIndex < currentDisplayIndex) {
-                        pushAlbumIndexPublisher = albumRepository
-                                .pushDisplayIndexBetween(requestMemberId, displayIndex, currentDisplayIndex -1);
-                    } else if(displayIndex > currentDisplayIndex) {
-                        pushAlbumIndexPublisher = albumRepository
-                                .popDisplayIndexBetween(requestMemberId, currentDisplayIndex + 1, displayIndex);
-                    } else {
-                        pushAlbumIndexPublisher = Mono.error(new AlbumIndexIsSameException());
-                    }
-                    return pushAlbumIndexPublisher.then(Mono.defer(() -> {
-                        album.setDisplayIndex(displayIndex);
-                        return albumRepository.save(album);
-                    }));
-                });
-    }
-
-    public Flux<AlbumEntity> findAllByOwnerMemberId(String ownerMemberId) {
-        return albumRepository.findAllByOwnerMemberIdOrderByDisplayIndex(ownerMemberId);
-    }
-
-    public Mono<AlbumEntity> findByAlbumId(String albumId, String requestMemberId) {
-        return albumRepository
-                .findById(albumId)
-                .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                .flatMap(albumEntity -> {
-                    if(!albumEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 앨범이 아니면 그냥 없는 앨범 처리
-                        return Mono.error(new AlbumNotFoundException());
-                    } else {
-                        return Mono.just(albumEntity);
-                    }
-                });
+    public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String requestMemberId) {
+        return albumCommand.addAlbum(albumName, albumType, requestMemberId);
     }
 
     @Transactional
-    public Mono<Void> deleteAlbumById(String albumId, String requestMemberId) {
-        return findByAlbumId(albumId, requestMemberId)
-                .flatMap(albumEntity ->
-                        albumRepository
-                                .deleteById(albumId)
-                                .then(albumRepository.popDisplayIndexBetween(
-                                        requestMemberId, albumEntity.getDisplayIndex(), Integer.MAX_VALUE))
-                );
+    public Mono<AlbumEntity> modifyAlbumNameAndType(String albumId, String newAlbumName, String newAlbumType, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+            .flatMap(album -> albumCommand.modifyAlbumNameAndType(album, newAlbumName, newAlbumType));
     }
 
     @Transactional
-    public Mono<AlbumEntity> updateAlbumName(String albumId, String albumName, String requestMemberId) {
-        return findByAlbumId(albumId, requestMemberId)
-                .flatMap(albumEntity -> albumRepository.save(albumEntity.updateName(albumName)));
+    public Mono<AlbumEntity> modifyAlbumOwnership(String albumId, String newOwnerMemberId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
+            .flatMap(album -> albumCommand.modifyAlbumOwnership(album, newOwnerMemberId)
+                // TODO : 앨범 내부 사진 소유자를 새로운 앨범 소유자로 변경
+            );
     }
 
     @Transactional
-    public Mono<AlbumEntity> updateAlbumType(String albumId, AlbumType albumType, String requestMemberId) {
-        return findByAlbumId(albumId, requestMemberId)
-                .flatMap(albumEntity -> albumRepository.save(albumEntity.updateType(albumType)));
-    }
-
-    @Transactional
-    public Mono<AlbumEntity> increaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
-        return findByAlbumId(albumId, requestMemberId)
-                .flatMap(albumEntity -> albumRepository.save(albumEntity.increasePhotoCount(count)));
-    }
-
-    @Transactional
-    public Mono<AlbumEntity> decreaseAlbumPhotoCount(String albumId, int count, String requestMemberId) {
-        return Mono.justOrEmpty(albumId)
-                .switchIfEmpty(Mono.empty())
-                .flatMap(id -> findByAlbumId(id, requestMemberId))
-                .flatMap(albumEntity -> albumRepository.save(albumEntity.decreasePhotoCount(count)));
+    public Mono<Void> removeAlbum(String albumId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
+            .flatMap(albumCommand::removeAlbum);
     }
 
 }

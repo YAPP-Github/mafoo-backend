@@ -3,7 +3,7 @@ package kr.mafoo.photo.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.domain.enums.AlbumType;
 
 import java.time.LocalDateTime;
 

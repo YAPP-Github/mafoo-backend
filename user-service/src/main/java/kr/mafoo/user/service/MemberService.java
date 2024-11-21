@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -24,6 +25,12 @@ public class MemberService {
         return socialMemberRepository
                 .deleteSocialMemberByMemberId(memberId)
                 .then(memberRepository.deleteMemberById(memberId));
+    }
+
+    public Flux<MemberEntity> getMemberByKeyword(String keyword) {
+        return memberRepository
+            .findAllByNameContaining(keyword)
+            .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
     public Mono<MemberEntity> getMemberByMemberId(String memberId) {

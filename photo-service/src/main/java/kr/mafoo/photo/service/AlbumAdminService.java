@@ -2,7 +2,7 @@ package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.controller.dto.response.PageResponse;
 import kr.mafoo.photo.domain.AlbumEntity;
-import kr.mafoo.photo.domain.AlbumType;
+import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.repository.AlbumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

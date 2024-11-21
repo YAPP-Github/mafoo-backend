@@ -8,7 +8,8 @@ import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Validated
-@Tag(name = "앨범 관련 API", description = "앨범 조회, 생성, 수정, 삭제 등 API")
+@Tag(name = "앨범 관련 API", description = "앨범 조회, 생성, 변경, 삭제 등 API")
 @RequestMapping("/v1/albums")
 public interface AlbumApi {
-    @Operation(summary = "앨범 n건 조회", description = "앨범 목록을 조회합니다.")
+    @Operation(summary = "사용자 별 앨범 목록 조회", description = "사용자 별 앨범 목록을 조회합니다.")
     @GetMapping
-    Flux<AlbumResponse> getAlbums(
+    Flux<AlbumResponse> getAlbumListByMember(
             @RequestMemberId
             String memberId
     );
@@ -49,9 +50,9 @@ public interface AlbumApi {
             AlbumCreateRequest request
     );
 
-    @Operation(summary = "앨범 변경", description = "앨범의 속성을 변경합니다.")
+    @Operation(summary = "앨범 속성(이름, 종류) 변경", description = "앨범의 속성(이름, 종류)을 변경합니다.")
     @PutMapping("/{albumId}")
-    Mono<AlbumResponse> updateAlbum(
+    Mono<AlbumResponse> updateAlbumNameAndType(
             @RequestMemberId
             String memberId,
 
@@ -62,12 +63,28 @@ public interface AlbumApi {
 
             @Valid
             @RequestBody
-            AlbumUpdateRequest request
+            AlbumUpdateNameAndTypeRequest request
     );
 
-    @Operation(summary = "앨범 표기 순서 변경", description = "앨범의 표기 순서를 변경합니다.")
-    @PatchMapping("/{albumId}/display-index")
-    Mono<AlbumResponse> updateAlbumDisplayIndex(
+//    @Operation(summary = "[DEPRECATED] 앨범 표시 순서 변경", description = "앨범의 표시 순서를 변경합니다.")
+//    @PatchMapping("/{albumId}/display-index")
+//    Mono<AlbumResponse> updateAlbumDisplayIndex(
+//            @RequestMemberId
+//            String memberId,
+//
+//            @ULID
+//            @Parameter(description = "앨범 ID", example = "test_album_id")
+//            @PathVariable
+//            String albumId,
+//
+//            @Valid
+//            @RequestBody
+//            AlbumUpdateDisplayIndexRequest request
+//    );
+
+    @Operation(summary = "앨범 소유자 변경", description = "앨범의 소유자를 변경합니다.")
+    @PatchMapping("/{albumId}/ownership")
+    Mono<AlbumResponse> updateAlbumOwnerShip(
             @RequestMemberId
             String memberId,
 
@@ -78,7 +95,7 @@ public interface AlbumApi {
 
             @Valid
             @RequestBody
-            AlbumUpdateDisplayIndexRequest request
+            AlbumUpdateOwnershipRequest request
     );
 
     @Operation(summary = "앨범 삭제", description = "앨범을 삭제합니다.")

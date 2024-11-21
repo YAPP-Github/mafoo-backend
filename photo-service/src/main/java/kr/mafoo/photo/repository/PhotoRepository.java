@@ -1,6 +1,6 @@
 package kr.mafoo.photo.repository;
 
-import kr.mafoo.photo.domain.BrandType;
+import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Modifying;

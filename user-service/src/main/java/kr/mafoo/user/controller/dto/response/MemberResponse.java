@@ -12,13 +12,17 @@ public record MemberResponse(
         String name,
 
         @Schema(description = "프로필 이미지 URL", example = "https://mafoo.kr/profile.jpg")
-        String profileImageUrl
+        String profileImageUrl,
+
+        @Schema(description = "식별 번호", example = "0000")
+        String serialNumber
 ) {
         public static MemberResponse fromEntity(MemberEntity memberEntity) {
                 return new MemberResponse(
                         memberEntity.getId(),
                         memberEntity.getName(),
-                        memberEntity.getProfileImageUrl()
+                        memberEntity.getProfileImageUrl(),
+                        String.format("%04d", memberEntity.getSerialNumber())
                 );
         }
 }
