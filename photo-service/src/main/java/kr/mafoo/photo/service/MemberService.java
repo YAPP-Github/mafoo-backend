@@ -5,6 +5,7 @@ import kr.mafoo.photo.exception.MafooUserApiFailed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -28,8 +29,24 @@ public class MemberService {
     }
 
     public Mono<MemberDto> getMemberInfoById(String memberId, String authorizationToken) {
-        // TODO : API 구현 후 연결 필요
-        return Mono.empty();
+        return client
+            .get()
+            .uri(endpoint + "/user/v1/members/" + memberId)
+            .header("Authorization", "Bearer " + authorizationToken)
+            .retrieve()
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .bodyToMono(MemberDto.class);
     }
+
+    public Flux<MemberDto> getMemberListByKeyword(String keyword, String authorizationToken) {
+        return client
+            .get()
+            .uri(endpoint + "/user/v1/members?keyword=" + keyword)
+            .header("Authorization", "Bearer " + authorizationToken)
+            .retrieve()
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .bodyToFlux(MemberDto.class);
+    }
+
 }
 
