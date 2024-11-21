@@ -21,7 +21,7 @@ public class AlbumPermissionQuery {
                 sharedMemberQuery.findByAlbumIdAndMemberId(albumId, requestMemberId)
                     .flatMap(sharedAlbumMember ->
                         checkAccessPermission(sharedAlbumMember.getPermissionLevel(), permissionLevel)
-                    ).then(albumQuery.findById(albumId))
+                    ).then(albumQuery.findById(albumId))    // TODO : findById 중복 실행 제거 필요
             );
     }
 

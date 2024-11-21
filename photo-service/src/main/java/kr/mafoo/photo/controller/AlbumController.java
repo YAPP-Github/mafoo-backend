@@ -3,9 +3,9 @@ package kr.mafoo.photo.controller;
 import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumUpdateRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
+import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
-import kr.mafoo.photo.domain.AlbumType;
 import kr.mafoo.photo.service.AlbumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,14 +15,15 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RestController
 public class AlbumController implements AlbumApi {
+
     private final AlbumService albumService;
 
     @Override
-    public Flux<AlbumResponse> getAlbums(
+    public Flux<AlbumResponse> getAlbumListByMember(
             String memberId
     ) {
         return albumService
-                .findAllByOwnerMemberId(memberId)
+                .findAlbumListByMemberId(memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
@@ -32,7 +33,7 @@ public class AlbumController implements AlbumApi {
             String albumId
     ) {
         return albumService
-                .findByAlbumId(albumId, memberId)
+                .findAlbumById(albumId, memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
@@ -41,36 +42,42 @@ public class AlbumController implements AlbumApi {
             String memberId,
             AlbumCreateRequest request
     ){
-        AlbumType type = AlbumType.valueOf(request.type());
         return albumService
-                .createNewAlbum(memberId, request.name(), type)
+                .addAlbum(memberId, request.name(), request.type())
                 .map(AlbumResponse::fromEntity);
     }
 
-    @Override
-    public Mono<AlbumResponse> updateAlbum(
-            String memberId,
-            String albumId,
-            AlbumUpdateRequest request
-    ) {
-        AlbumType albumType = AlbumType.valueOf(request.type());
-        return albumService
-                .updateAlbumName(albumId, request.name(), memberId)
-                .then(albumService.updateAlbumType(albumId, albumType, memberId))
-                .map(AlbumResponse::fromEntity);
-    }
-
+    // tmp. deprecated
     @Override
     public Mono<AlbumResponse> updateAlbumDisplayIndex(
             String memberId,
             String albumId,
             AlbumUpdateDisplayIndexRequest request
     ) {
+        return Mono.empty();
+    }
+
+    @Override
+    public Mono<AlbumResponse> updateAlbumNameAndType(
+            String memberId,
+            String albumId,
+            AlbumUpdateNameAndTypeRequest request
+    ) {
         return albumService
-                .moveAlbumDisplayIndex(albumId, memberId, request.newDisplayIndex())
+                .modifyAlbumNameAndType(albumId, request.name(), request.type(), memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
+    @Override
+    public Mono<AlbumResponse> updateAlbumOwnerShip(
+            String memberId,
+            String albumId,
+            AlbumUpdateOwnershipRequest request
+    ) {
+        return albumService
+            .modifyAlbumOwnership(albumId, request.newOwnerMemberId(), memberId)
+            .map(AlbumResponse::fromEntity);
+    }
 
     @Override
     public Mono<Void> deleteAlbum(
@@ -78,7 +85,7 @@ public class AlbumController implements AlbumApi {
             String albumId
     ){
         return albumService
-                .deleteAlbumById(albumId, memberId);
+                .removeAlbum(albumId, memberId);
     }
 
 }
