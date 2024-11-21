@@ -4,11 +4,9 @@ import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
 
 import kr.mafoo.photo.domain.enums.BrandType;
-import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;
-import kr.mafoo.photo.exception.PhotoNotFoundException;
 import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -25,51 +23,67 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PhotoService {
-    private final PhotoRepository photoRepository;
 
-    private final AlbumService albumService;
+    private final PhotoQuery photoQuery;
+    private final PhotoCommand photoCommand;
+
+    private final PhotoPermissionVerifier photoPermissionVerifier;
+
+    private final AlbumQuery albumQuery;
+    private final AlbumCommand albumCommand;
+
+    private final AlbumPermissionVerifier albumPermissionVerifier;
+
     private final QrService qrService;
     private final ObjectStorageService objectStorageService;
 
+    // FIXME : 추후 제거 필요
+    private final PhotoRepository photoRepository;
+
+    @Transactional(readOnly = true)
+    public Flux<PhotoEntity> findPhotoListByAlbumId(String albumId, String requestMemberId, String sort) {
+        String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
+
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
+            .thenMany(
+                switch (sortMethod) {
+                    case "ASC" -> photoQuery.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
+                    case "DESC" -> photoQuery.findAllByAlbumIdOrderByCreatedAtDesc(albumId);
+                    case "CUSTOM" -> photoQuery.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
+                    default -> photoQuery.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
+                }
+            );
+    }
+
     @Transactional
-    public Mono<PhotoEntity> createNewPhotoByQrUrl(String qrUrl, String requestMemberId) {
+    public Mono<PhotoEntity> addPhotoWithQrUrl(String qrUrl) {
         return qrService
-                .getFileFromQrUrl(qrUrl)
-                .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
-                        .flatMap(photoUrl -> createNewPhoto(photoUrl, fileDto.type(), requestMemberId))
-                );
+            .getFileFromQrUrl(qrUrl)
+            .flatMap(fileDto -> objectStorageService.uploadFile(fileDto.fileByte())
+                    .flatMap(photoUrl -> photoCommand.addPhotoWithoutOwnerAndAlbum(photoUrl, fileDto.type()))
+            );
     }
 
     @Transactional
-    public Flux<PhotoEntity> createNewPhotoFileUrls(String[] fileUrls, String albumId, String requestMemberId) {
-        return albumService.findByAlbumId(albumId, requestMemberId)
-                .flatMapMany(albumEntity -> {
-                    AtomicInteger displayIndex = new AtomicInteger(albumEntity.getPhotoCount());
+    public Flux<PhotoEntity> addPhotoBulkWithFileUrls(String[] fileUrls, String albumId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+            .flatMapMany(album -> {
+                AtomicInteger displayIndex = new AtomicInteger(album.getPhotoCount());
 
-                    return Flux.fromArray(fileUrls)
-                            .concatMap(fileUrl ->
-                                    createNewPhotoFileUrl(fileUrl, BrandType.EXTERNAL, albumId, displayIndex.getAndIncrement(), requestMemberId)
-                            );
-                });
-    }
-
-    private Mono<PhotoEntity> createNewPhotoFileUrl(String fileUrl, BrandType type, String albumId, Integer displayIndex, String requestMemberId) {
-        return objectStorageService.setObjectPublicRead(fileUrl)
-                .flatMap(fileLink -> {
-                    PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), fileLink, type, albumId, displayIndex, requestMemberId);
-                    return albumService.increaseAlbumPhotoCount(albumId, 1, requestMemberId)
-                            .then(photoRepository.save(photoEntity));
-                });
-    }
-
-    private Mono<PhotoEntity> createNewPhoto(String photoUrl, BrandType type, String requestMemberId) {
-        PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, type, null, 0, requestMemberId);
-        return photoRepository.save(photoEntity);
+                return Flux.fromArray(fileUrls)
+                    .concatMap(fileUrl -> objectStorageService.setObjectPublicRead(fileUrl)
+                        .flatMap(fileLink -> photoCommand.addPhoto(fileLink, BrandType.EXTERNAL, albumId, displayIndex.getAndIncrement(), album.getOwnerMemberId()))
+                    )
+                    .collectList()
+                    .flatMapMany(addedPhotos ->
+                        albumCommand.increaseAlbumPhotoCount(album, addedPhotos.size())
+                            .thenMany(Flux.fromIterable(addedPhotos))
+                    );
+            });
     }
 
     @Transactional
@@ -98,146 +112,46 @@ public class PhotoService {
                 ).sequential();
     }
 
-//     @Transactional(readOnly = true)
-//     public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId) {
-//         return albumService.checkAlbumReadPermission(albumId, requestMemberId)
-//                 .flatMapMany(albumEntity -> handleFindAllByAlbumId(albumEntity.getId()));
-//     }
-
-//     private Flux<PhotoEntity> handleFindAllByAlbumId(String albumId) {
-//         return photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
-
-    public Flux<PhotoEntity> findAllByAlbumId(String albumId, String requestMemberId, String sort) {
-        String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
-
-        return albumService.findByAlbumId(albumId, requestMemberId)
-                .thenMany(
-                        switch (sortMethod) {
-                            case "ASC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
-                            case "DESC" -> photoRepository.findAllByAlbumIdOrderByCreatedAtDesc(albumId);
-                            default -> photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
-                        }
-                );
-    }
-
-    public Mono<PhotoEntity> findByPhotoId(String photoId, String requestMemberId) {
-        return photoRepository
-                .findById(photoId)
-                .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
-//                 .flatMap(photoEntity -> albumService
-//                         .checkAlbumFullAccessPermission(photoEntity.getAlbumId(), requestMemberId)
-//                         .flatMap(albumEntity -> handleDeletePhotoById(photoEntity)));
-//     }
-
-//     private Mono<Void> handleDeletePhotoById(PhotoEntity photoEntity) {
-//         return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId())
-//                 .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
-//                 .then(photoRepository.deleteById(photoEntity.getPhotoId()));
-
-                .flatMap(photoEntity -> {
-                    if (!photoEntity.hasOwnerMemberId()) {
-                        return photoRepository.save(photoEntity.updateOwnerMemberId(requestMemberId));
-                    }
-                    else if (!photoEntity.getOwnerMemberId().equals(requestMemberId)) {
-                        // 내 사진이 아니면 그냥 없는 사진 처리
-                        return Mono.error(new PhotoNotFoundException());
-                    } else {
-                        return Mono.just(photoEntity);
-                    }
-                });
+    @Transactional
+    public Mono<PhotoEntity> initPhotoAlbumId(String photoId, String albumId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+            .flatMap(album -> albumCommand.increaseAlbumPhotoCount(album, 1))
+            .flatMap(album -> photoQuery.findByPhotoId(photoId)
+                .flatMap(photo -> photoCommand.modifyPhotoAlbumId(photo, albumId, album.getPhotoCount()-1, album.getOwnerMemberId()))
+            );
     }
 
     @Transactional
-    public Mono<Void> deletePhotoById(String photoId, String requestMemberId) {
-        return findByPhotoId(photoId, requestMemberId)
-                .flatMap(photoEntity ->
-                        albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), 1, requestMemberId)
-                                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
-                                .then(photoRepository.deleteById(photoId))
-                );
-    }
+    public Flux<PhotoEntity> modifyPhotoBulkAlbumId(String[] photoIds, String albumId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+            .flatMapMany(newAlbum -> {
+                AtomicInteger displayIndex = new AtomicInteger(newAlbum.getPhotoCount());
 
-    @Transactional
-    public Flux<PhotoEntity> updatePhotoBulkAlbumId(String[] photoIds, String albumId, String requestMemberId) {
-        return Flux.fromArray(photoIds)
-                .concatMap(photoId -> this.updatePhotoAlbumId(photoId, albumId, requestMemberId));
-    }
-
-    @Transactional
-    public Mono<PhotoEntity> updatePhotoAlbumId(String photoId, String albumId, String requestMemberId) {
-//         return photoRepository
-//                 .findById(photoId)
-//                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
-//                 .flatMap(photoEntity -> {
-
-//                     if (photoEntity.getAlbumId() == null) {
-//                         if (!photoEntity.hasOwnerMemberId()) {
-//                             photoEntity.updateOwnerMemberId(requestMemberId);
-//                         }
-                      
-//                         return albumService.checkAlbumFullAccessPermission(albumId, requestMemberId)
-//                                 .flatMap(albumEntity -> photoRepository.save(photoEntity.updateAlbumId(albumId)));
-//                     }
-
-//                     return albumService.checkAlbumFullAccessPermission(photoEntity.getAlbumId(), requestMemberId)
-//                             .flatMap(previousAlbum -> albumService.checkAlbumFullAccessPermission(albumId, requestMemberId)
-//                                     .flatMap(newAlbum -> handleUpdatePhotoAlbumId(photoEntity, newAlbum)));
-//                 });
-        return findByPhotoId(photoId, requestMemberId)
-                .flatMap(photoEntity ->
-                        albumService.findByAlbumId(albumId, requestMemberId)
-                                .flatMap(albumEntity ->
-                                        albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId(), 1, requestMemberId)
-                                                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
-                                                .then(albumService.increaseAlbumPhotoCount(albumId, 1, requestMemberId))
-                                                .then(photoRepository.save(
-                                                        photoEntity
-                                                                .updateAlbumId(albumId)
-                                                                .updateDisplayIndex(albumEntity.getPhotoCount())
-                                                ))
+                return Flux.fromArray(photoIds)
+                    .concatMap(photoId -> photoQuery.findByPhotoId(photoId)
+                        .flatMap(photo -> albumPermissionVerifier.verifyOwnershipOrAccessPermission(photo.getAlbumId(), requestMemberId, FULL_ACCESS)
+                                .flatMap(oldAlbum -> albumCommand.decreaseAlbumPhotoCount(oldAlbum, 1))
+                                .then(photoCommand.popDisplayIndexGreaterThan(photo.getAlbumId(), photo.getDisplayIndex())
+                                    .thenReturn(photo)
                                 )
-                );
+                        )
+                        .flatMap(photo -> photoCommand.modifyPhotoAlbumId(photo, albumId, displayIndex.getAndIncrement(), newAlbum.getOwnerMemberId())
+                        )
+                    )
+                    .collectList()
+                    .flatMapMany(addedPhotos ->
+                        albumCommand.increaseAlbumPhotoCount(newAlbum, addedPhotos.size())
+                            .thenMany(Flux.fromIterable(addedPhotos))
+                    );
+            });
     }
 
-    private Mono<PhotoEntity> handleUpdatePhotoAlbumId(PhotoEntity photoEntity, AlbumEntity albumEntity) {
-        return albumService.decreaseAlbumPhotoCount(photoEntity.getAlbumId())
-                .then(photoRepository.popDisplayIndexGreaterThan(photoEntity.getAlbumId(), photoEntity.getDisplayIndex()))
-                .then(albumService.increaseAlbumPhotoCount(albumEntity.getId()))
-                .then(photoRepository.save(
-                        photoEntity.updateAlbumId(albumEntity.getId()).updateDisplayIndex(albumEntity.getPhotoCount())
-                ));
-    }
-
+    // FIXME : 추후 수정 필요
     @Transactional
-    public Mono<PhotoEntity> updatePhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
-//         return photoRepository
-//                 .findById(photoId)
-//                 .switchIfEmpty(Mono.error(new PhotoNotFoundException()))
-//                 .flatMap(photoEntity -> albumService.checkAlbumFullAccessPermission(photoEntity.getAlbumId(), requestMemberId)
-//                         .flatMap(albumEntity -> {
-//                             int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
-
-//                             if (photoEntity.getDisplayIndex().equals(targetIndex)) {
-//                                 return Mono.error(new PhotoDisplayIndexIsSameException());
-//                             }
-
-//                             if (targetIndex < 0 || targetIndex >= albumEntity.getPhotoCount()) {
-//                                 return Mono.error(new PhotoDisplayIndexNotValidException());
-//                             }
-
-//                             if (photoEntity.getDisplayIndex() < targetIndex) {
-//                                 return photoRepository
-//                                         .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
-//                                         .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
-//                             } else {
-//                                 return photoRepository
-//                                         .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
-//                                         .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
-//                             }
-//                         }));
-        return findByPhotoId(photoId, requestMemberId)
+    public Mono<PhotoEntity> modifyPhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
+        return photoPermissionVerifier.verifyAccessPermission(photoId, requestMemberId, FULL_ACCESS)
                 .flatMap(photoEntity ->
-                        albumService.findByAlbumId(photoEntity.getAlbumId(), requestMemberId)
+                    albumPermissionVerifier.verifyOwnershipOrAccessPermission(photoEntity.getAlbumId(), requestMemberId, FULL_ACCESS)
                                 .flatMap(albumEntity -> {
                                     int targetIndex = albumEntity.getPhotoCount() - newIndex - 1;
 
@@ -260,6 +174,16 @@ public class PhotoService {
                                     }
                                 })
                 );
+    }
+
+    @Transactional
+    public Mono<Void> removePhoto(String photoId, String requestMemberId) {
+        return photoPermissionVerifier.verifyAccessPermission(photoId, requestMemberId, FULL_ACCESS)
+            .flatMap(photo -> photoCommand.removePhoto(photo)
+                .then(albumQuery.findById(photo.getAlbumId())
+                    .flatMap(album -> albumCommand.decreaseAlbumPhotoCount(album, 1))
+                ).then()
+            );
     }
 
 }

@@ -17,43 +17,43 @@ public class PhotoController implements PhotoApi {
     private final PhotoService photoService;
 
     @Override
-    public Flux<PhotoResponse> getPhotos(
+    public Flux<PhotoResponse> getPhotoListByAlbum(
             String memberId,
             String albumId,
             String sort
     ){
         return photoService
-                .findAllByAlbumId(albumId, memberId, sort)
+                .findPhotoListByAlbumId(albumId, memberId, sort)
                 .map(PhotoResponse::fromEntity);
     }
 
     @Override
-    public Mono<PhotoResponse> uploadQrPhotoOriginal(
+    public Mono<PhotoResponse> createPhotoWithQrUrlOriginal(
             String memberId,
-            PhotoQrUploadRequest request
+            PhotoCreateWithQrUrlRequest request
     ){
         return photoService
-                .createNewPhotoByQrUrl(request.qrUrl(), memberId)
+                .addPhotoWithQrUrl(request.qrUrl())
                 .map(PhotoResponse::fromEntity);
     }
 
     @Override
-    public Mono<PhotoResponse> uploadQrPhoto(
+    public Mono<PhotoResponse> createPhotoWithQrUrl(
             String memberId,
-            PhotoQrUploadRequest request
+            PhotoCreateWithQrUrlRequest request
     ){
         return photoService
-                .createNewPhotoByQrUrl(request.qrUrl(), memberId)
+                .addPhotoWithQrUrl(request.qrUrl())
                 .map(PhotoResponse::fromEntity);
     }
 
     @Override
-    public Flux<PhotoResponse> uploadFileUrlPhoto(
+    public Flux<PhotoResponse> createPhotoBulkWithFileUrls(
             String memberId,
-            PhotoFileUrlUploadRequest request
+            PhotoCreateBulkWithFileUrlsRequest request
     ){
         return photoService
-                .createNewPhotoFileUrls(request.fileUrls(), request.albumId(), memberId)
+                .addPhotoBulkWithFileUrls(request.fileUrls(), request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 
@@ -65,23 +65,23 @@ public class PhotoController implements PhotoApi {
     }
 
     @Override
-    public Mono<PhotoResponse> updatePhotoAlbum(
+    public Mono<PhotoResponse> setPhotoAlbum(
             String memberId,
             String photoId,
-            PhotoUpdateAlbumIdRequest request
+            PhotoSetAlbumRequest request
     ){
         return photoService
-                .updatePhotoAlbumId(photoId, request.albumId(), memberId)
+                .initPhotoAlbumId(photoId, request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 
     @Override
     public Flux<PhotoResponse> updatePhotoBulkAlbum(
             String memberId,
-            PhotoBulkUpdateAlbumIdRequest request
+            PhotoUpdateBulkAlbumRequest request
     ){
         return photoService
-                .updatePhotoBulkAlbumId(request.photoIds(), request.albumId(), memberId)
+                .modifyPhotoBulkAlbumId(request.photoIds(), request.albumId(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 
@@ -92,7 +92,7 @@ public class PhotoController implements PhotoApi {
             PhotoUpdateDisplayIndexRequest request
     ) {
         return photoService
-                .updatePhotoDisplayIndex(photoId, request.newDisplayIndex(), memberId)
+                .modifyPhotoDisplayIndex(photoId, request.newDisplayIndex(), memberId)
                 .map(PhotoResponse::fromEntity);
     }
 
@@ -102,6 +102,6 @@ public class PhotoController implements PhotoApi {
             String photoId
     ){
         return photoService
-                .deletePhotoById(photoId, memberId);
+                .removePhoto(photoId, memberId);
     }
 }

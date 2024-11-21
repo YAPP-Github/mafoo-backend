@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public interface PhotoApi {
     @Operation(summary = "사진 조회", description = "사진 목록을 조회합니다.")
     @GetMapping
-    Flux<PhotoResponse> getPhotos(
+    Flux<PhotoResponse> getPhotoListByAlbum(
             @RequestMemberId
             String memberId,
 
@@ -37,35 +37,35 @@ public interface PhotoApi {
 
     @Operation(summary = "(수정 이전) QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
     @PostMapping(value = "")
-    Mono<PhotoResponse> uploadQrPhotoOriginal(
+    Mono<PhotoResponse> createPhotoWithQrUrlOriginal(
             @RequestMemberId
             String memberId,
 
             @Valid
             @RequestBody
-            PhotoQrUploadRequest request
+            PhotoCreateWithQrUrlRequest request
     );
 
     @Operation(summary = "QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")
     @PostMapping(value = "/qr")
-    Mono<PhotoResponse> uploadQrPhoto(
+    Mono<PhotoResponse> createPhotoWithQrUrl(
             @RequestMemberId
             String memberId,
 
             @Valid
             @RequestBody
-            PhotoQrUploadRequest request
+            PhotoCreateWithQrUrlRequest request
     );
 
     @Operation(summary = "파일(url) 사진 n건 업로드", description = "파일(url)을 사용해 사진을 업로드합니다.")
     @PostMapping(value = "/file-urls")
-    Flux<PhotoResponse> uploadFileUrlPhoto(
+    Flux<PhotoResponse> createPhotoBulkWithFileUrls(
             @RequestMemberId
             String memberId,
 
             @Valid
             @RequestBody
-            PhotoFileUrlUploadRequest request
+            PhotoCreateBulkWithFileUrlsRequest request
     );
 
     @Operation(summary = "사진 파일로 업로드", description = "사진을 직접 업로드합니다.")
@@ -78,9 +78,9 @@ public interface PhotoApi {
             Flux<FilePart> request
     );
 
-    @Operation(summary = "사진 앨범 단건 수정", description = "사진 한 개를 다른 앨범으로 이동시킵니다.")
+    @Operation(summary = "사진 앨범 설정", description = "사진의 초기 앨범 정보를 설정합니다.")
     @PatchMapping(value = "/{photoId}/album")
-    Mono<PhotoResponse> updatePhotoAlbum(
+    Mono<PhotoResponse> setPhotoAlbum(
             @RequestMemberId
             String memberId,
 
@@ -91,7 +91,7 @@ public interface PhotoApi {
 
             @Valid
             @RequestBody
-            PhotoUpdateAlbumIdRequest request
+            PhotoSetAlbumRequest request
     );
 
     @Operation(summary = "사진 앨범 n건 수정", description = "사진 여러 개를 다른 앨범으로 이동시킵니다.")
@@ -102,7 +102,7 @@ public interface PhotoApi {
 
             @Valid
             @RequestBody
-            PhotoBulkUpdateAlbumIdRequest request
+            PhotoUpdateBulkAlbumRequest request
     );
 
     @Operation(summary = "사진 표시 순서 변경", description = "사진의 표시 순서를 변경합니다.")
