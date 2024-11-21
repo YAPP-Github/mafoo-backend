@@ -3,7 +3,6 @@ package kr.mafoo.photo.domain;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,7 +14,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Table("album")
 public class AlbumEntity implements Persistable<String> {
@@ -66,6 +64,16 @@ public class AlbumEntity implements Persistable<String> {
     @Override
     public String getId() {
         return albumId;
+    }
+
+    public AlbumEntity updateOwnerMemberId(String newOwnerMemberId) {
+        this.ownerMemberId = newOwnerMemberId;
+        return this;
+    }
+
+    public AlbumEntity updateDisplayIndex(int newDisplayIndex) {
+        this.displayIndex = newDisplayIndex;
+        return this;
     }
 
     public AlbumEntity updateName(String newName) {
