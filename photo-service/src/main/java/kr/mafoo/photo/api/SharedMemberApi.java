@@ -9,32 +9,15 @@ import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.SharedMemberCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdatePermissionRequest;
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdateStatusRequest;
-import kr.mafoo.photo.controller.dto.response.SharedMemberDetailResponse;
 import kr.mafoo.photo.controller.dto.response.SharedMemberResponse;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Validated
-@Tag(name = "공유 사용자 관련 API", description = "공유 사용자 조회, 생성, 수정, 삭제 등 API")
+@Tag(name = "공유 사용자 관련 API", description = "공유 사용자 조회, 생성, 변경, 삭제 등 API")
 @RequestMapping("/v1/shared-members")
 public interface SharedMemberApi {
-    @Operation(summary = "공유 사용자 조회", description = "앨범 별 공유 사용자 목록을 조회합니다.")
-    @GetMapping
-    Flux<SharedMemberDetailResponse> getSharedMemberListByAlbum(
-            @RequestMemberId
-            String memberId,
-
-            @ULID
-            @Parameter(description = "앨범 ID", example = "test_album_id")
-            @RequestParam
-            String albumId,
-
-            // Authorization Header를 받아올 목적
-            ServerHttpRequest serverHttpRequest
-    );
 
     @Operation(summary = "공유 사용자 생성", description = "공유 사용자를 생성합니다.")
     @PostMapping
@@ -47,23 +30,23 @@ public interface SharedMemberApi {
             SharedMemberCreateRequest request
     );
 
-    @Operation(summary = "공유 사용자 상태 수정", description = "공유 사용자의 상태를 수정합니다.")
+    @Operation(summary = "공유 사용자 상태 변경", description = "공유 사용자의 상태를 변경합니다.")
     @PatchMapping("/{sharedMemberId}/status")
     Mono<SharedMemberResponse> updateSharedMemberStatus(
-        @RequestMemberId
-        String memberId,
+            @RequestMemberId
+            String memberId,
 
-        @ULID
-        @Parameter(description = "공유 사용자 ID", example = "test_shared_member_id")
-        @PathVariable
-        String sharedMemberId,
+            @ULID
+            @Parameter(description = "공유 사용자 ID", example = "test_shared_member_id")
+            @PathVariable
+            String sharedMemberId,
 
-        @Valid
-        @RequestBody
-        SharedMemberUpdateStatusRequest request
+            @Valid
+            @RequestBody
+            SharedMemberUpdateStatusRequest request
     );
 
-    @Operation(summary = "공유 사용자 권한 수정", description = "공유 사용자의 권한을 수정합니다.")
+    @Operation(summary = "공유 사용자 권한 변경", description = "공유 사용자의 권한을 변경합니다.")
     @PatchMapping("/{sharedMemberId}/permission")
     Mono<SharedMemberResponse> updateSharedMemberPermission(
             @RequestMemberId

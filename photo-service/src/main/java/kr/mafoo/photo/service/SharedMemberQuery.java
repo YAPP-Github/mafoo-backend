@@ -1,11 +1,7 @@
 package kr.mafoo.photo.service;
 
-import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
-
 import kr.mafoo.photo.domain.SharedMemberEntity;
-import kr.mafoo.photo.domain.enums.ShareStatus;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
-import kr.mafoo.photo.exception.SharedMemberStatusNotAcceptedException;
 import kr.mafoo.photo.repository.SharedMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,25 +21,12 @@ public class SharedMemberQuery {
 
     public Mono<SharedMemberEntity> findBySharedMemberId(String sharedMemberId) {
         return sharedMemberRepository.findById(sharedMemberId)
-            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()))
-            .flatMap(sharedMemberEntity -> verifyStatus(sharedMemberEntity.getShareStatus())
-                .thenReturn(sharedMemberEntity)
-            );
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Mono<SharedMemberEntity> findByAlbumIdAndMemberId(String albumId, String memberId) {
         return sharedMemberRepository.findByAlbumIdAndMemberId(albumId, memberId)
-            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()))
-            .flatMap(sharedMemberEntity -> verifyStatus(sharedMemberEntity.getShareStatus())
-                .thenReturn(sharedMemberEntity)
-            );
-    }
-
-    private Mono<Void> verifyStatus(ShareStatus status) {
-        if (!status.equals(ACCEPTED)) {
-            return Mono.error(new SharedMemberStatusNotAcceptedException());
-        }
-        return Mono.empty();
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
 }
