@@ -29,7 +29,7 @@ public class RecapService {
     @Value("${recap.path.tmp}")
     private String tmpPath;
 
-    private final AlbumService albumService;
+    private final AlbumPermissionVerifier albumPermissionVerifier;
     private final PhotoService photoService;
     private final MemberService memberService;
 
@@ -44,14 +44,14 @@ public class RecapService {
 
         String recapId = IdGenerator.generate();
 
-        return albumService.findByAlbumId(albumId, requestMemberId)
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, DOWNLOAD_ACCESS)
                 .flatMap(albumEntity -> {
                     String albumType = String.valueOf(albumEntity.getType());
 
                     return graphics2dService.generateAlbumChipForRecap(recapId, albumEntity.getName(), albumType)
-                            .then(memberService.getMemberInfo(token))
+                            .then(memberService.getMemberInfoByToken(token))
                             .flatMap(memberInfo -> generateRecapFrame(recapId, memberInfo.name(), albumType))
-                            .then(photoService.findAllByAlbumId(albumId, requestMemberId, sort)
+                            .then(photoService.findPhotoListByAlbumId(albumId, requestMemberId, sort)
                                 .collectList()
                                 .flatMap(photoEntities -> {
                                     List<String> photoUrls = photoEntities.stream()
