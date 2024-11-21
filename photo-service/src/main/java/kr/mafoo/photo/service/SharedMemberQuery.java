@@ -1,6 +1,7 @@
 package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.domain.SharedMemberEntity;
+import kr.mafoo.photo.exception.SharedMemberDuplicatedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.repository.SharedMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,12 @@ public class SharedMemberQuery {
     public Mono<SharedMemberEntity> findByAlbumIdAndMemberId(String albumId, String memberId) {
         return sharedMemberRepository.findByAlbumIdAndMemberId(albumId, memberId)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
+    public Mono<Void> checkDuplicateByAlbumIdAndMemberId(String albumId, String memberId) {
+        return sharedMemberRepository.findByAlbumIdAndMemberId(albumId, memberId)
+            .switchIfEmpty(Mono.empty())
+            .flatMap(existingMember -> Mono.error(new SharedMemberDuplicatedException()));
     }
 
 }

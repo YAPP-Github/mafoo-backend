@@ -50,6 +50,6 @@ public class SharedMemberController implements SharedMemberApi {
         String memberId,
         String sharedMemberId
     ){
-        return sharedMemberService.removeSharedMember(memberId, sharedMemberId);
+        return sharedMemberService.removeSharedMember(sharedMemberId, memberId);
     }
 }

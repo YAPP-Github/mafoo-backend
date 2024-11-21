@@ -5,8 +5,6 @@ import static kr.mafoo.photo.domain.enums.ShareStatus.PENDING;
 
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.ShareStatus;
-import kr.mafoo.photo.exception.SharedMemberDuplicatedException;
-import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.exception.SharedMemberPermissionDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,16 +18,13 @@ public class SharedMemberService {
     private final SharedMemberQuery sharedMemberQuery;
     private final SharedMemberCommand sharedMemberCommand;
 
-    private final AlbumPermissionQuery albumPermissionQuery;
+    private final AlbumPermissionVerifier albumPermissionVerifier;
 
     @Transactional
     public Mono<SharedMemberEntity> addSharedMember(String albumId, String permissionLevel, String sharingMemberId, String requestMemberId) {
-        return albumPermissionQuery.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
-            .then(sharedMemberQuery.findByAlbumIdAndMemberId(albumId, sharingMemberId)
-                .onErrorResume(SharedMemberNotFoundException.class, ex ->
-                    sharedMemberCommand.addSharedMember(albumId, permissionLevel, sharingMemberId)
-                )
-                .flatMap(existingMember -> Mono.error(new SharedMemberDuplicatedException()))
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
+            .then(sharedMemberQuery.checkDuplicateByAlbumIdAndMemberId(albumId, sharingMemberId)
+                .then(sharedMemberCommand.addSharedMember(albumId, permissionLevel, sharingMemberId))
             );
     }
 
@@ -40,7 +35,7 @@ public class SharedMemberService {
                 if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && !isPendingStatus(sharedMember.getShareStatus())) {
                     return sharedMemberCommand.removeSharedMember(sharedMember);
                 } else {
-                    return albumPermissionQuery.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
+                    return albumPermissionVerifier.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
                         .then(sharedMemberCommand.removeSharedMember(sharedMember));
                 }
             });
@@ -61,7 +56,7 @@ public class SharedMemberService {
     @Transactional
     public Mono<SharedMemberEntity> modifySharedMemberPermissionLevel(String sharedMemberId, String newPermissionLevel, String requestMemberId) {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
-            .flatMap(sharedMember -> albumPermissionQuery.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
+            .flatMap(sharedMember -> albumPermissionVerifier.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
                 .then(sharedMemberCommand.modifySharedMemberPermissionLevel(sharedMember, newPermissionLevel))
             );
     }
