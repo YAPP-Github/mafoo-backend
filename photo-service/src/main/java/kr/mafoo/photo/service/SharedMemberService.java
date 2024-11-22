@@ -20,6 +20,11 @@ public class SharedMemberService {
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
 
+    @Transactional(readOnly = true)
+    public Mono<SharedMemberEntity> findSharedMemberByAlbumIdAndMemberId(String albumId, String requestMemberId) {
+        return sharedMemberQuery.findByAlbumIdAndMemberId(albumId, requestMemberId);
+    }
+
     @Transactional
     public Mono<SharedMemberEntity> addSharedMember(String albumId, String permissionLevel, String sharingMemberId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
