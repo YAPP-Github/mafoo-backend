@@ -29,8 +29,8 @@ public record AlbumDetailResponse(
         @Schema(description = "공유 받은 앨범 권한", example = "null")
         PermissionLevel permissionLevel,
 
-        @Schema(description = "공유 받은 앨범 소유자 프로필 사진", example = "null")
-        String ownerProfileImgUrl
+        @Schema(description = "공유 받은 앨범 소유자 프로필 사진 URL", example = "null")
+        String ownerProfileImageUrl
 ) {
         public static AlbumDetailResponse fromDto(
             AlbumDto dto
@@ -43,7 +43,7 @@ public record AlbumDetailResponse(
                     dto.isShared(),
                     dto.shareStatus(),
                     dto.permissionLevel(),
-                    dto.ownerProfileImgUrl()
+                    dto.ownerProfileImageUrl()
                 );
         }
 }

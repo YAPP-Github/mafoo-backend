@@ -15,7 +15,7 @@ public record AlbumDto(
     Boolean isShared,
     ShareStatus shareStatus,
     PermissionLevel permissionLevel,
-    String ownerProfileImgUrl,
+    String ownerProfileImageUrl,
     LocalDateTime createdAt
 ) {
     public static AlbumDto fromOwnedAlbum(
