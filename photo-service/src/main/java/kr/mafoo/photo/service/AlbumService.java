@@ -41,7 +41,7 @@ public class AlbumService {
     }
 
     private Flux<AlbumDto> findSharedAlbumListByMemberId(String memberId, String token) {
-        return sharedMemberQuery.findAllByMemberId(memberId)
+        return sharedMemberQuery.findAllByMemberIdWhereStatusNotRejected(memberId)
             .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
             .concatMap(sharedMember -> albumQuery.findById(sharedMember.getAlbumId())
                 .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId(), token)
