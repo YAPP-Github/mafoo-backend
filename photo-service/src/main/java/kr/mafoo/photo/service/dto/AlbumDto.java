@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
+import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 
 public record AlbumDto(
@@ -13,6 +14,7 @@ public record AlbumDto(
     Integer photoCount,
     Boolean isShared,
     ShareStatus shareStatus,
+    PermissionLevel permissionLevel,
     String ownerProfileImgUrl,
     LocalDateTime createdAt
 ) {
@@ -25,6 +27,7 @@ public record AlbumDto(
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
             false,
+            null,
             null,
             null,
             albumEntity.getCreatedAt()
@@ -43,6 +46,7 @@ public record AlbumDto(
             albumEntity.getPhotoCount(),
             true,
             sharedMemberEntity.getShareStatus(),
+            sharedMemberEntity.getPermissionLevel(),
             memberDto.profileImageUrl(),
             sharedMemberEntity.getCreatedAt()
         );

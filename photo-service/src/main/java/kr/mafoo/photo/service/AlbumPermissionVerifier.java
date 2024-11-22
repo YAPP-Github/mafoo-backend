@@ -30,7 +30,7 @@ public class AlbumPermissionVerifier {
                     .flatMap(sharedAlbumMember ->
                             checkShareStatus(sharedAlbumMember.getShareStatus())
                                 .then(checkAccessPermission(sharedAlbumMember.getPermissionLevel(), permissionLevel))
-                    ).then(albumQuery.findById(albumId))    // FIXME : findById 중복 실행 제거 필요
+                    ).then(albumQuery.findById(albumId))
             );
     }
 
