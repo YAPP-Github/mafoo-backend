@@ -17,8 +17,8 @@ public class SharedMemberQuery {
 
     private final SharedMemberRepository sharedMemberRepository;
 
-    public Flux<SharedMemberEntity> findAllByAlbumId(String albumId) {
-        return sharedMemberRepository.findAllByAlbumId(albumId)
+    public Flux<SharedMemberEntity> findAllByAlbumIdWhereStatusNotRejected(String albumId) {
+        return sharedMemberRepository.findAllByAlbumIdAndShareStatusNot(albumId, REJECTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 

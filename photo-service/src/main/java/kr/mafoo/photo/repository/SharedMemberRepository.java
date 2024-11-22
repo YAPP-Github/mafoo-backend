@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEntity, String> {
-    Flux<SharedMemberEntity> findAllByAlbumId(String albumId);
+    Flux<SharedMemberEntity> findAllByAlbumIdAndShareStatusNot(String albumId, ShareStatus status);
     Flux<SharedMemberEntity> findAllByMemberIdAndShareStatusNot(String memberId, ShareStatus status);
     Mono<SharedMemberEntity> findByAlbumIdAndMemberId(String albumId, String memberId);
 }
