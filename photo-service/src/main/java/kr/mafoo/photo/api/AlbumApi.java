@@ -7,10 +7,11 @@ import jakarta.validation.Valid;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
+import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -22,9 +23,12 @@ import reactor.core.publisher.Mono;
 public interface AlbumApi {
     @Operation(summary = "사용자 별 앨범 목록 조회", description = "사용자 별 앨범 목록을 조회합니다.")
     @GetMapping
-    Flux<AlbumResponse> getAlbumListByMember(
+    Flux<AlbumDetailResponse> getAlbumListByMember(
             @RequestMemberId
-            String memberId
+            String memberId,
+
+            // Authorization Header를 받아올 목적
+            ServerHttpRequest serverHttpRequest
     );
 
     @Operation(summary = "앨범 단건 조회", description = "앨범 단건을 조회합니다.")
