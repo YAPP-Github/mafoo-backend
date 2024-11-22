@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.annotation.RequestMemberId;
+import kr.mafoo.user.controller.dto.response.MemberDetailResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +19,23 @@ import reactor.core.publisher.Mono;
 @Validated
 @RequestMapping("/v1/members")
 public interface MemberApi {
-    @Operation(summary = "사용자 검색", description = "키워드로 사용자를 검색합니다. (이름으로 검색)")
+    @Operation(summary = "공유 앨범 대상 사용자 검색", description = "키워드로 사용자를 검색합니다. (이름으로 검색)")
     @GetMapping
-    Flux<MemberResponse> getMemberListByName(
+    Flux<MemberDetailResponse> getMemberListByNameForSharedAlbum(
         @RequestMemberId
         @Parameter(hidden = true)
         String requesterId,
 
         @Parameter(description = "검색어", example = "사람")
         @RequestParam
-        String keyword
+        String keyword,
+
+        @Parameter(description = "앨범 ID", example = "test_album_id")
+        @RequestParam
+        String albumId,
+
+        // Authorization Header를 받아올 목적
+        ServerHttpRequest serverHttpRequest
     );
 
     @Operation(summary = "사용자 단건 조회", description = "사용자 단건 정보를 조회합니다.")
