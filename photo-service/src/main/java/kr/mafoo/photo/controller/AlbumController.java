@@ -2,12 +2,13 @@ package kr.mafoo.photo.controller;
 
 import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
-import kr.mafoo.photo.controller.dto.request.AlbumUpdateDisplayIndexRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
+import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import kr.mafoo.photo.service.AlbumService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,12 +20,15 @@ public class AlbumController implements AlbumApi {
     private final AlbumService albumService;
 
     @Override
-    public Flux<AlbumResponse> getAlbumListByMember(
-            String memberId
+    public Flux<AlbumDetailResponse> getAlbumListByMember(
+            String memberId,
+            ServerHttpRequest serverHttpRequest
     ) {
+        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
+
         return albumService
-                .findAlbumListByMemberId(memberId)
-                .map(AlbumResponse::fromEntity);
+                .findAlbumListByMemberId(memberId, authorizationToken)
+                .map(AlbumDetailResponse::fromDto);
     }
 
     @Override

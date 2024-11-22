@@ -1,5 +1,7 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.ShareStatus.REJECTED;
+
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.exception.SharedMemberDuplicatedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
@@ -17,6 +19,11 @@ public class SharedMemberQuery {
 
     public Flux<SharedMemberEntity> findAllByAlbumId(String albumId) {
         return sharedMemberRepository.findAllByAlbumId(albumId)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
+    public Flux<SharedMemberEntity> findAllByMemberIdWhereStatusNotRejected(String memberId) {
+        return sharedMemberRepository.findAllByMemberIdAndShareStatusNot(memberId, REJECTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
