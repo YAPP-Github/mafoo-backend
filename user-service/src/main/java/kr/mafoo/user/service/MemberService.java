@@ -29,15 +29,18 @@ public class MemberService {
                 .then(memberRepository.deleteMemberById(memberId));
     }
 
-    public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String token) {
+    @Transactional(readOnly = true)
+    public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId, String token) {
         return memberRepository
             .findAllByNameContaining(keyword)
+            .filter(member -> !member.getId().equals(memberId))
             .switchIfEmpty(Mono.empty())
             .concatMap(member -> sharedMemberService.getSharedMemberInfoByAlbumId(albumId, member.getId(), token)
                 .flatMap(sharedMemberDto -> Mono.just(MemberDetailDto.fromSharedMember(member, sharedMemberDto)))
             );
     }
 
+    @Transactional(readOnly = true)
     public Mono<MemberEntity> getMemberByMemberId(String memberId) {
         return memberRepository
                 .findById(memberId)

@@ -24,7 +24,7 @@ public class MemberController implements MemberApi {
     ) {
         String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
 
-        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, authorizationToken)
+        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, requesterId, authorizationToken)
             .map(MemberDetailResponse::fromDto);
     }
 
