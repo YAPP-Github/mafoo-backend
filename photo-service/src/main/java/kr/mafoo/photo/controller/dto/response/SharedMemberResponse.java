@@ -19,7 +19,7 @@ public record SharedMemberResponse(
         @Schema(description = "공유 대상 앨범 ID", example = "test_album_id")
         String albumId,
 
-        @Schema(description = "공유 대상 사용자 ID", example = "test_album_id")
+        @Schema(description = "공유 대상 사용자 ID", example = "test_member_id")
         String memberId
 ) {
         public static SharedMemberResponse fromEntity(
