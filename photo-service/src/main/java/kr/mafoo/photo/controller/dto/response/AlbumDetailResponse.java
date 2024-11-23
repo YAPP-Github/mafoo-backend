@@ -1,6 +1,8 @@
 package kr.mafoo.photo.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
@@ -26,8 +28,21 @@ public record AlbumDetailResponse(
         @Schema(description = "공유 받은 앨범 권한", example = "null")
         PermissionLevel permissionLevel,
 
+        @Schema(description = "공유 받은 앨범 소유자 ID", example = "test_member_id")
+        String ownerMemberId,
+
+        @Schema(description = "공유 받은 앨범 소유자 이름", example = "시금치파슷하")
+        String ownerName,
+
         @Schema(description = "공유 받은 앨범 소유자 프로필 사진 URL", example = "null")
-        String ownerProfileImageUrl
+        String ownerProfileImageUrl,
+
+        @Schema(description = "공유 받은 앨범 소유자 식별 번호", example = "0000")
+        String ownerSerialNumber,
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        @Schema(description = "생성 시간", example = "2021-08-01 00:00:00")
+        LocalDateTime createdAt
 ) {
         public static AlbumDetailResponse fromDto(
             AlbumDto dto
@@ -39,7 +54,11 @@ public record AlbumDetailResponse(
                     dto.photoCount().toString(),
                     dto.shareStatus(),
                     dto.permissionLevel(),
-                    dto.ownerProfileImageUrl()
+                    dto.ownerMemberId(),
+                    dto.ownerName(),
+                    dto.ownerProfileImageUrl(),
+                    dto.ownerSerialNumber(),
+                    dto.createdAt()
                 );
         }
 }

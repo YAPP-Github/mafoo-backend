@@ -14,7 +14,10 @@ public record AlbumDto(
     Integer photoCount,
     ShareStatus shareStatus,
     PermissionLevel permissionLevel,
+    String ownerMemberId,
+    String ownerName,
     String ownerProfileImageUrl,
+    String ownerSerialNumber,
     LocalDateTime createdAt
 ) {
     public static AlbumDto fromOwnedAlbum(
@@ -25,6 +28,9 @@ public record AlbumDto(
             albumEntity.getName(),
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -44,7 +50,10 @@ public record AlbumDto(
             albumEntity.getPhotoCount(),
             sharedMemberEntity.getShareStatus(),
             sharedMemberEntity.getPermissionLevel(),
+            memberDto.memberId(),
+            memberDto.name(),
             memberDto.profileImageUrl(),
+            memberDto.serialNumber(),
             sharedMemberEntity.getCreatedAt()
         );
     }
