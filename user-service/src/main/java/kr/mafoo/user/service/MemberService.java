@@ -32,7 +32,7 @@ public class MemberService {
     public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String token) {
         return memberRepository
             .findAllByNameContaining(keyword)
-            .switchIfEmpty(Mono.error(new MemberNotFoundException()))
+            .switchIfEmpty(Mono.empty())
             .concatMap(member -> sharedMemberService.getSharedMemberInfoByAlbumId(albumId, member.getId(), token)
                 .flatMap(sharedMemberDto -> Mono.just(MemberDetailDto.fromSharedMember(member, sharedMemberDto)))
             );
