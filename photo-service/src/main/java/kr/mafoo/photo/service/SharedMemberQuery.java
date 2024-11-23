@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 import static kr.mafoo.photo.domain.enums.ShareStatus.REJECTED;
 
 import kr.mafoo.photo.domain.SharedMemberEntity;
@@ -29,6 +30,11 @@ public class SharedMemberQuery {
 
     public Mono<SharedMemberEntity> findBySharedMemberId(String sharedMemberId) {
         return sharedMemberRepository.findById(sharedMemberId)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
+    public Mono<SharedMemberEntity> findByAlbumIdAndMemberIdWhereStatusAccepted(String albumId, String memberId) {
+        return sharedMemberRepository.findByAlbumIdAndMemberIdAndShareStatus(albumId, memberId, ACCEPTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 

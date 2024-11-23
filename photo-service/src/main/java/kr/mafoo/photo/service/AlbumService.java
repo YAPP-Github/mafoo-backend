@@ -88,7 +88,7 @@ public class AlbumService {
     @Transactional
     public Mono<AlbumEntity> modifyAlbumOwnership(String albumId, String newOwnerMemberId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
-            .flatMap(album -> sharedMemberQuery.findByAlbumIdAndMemberId(albumId, newOwnerMemberId)
+            .flatMap(album -> sharedMemberQuery.findByAlbumIdAndMemberIdWhereStatusAccepted(albumId, newOwnerMemberId)
                     .onErrorResume(SharedMemberNotFoundException.class, ex ->
                         Mono.error(new AlbumOwnerChangeDeniedException())
                     )
