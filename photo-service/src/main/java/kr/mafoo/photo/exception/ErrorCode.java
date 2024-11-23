@@ -13,6 +13,7 @@ public enum ErrorCode {
     ALBUM_NOT_FOUND("AE0001", "앨범을 찾을 수 없습니다"),
     ALBUM_DISPLAY_INDEX_IS_SAME("AE0002", "옮기려는 대상 앨범 인덱스가 같습니다"),
     ALBUM_OWNER_MISMATCH("AE0003", "앨범의 소유자가 아닙니다"),
+    ALBUM_OWNER_CHANGE_DENIED("AE0004", "공유된 사용자에게만 소유자를 넘길 수 있습니다"),
 
     PHOTO_NOT_FOUND("PE0001", "사진을 찾을 수 없습니다"),
     PHOTO_BRAND_NOT_EXISTS("PE0002", "사진 브랜드가 존재하지 않습니다"),

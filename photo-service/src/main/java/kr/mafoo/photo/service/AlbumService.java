@@ -6,6 +6,7 @@ import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
 import java.util.Comparator;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
+import kr.mafoo.photo.exception.AlbumOwnerChangeDeniedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.service.dto.AlbumDto;
 import kr.mafoo.photo.service.dto.SharedAlbumDto;
@@ -27,6 +28,7 @@ public class AlbumService {
 
     private final SharedMemberQuery sharedMemberQuery;
     private final MemberService memberService;
+    private final SharedMemberCommand sharedMemberCommand;
 
     @Transactional(readOnly = true)
     public Flux<AlbumDto> findAlbumListByMemberId(String memberId, String token) {
@@ -84,8 +86,14 @@ public class AlbumService {
     @Transactional
     public Mono<AlbumEntity> modifyAlbumOwnership(String albumId, String newOwnerMemberId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
-            .flatMap(album -> albumCommand.modifyAlbumOwnership(album, newOwnerMemberId)
-                // TODO : 앨범 내부 사진 소유자를 새로운 앨범 소유자로 변경
+            .flatMap(album -> sharedMemberQuery.findByAlbumIdAndMemberId(albumId, newOwnerMemberId)
+                    .onErrorResume(SharedMemberNotFoundException.class, ex ->
+                        Mono.error(new AlbumOwnerChangeDeniedException())
+                    )
+                    .flatMap(sharedMemberCommand::removeSharedMember)
+                    .then(albumCommand.modifyAlbumOwnership(album, newOwnerMemberId))
+                    .then(sharedMemberCommand.addSharedMember(albumId, String.valueOf(FULL_ACCESS), requestMemberId))
+                    .thenReturn(album)
             );
     }
 
