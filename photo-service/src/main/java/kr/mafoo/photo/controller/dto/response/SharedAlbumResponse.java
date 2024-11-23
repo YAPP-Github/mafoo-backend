@@ -17,6 +17,9 @@ public record SharedAlbumResponse(
         @Schema(description = "앨범 종류", example = "HEART")
         AlbumType type,
 
+        @Schema(description = "앨범 내 사진 수", example = "6")
+        String photoCount,
+
         @Schema(description = "공유 앨범 소유자 ID", example = "test_member_id")
         String ownerMemberId,
 
@@ -42,6 +45,7 @@ public record SharedAlbumResponse(
                     dto.albumId(),
                     dto.name(),
                     dto.type(),
+                    dto.photoCount().toString(),
                     dto.ownerMemberId(),
                     dto.ownerName(),
                     dto.ownerProfileImageUrl(),
