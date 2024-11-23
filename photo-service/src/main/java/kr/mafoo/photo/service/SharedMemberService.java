@@ -37,7 +37,10 @@ public class SharedMemberService {
     public Mono<Void> removeSharedMember(String sharedMemberId, String requestMemberId) {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> {
-                if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && !isPendingStatus(sharedMember.getShareStatus())) {
+                if (isSharedMemberSelfRequest(sharedMember, requestMemberId)
+                    // 공유 요청을 거절하는 경우, 삭제 실행하기로 하여 주석 처리
+                    // && !isPendingStatus(sharedMember.getShareStatus())
+                ) {
                     return sharedMemberCommand.removeSharedMember(sharedMember);
                 } else {
                     return albumPermissionVerifier.verifyOwnership(sharedMember.getAlbumId(), requestMemberId)
