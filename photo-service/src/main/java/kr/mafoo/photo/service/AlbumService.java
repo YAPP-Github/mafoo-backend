@@ -70,13 +70,6 @@ public class AlbumService {
             );
     }
 
-    private Flux<SharedMemberDto> findSharedAlbumMemberDetail(String albumId, String token) {
-        return sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
-            .concatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId(), token)
-                .flatMap(memberInfo -> Mono.just(SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
-            ).sort(Comparator.comparing(SharedMemberDto::shareStatus));
-    }
-
     @Transactional
     public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String requestMemberId) {
         return albumCommand.addAlbum(albumName, albumType, requestMemberId);

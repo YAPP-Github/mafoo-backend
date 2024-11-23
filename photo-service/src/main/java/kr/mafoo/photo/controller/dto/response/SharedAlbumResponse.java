@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.service.dto.SharedAlbumDto;
-import reactor.core.publisher.Mono;
 
 @Schema(description = "공유 앨범 응답")
 public record SharedAlbumResponse(
@@ -38,31 +37,6 @@ public record SharedAlbumResponse(
         public static SharedAlbumResponse fromDto(
             SharedAlbumDto dto
         ) {
-//                return Mono.justOrEmpty(dto.sharedMemberDtoFlux())
-//                    .flatMap(flux -> flux.map(SharedMemberDetailResponse::fromDto)
-//                        .collectList()
-//                        .map(sharedMemberList -> new SharedAlbumResponse(
-//                            dto.albumId(),
-//                            dto.name(),
-//                            dto.type(),
-//                            dto.photoCount().toString(),
-//                            dto.ownerMemberId(),
-//                            dto.ownerName(),
-//                            dto.ownerProfileImageUrl(),
-//                            dto.ownerSerialNumber(),
-//                            sharedMemberList
-//                        )))
-//                    .defaultIfEmpty(new SharedAlbumResponse(
-//                        dto.albumId(),
-//                        dto.name(),
-//                        dto.type(),
-//                        dto.photoCount().toString(),
-//                        dto.ownerMemberId(),
-//                        dto.ownerName(),
-//                        dto.ownerProfileImageUrl(),
-//                        dto.ownerSerialNumber(),
-//                        null
-//                    ));
                 return new SharedAlbumResponse(
                     dto.albumId(),
                     dto.name(),
