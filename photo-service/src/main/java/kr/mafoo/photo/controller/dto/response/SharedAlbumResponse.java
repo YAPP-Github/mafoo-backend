@@ -35,33 +35,44 @@ public record SharedAlbumResponse(
         @Schema(description = "공유 앨범 사용자 정보 목록")
         List<SharedMemberDetailResponse> sharedMembers
 ) {
-        public static Mono<SharedAlbumResponse> fromDto(
+        public static SharedAlbumResponse fromDto(
             SharedAlbumDto dto
         ) {
-                return Mono.justOrEmpty(dto.sharedMemberDtoFlux())
-                    .flatMap(flux -> flux.map(SharedMemberDetailResponse::fromDto)
-                        .collectList()
-                        .map(sharedMemberList -> new SharedAlbumResponse(
-                            dto.albumId(),
-                            dto.name(),
-                            dto.type(),
-                            dto.photoCount().toString(),
-                            dto.ownerMemberId(),
-                            dto.ownerName(),
-                            dto.ownerProfileImageUrl(),
-                            dto.ownerSerialNumber(),
-                            sharedMemberList
-                        )))
-                    .defaultIfEmpty(new SharedAlbumResponse(
-                        dto.albumId(),
-                        dto.name(),
-                        dto.type(),
-                        dto.photoCount().toString(),
-                        dto.ownerMemberId(),
-                        dto.ownerName(),
-                        dto.ownerProfileImageUrl(),
-                        dto.ownerSerialNumber(),
-                        null
-                    ));
+//                return Mono.justOrEmpty(dto.sharedMemberDtoFlux())
+//                    .flatMap(flux -> flux.map(SharedMemberDetailResponse::fromDto)
+//                        .collectList()
+//                        .map(sharedMemberList -> new SharedAlbumResponse(
+//                            dto.albumId(),
+//                            dto.name(),
+//                            dto.type(),
+//                            dto.photoCount().toString(),
+//                            dto.ownerMemberId(),
+//                            dto.ownerName(),
+//                            dto.ownerProfileImageUrl(),
+//                            dto.ownerSerialNumber(),
+//                            sharedMemberList
+//                        )))
+//                    .defaultIfEmpty(new SharedAlbumResponse(
+//                        dto.albumId(),
+//                        dto.name(),
+//                        dto.type(),
+//                        dto.photoCount().toString(),
+//                        dto.ownerMemberId(),
+//                        dto.ownerName(),
+//                        dto.ownerProfileImageUrl(),
+//                        dto.ownerSerialNumber(),
+//                        null
+//                    ));
+                return new SharedAlbumResponse(
+                    dto.albumId(),
+                    dto.name(),
+                    dto.type(),
+                    dto.photoCount().toString(),
+                    dto.ownerMemberId(),
+                    dto.ownerName(),
+                    dto.ownerProfileImageUrl(),
+                    dto.ownerSerialNumber(),
+                    dto.sharedMemberDtoList().stream().map(SharedMemberDetailResponse::fromDto).toList()
+                );
         }
 }

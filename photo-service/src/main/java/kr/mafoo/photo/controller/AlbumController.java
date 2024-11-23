@@ -42,7 +42,7 @@ public class AlbumController implements AlbumApi {
 
         return albumService
                 .findAlbumDetailById(albumId, memberId, authorizationToken)
-                .flatMap(SharedAlbumResponse::fromDto);
+                .map(SharedAlbumResponse::fromDto);
     }
 
     @Override

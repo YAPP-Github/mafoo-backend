@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service.dto;
 
+import java.util.List;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import reactor.core.publisher.Flux;
@@ -13,7 +14,7 @@ public record SharedAlbumDto(
     String ownerName,
     String ownerProfileImageUrl,
     String ownerSerialNumber,
-    Flux<SharedMemberDto> sharedMemberDtoFlux
+    List<SharedMemberDto> sharedMemberDtoList
 ) {
     public static SharedAlbumDto fromOwnedAlbum(
         AlbumEntity albumEntity
@@ -34,7 +35,7 @@ public record SharedAlbumDto(
     public static SharedAlbumDto fromSharedAlbum(
         AlbumEntity albumEntity,
         MemberDto ownerMemberDto,
-        Flux<SharedMemberDto> sharedMemberDtoFlux
+        List<SharedMemberDto> sharedMemberDtoList
     ) {
         return new SharedAlbumDto(
                 albumEntity.getAlbumId(),
@@ -45,7 +46,7 @@ public record SharedAlbumDto(
                 ownerMemberDto.name(),
                 ownerMemberDto.profileImageUrl(),
                 ownerMemberDto.serialNumber(),
-                sharedMemberDtoFlux
+                sharedMemberDtoList
         );
     }
 }

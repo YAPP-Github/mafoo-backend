@@ -55,18 +55,18 @@ public class AlbumService {
     @Transactional(readOnly = true)
     public Mono<SharedAlbumDto> findAlbumDetailById(String albumId, String requestMemberId, String token) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
-            .flatMap(album -> {
-                    if(album.getOwnerMemberId().equals(requestMemberId)) {
-                        return Mono.just(SharedAlbumDto.fromOwnedAlbum(album));
-                    } else {
-                        return memberService.getMemberInfoById(album.getOwnerMemberId(), token)
-                            .flatMap(ownerMember -> Mono.just(SharedAlbumDto.fromSharedAlbum(
-                                album,
-                                ownerMember,
-                                findSharedAlbumMemberDetail(albumId, token)
-                            )));
-                    }
-                }
+            .flatMap(album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
+                .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
+
+                .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId(), token)
+                    .map(memberInfo -> SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
+                    .sort(Comparator.comparing(SharedMemberDto::shareStatus))
+                .collectList()
+                .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId(), token)
+                    .map(ownerMember -> SharedAlbumDto.fromSharedAlbum(album, ownerMember, sharedMembers))
+                )
+
+                .switchIfEmpty(Mono.just(SharedAlbumDto.fromOwnedAlbum(album)))
             );
     }
 
