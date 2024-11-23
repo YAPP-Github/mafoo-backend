@@ -17,6 +17,16 @@ public class SharedMemberController implements SharedMemberApi {
     private final SharedMemberService sharedMemberService;
 
     @Override
+    public Mono<SharedMemberResponse> getSharedMemberByAlbumAndMember(
+        String requestMemberId,
+        String albumId,
+        String memberId
+    ) {
+        return sharedMemberService.findSharedMemberByAlbumIdAndMemberId(albumId, memberId)
+            .map(SharedMemberResponse::fromEntity);
+    }
+
+    @Override
     public Mono<SharedMemberResponse> createSharedMember(
         String memberId,
         SharedMemberCreateRequest request
