@@ -2,6 +2,7 @@ package kr.mafoo.photo.service;
 
 import static kr.mafoo.photo.domain.enums.ShareStatus.PENDING;
 
+import java.util.Optional;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.ShareStatus;
@@ -17,10 +18,10 @@ public class SharedMemberCommand {
 
     private final SharedMemberRepository sharedMemberRepository;
 
-    public Mono<SharedMemberEntity> addSharedMember(String albumId, String permissionLevel, String sharingMemberId) {
+    public Mono<SharedMemberEntity> addSharedMember(String albumId, String permissionLevel, Optional<ShareStatus> shareStatus, String sharingMemberId) {
         return sharedMemberRepository.save(
             SharedMemberEntity.newSharedMember(
-                IdGenerator.generate(), PENDING, PermissionLevel.valueOf(permissionLevel), sharingMemberId, albumId
+                IdGenerator.generate(), shareStatus, PermissionLevel.valueOf(permissionLevel), sharingMemberId, albumId
             )
         );
     }

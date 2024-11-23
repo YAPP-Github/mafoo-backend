@@ -2,8 +2,10 @@ package kr.mafoo.photo.service;
 
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
+import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 
 import java.util.Comparator;
+import java.util.Optional;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.AlbumOwnerChangeDeniedException;
@@ -92,7 +94,7 @@ public class AlbumService {
                     )
                     .flatMap(sharedMemberCommand::removeSharedMember)
                     .then(albumCommand.modifyAlbumOwnership(album, newOwnerMemberId))
-                    .then(sharedMemberCommand.addSharedMember(albumId, String.valueOf(FULL_ACCESS), requestMemberId))
+                    .then(sharedMemberCommand.addSharedMember(albumId, String.valueOf(FULL_ACCESS), Optional.of(ACCEPTED), requestMemberId))
                     .thenReturn(album)
             );
     }

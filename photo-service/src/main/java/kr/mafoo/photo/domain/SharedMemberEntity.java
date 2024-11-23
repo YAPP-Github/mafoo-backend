@@ -1,6 +1,7 @@
 package kr.mafoo.photo.domain;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 import lombok.Getter;
@@ -73,10 +74,10 @@ public class SharedMemberEntity implements Persistable<String> {
         return this;
     }
 
-    public static SharedMemberEntity newSharedMember(String sharedMemberId, ShareStatus shareStatus, PermissionLevel permissionLevel, String memberId, String albumId) {
+    public static SharedMemberEntity newSharedMember(String sharedMemberId, Optional<ShareStatus> shareStatus, PermissionLevel permissionLevel, String memberId, String albumId) {
         SharedMemberEntity sharedMember = new SharedMemberEntity();
         sharedMember.sharedMemberId = sharedMemberId;
-        sharedMember.shareStatus = shareStatus;
+        sharedMember.shareStatus = shareStatus.orElse(ShareStatus.PENDING);
         sharedMember.permissionLevel = permissionLevel;
         sharedMember.memberId = memberId;
         sharedMember.albumId = albumId;
