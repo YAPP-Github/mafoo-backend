@@ -11,6 +11,7 @@ import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
+import kr.mafoo.photo.controller.dto.response.SharedAlbumResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +34,17 @@ public interface AlbumApi {
 
     @Operation(summary = "앨범 단건 조회", description = "앨범 단건을 조회합니다.")
     @GetMapping("/{albumId}")
-    Mono<AlbumResponse> getAlbum(
+    Mono<SharedAlbumResponse> getAlbum(
             @RequestMemberId
             String memberId,
 
             @ULID
             @Parameter(description = "앨범 ID", example = "test_album_id")
             @PathVariable
-            String albumId
+            String albumId,
+
+            // Authorization Header를 받아올 목적
+            ServerHttpRequest serverHttpRequest
     );
 
     @Operation(summary = "앨범 생성", description = "앨범을 생성합니다.")

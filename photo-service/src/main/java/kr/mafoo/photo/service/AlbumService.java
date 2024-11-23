@@ -8,6 +8,8 @@ import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.service.dto.AlbumDto;
+import kr.mafoo.photo.service.dto.SharedAlbumDto;
+import kr.mafoo.photo.service.dto.SharedMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +53,28 @@ public class AlbumService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<AlbumEntity> findAlbumById(String albumId, String memberId) {
-        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, memberId, VIEW_ACCESS);
+    public Mono<SharedAlbumDto> findAlbumDetailById(String albumId, String requestMemberId, String token) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
+            .flatMap(album -> {
+                    if(album.getOwnerMemberId().equals(requestMemberId)) {
+                        return Mono.just(SharedAlbumDto.fromOwnedAlbum(album));
+                    } else {
+                        return memberService.getMemberInfoById(album.getOwnerMemberId(), token)
+                            .flatMap(ownerMember -> Mono.just(SharedAlbumDto.fromSharedAlbum(
+                                album,
+                                ownerMember,
+                                findSharedAlbumMemberDetail(albumId, token)
+                            )));
+                    }
+                }
+            );
+    }
+
+    private Flux<SharedMemberDto> findSharedAlbumMemberDetail(String albumId, String token) {
+        return sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
+            .concatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId(), token)
+                .flatMap(memberInfo -> Mono.just(SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
+            ).sort(Comparator.comparing(SharedMemberDto::shareStatus));
     }
 
     @Transactional

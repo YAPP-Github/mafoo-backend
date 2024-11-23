@@ -15,6 +15,22 @@ public record SharedAlbumDto(
     String ownerSerialNumber,
     Flux<SharedMemberDto> sharedMemberDtoFlux
 ) {
+    public static SharedAlbumDto fromOwnedAlbum(
+        AlbumEntity albumEntity
+    ) {
+        return new SharedAlbumDto(
+            albumEntity.getAlbumId(),
+            albumEntity.getName(),
+            albumEntity.getType(),
+            albumEntity.getPhotoCount(),
+            albumEntity.getOwnerMemberId(),
+            null,
+             null,
+            null,
+            null
+        );
+    }
+
     public static SharedAlbumDto fromSharedAlbum(
         AlbumEntity albumEntity,
         MemberDto ownerMemberDto,

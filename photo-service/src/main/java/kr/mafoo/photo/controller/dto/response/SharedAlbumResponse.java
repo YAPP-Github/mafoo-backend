@@ -38,19 +38,30 @@ public record SharedAlbumResponse(
         public static Mono<SharedAlbumResponse> fromDto(
             SharedAlbumDto dto
         ) {
-            return dto.sharedMemberDtoFlux()
-                .map(SharedMemberDetailResponse::fromDto)
-                .collectList()
-                .map(sharedMemberList -> new SharedAlbumResponse(
-                    dto.albumId(),
-                    dto.name(),
-                    dto.type(),
-                    dto.photoCount().toString(),
-                    dto.ownerMemberId(),
-                    dto.ownerName(),
-                    dto.ownerProfileImageUrl(),
-                    dto.ownerSerialNumber(),
-                    sharedMemberList
-            ));
+                return Mono.justOrEmpty(dto.sharedMemberDtoFlux())
+                    .flatMap(flux -> flux.map(SharedMemberDetailResponse::fromDto)
+                        .collectList()
+                        .map(sharedMemberList -> new SharedAlbumResponse(
+                            dto.albumId(),
+                            dto.name(),
+                            dto.type(),
+                            dto.photoCount().toString(),
+                            dto.ownerMemberId(),
+                            dto.ownerName(),
+                            dto.ownerProfileImageUrl(),
+                            dto.ownerSerialNumber(),
+                            sharedMemberList
+                        )))
+                    .defaultIfEmpty(new SharedAlbumResponse(
+                        dto.albumId(),
+                        dto.name(),
+                        dto.type(),
+                        dto.photoCount().toString(),
+                        dto.ownerMemberId(),
+                        dto.ownerName(),
+                        dto.ownerProfileImageUrl(),
+                        dto.ownerSerialNumber(),
+                        null
+                    ));
         }
 }

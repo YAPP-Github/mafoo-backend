@@ -6,6 +6,7 @@ import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
+import kr.mafoo.photo.controller.dto.response.SharedAlbumResponse;
 import kr.mafoo.photo.service.AlbumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -32,13 +33,16 @@ public class AlbumController implements AlbumApi {
     }
 
     @Override
-    public Mono<AlbumResponse> getAlbum(
+    public Mono<SharedAlbumResponse> getAlbum(
             String memberId,
-            String albumId
+            String albumId,
+            ServerHttpRequest serverHttpRequest
     ) {
+        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
+
         return albumService
-                .findAlbumById(albumId, memberId)
-                .map(AlbumResponse::fromEntity);
+                .findAlbumDetailById(albumId, memberId, authorizationToken)
+                .flatMap(SharedAlbumResponse::fromDto);
     }
 
     @Override
