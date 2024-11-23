@@ -5,6 +5,7 @@ import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
 
 import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.domain.PhotoEntity;
+import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;
 import kr.mafoo.photo.repository.PhotoRepository;
@@ -49,6 +50,7 @@ public class PhotoService {
         String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
 
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
+            .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
             .thenMany(
                 switch (sortMethod) {
                     case "ASC" -> photoQuery.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
