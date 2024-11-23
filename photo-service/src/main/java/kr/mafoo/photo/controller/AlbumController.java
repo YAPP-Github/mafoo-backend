@@ -47,7 +47,7 @@ public class AlbumController implements AlbumApi {
             AlbumCreateRequest request
     ){
         return albumService
-                .addAlbum(memberId, request.name(), request.type())
+                .addAlbum(request.name(), request.type(), memberId)
                 .map(AlbumResponse::fromEntity);
     }
 
