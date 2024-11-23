@@ -12,6 +12,7 @@ public record AlbumDto(
     String name,
     AlbumType type,
     Integer photoCount,
+    String sharedMemberId,
     ShareStatus shareStatus,
     PermissionLevel permissionLevel,
     String ownerMemberId,
@@ -34,6 +35,7 @@ public record AlbumDto(
             null,
             null,
             null,
+            null,
             albumEntity.getCreatedAt()
         );
     }
@@ -48,6 +50,7 @@ public record AlbumDto(
             albumEntity.getName(),
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
+            sharedMemberEntity.getSharedMemberId(),
             sharedMemberEntity.getShareStatus(),
             sharedMemberEntity.getPermissionLevel(),
             memberDto.memberId(),

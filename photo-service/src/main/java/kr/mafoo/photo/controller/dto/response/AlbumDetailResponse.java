@@ -22,6 +22,9 @@ public record AlbumDetailResponse(
         @Schema(description = "앨범 내 사진 수", example = "6")
         String photoCount,
 
+        @Schema(description = "공유 사용자 ID", example = "test_shared_member_id")
+        String sharedMemberId,
+
         @Schema(description = "공유 받은 앨범 상태", example = "null")
         ShareStatus shareStatus,
 
@@ -52,6 +55,7 @@ public record AlbumDetailResponse(
                     dto.name(),
                     dto.type(),
                     dto.photoCount().toString(),
+                    dto.sharedMemberId(),
                     dto.shareStatus(),
                     dto.permissionLevel(),
                     dto.ownerMemberId(),
