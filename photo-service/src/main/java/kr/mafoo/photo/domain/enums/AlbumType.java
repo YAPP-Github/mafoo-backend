@@ -6,5 +6,6 @@ public enum AlbumType {
     BASKETBALL,
     BUILDING,
     STARFALL,
-    SMILE_FACE
+    SMILE_FACE,
+    SUMONE
 }
