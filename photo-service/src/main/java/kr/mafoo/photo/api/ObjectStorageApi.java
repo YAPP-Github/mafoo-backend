@@ -23,4 +23,12 @@ public interface ObjectStorageApi {
             @RequestBody
             ObjectStoragePreSignedUrlRequest request
     );
+
+    @Operation(summary = "리캡 Pre-signed Url 요청", description = "리캡 생성을 위한 Pre-signed Url 목록을 발급합니다.")
+    @PostMapping("/recap")
+    Mono<PreSignedUrlResponse> createRecapPreSignedUrls(
+            @RequestBody
+            ObjectStoragePreSignedUrlRequest request
+    );
+
 }
