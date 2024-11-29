@@ -50,6 +50,9 @@ public class AlbumController implements AlbumApi {
             String memberId,
             AlbumCreateRequest request
     ){
+        if (request.name().equals("SUMONE")) {
+            throw new RuntimeException(); // should not be happened
+        }
         return albumService
                 .addAlbum(request.name(), request.type(), memberId)
                 .map(AlbumResponse::fromEntity);

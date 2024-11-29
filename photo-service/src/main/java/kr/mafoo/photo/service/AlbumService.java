@@ -7,6 +7,7 @@ import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 import java.util.Comparator;
 import java.util.Optional;
 import kr.mafoo.photo.domain.AlbumEntity;
+import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.AlbumOwnerChangeDeniedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
@@ -105,4 +106,7 @@ public class AlbumService {
             .flatMap(albumCommand::removeAlbum);
     }
 
+    public Mono<Long> countAlbumByAlbumType(AlbumType albumType) {
+        return albumQuery.countAlbumByAlbumType(albumType);
+    }
 }

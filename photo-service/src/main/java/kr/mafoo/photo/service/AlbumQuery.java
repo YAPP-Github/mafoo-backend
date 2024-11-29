@@ -1,9 +1,15 @@
 package kr.mafoo.photo.service;
 
+import java.time.Duration;
 import kr.mafoo.photo.domain.AlbumEntity;
+import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,5 +28,18 @@ public class AlbumQuery {
     public Flux<AlbumEntity> findByMemberId(String memberId) {
         return albumRepository.findAllByOwnerMemberIdOrderByDisplayIndex(memberId)
             .switchIfEmpty(Mono.error(new AlbumNotFoundException()));
+    }
+
+    @Cacheable(value = "albumCount", key = "#albumType")
+    public Mono<Long> countAlbumByAlbumType(AlbumType albumType) {
+        return albumRepository
+                .countAlbumEntityByType(albumType)
+                .cache();
+    }
+
+    @CacheEvict(value = "albumCount", allEntries = true)
+    @Scheduled(fixedDelay = 1000 * 10)
+    public void clearAlbumCountCache() {
+        LoggerFactory.getLogger(AlbumQuery.class).debug("clear album count cache");
     }
 }
