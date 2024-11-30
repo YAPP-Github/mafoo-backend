@@ -30,6 +30,8 @@ public enum ErrorCode {
     PRE_SIGNED_URL_EXCEED_MAXIMUM("OE0001", "한 번에 생성할 수 있는 Pre-signed url 최대치를 초과했습니다"),
     PRE_SIGNED_URL_BANNED_FILE_TYPE("OE0002", "Pre-signed url 발급이 허용되지 않는 파일 형식입니다"),
 
+    RECAP_PHOTO_COUNT_NOT_VALID("RE0001", "리캡 생성에 유효한 사진 개수가 아닙니다"),
+
     MAFOO_USER_API_FAILED("MUE0001", "마푸의 user-service API 호출이 실패했습니다"),
 
     MAFOO_RECAP_LAMBDA_API_FAILED("MRE0001", "마푸의 recap-service AWS Lambda API 호출이 실패했습니다")
