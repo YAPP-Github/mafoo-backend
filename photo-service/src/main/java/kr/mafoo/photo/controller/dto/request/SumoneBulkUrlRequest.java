@@ -1,4 +1,4 @@
-package kr.mafoo.photo.controller.dto.response;
+package kr.mafoo.photo.controller.dto.request;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;

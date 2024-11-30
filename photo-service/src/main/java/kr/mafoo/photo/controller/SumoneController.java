@@ -4,11 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.atomic.AtomicInteger;
 import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
-import kr.mafoo.photo.controller.dto.request.RecapCreateRequest;
+import kr.mafoo.photo.controller.dto.request.SumoneRecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
 import kr.mafoo.photo.controller.dto.response.SumoneAlbumResponse;
-import kr.mafoo.photo.controller.dto.response.SumoneBulkUrlRequest;
+import kr.mafoo.photo.controller.dto.request.SumoneBulkUrlRequest;
 import kr.mafoo.photo.controller.dto.response.SumonePhotoResponse;
 import kr.mafoo.photo.controller.dto.response.SumoneSummaryResponse;
 import kr.mafoo.photo.domain.enums.AlbumType;
@@ -126,7 +126,7 @@ public class SumoneController {
     Mono<RecapResponse> createRecapVideo(
         @PathVariable String albumId,
         @RequestBody
-        RecapCreateRequest request
+        SumoneRecapCreateRequest request
     ) {
         return recapService.generateRecapVideo(request.fileUrls(), albumId, sumoneAlbumCommonMemberId)
             .map(RecapResponse::fromDto);
