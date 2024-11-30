@@ -64,6 +64,7 @@ public class WebExceptionHandler {
 
     @ExceptionHandler(PhotoBrandNotExistsException.class)
     public Mono<ResponseEntity<ErrorResponse>> handlePhotoBrandNotExistsException(ServerWebExchange exchange, PhotoBrandNotExistsException exception) {
+        String requestMemberId = exchange.getRequest().getHeaders().getFirst("X-MEMBER-ID");
         String method = extractMethod(exchange);
         String userAgent = extractUserAgent(exchange);
         String fullPath = extractURI(exchange);
@@ -73,7 +74,7 @@ public class WebExceptionHandler {
             logException(method, fullPath, originIp, userAgent, exception);
 
             return slackService.sendQrRelatedErrorNotification(
-                    method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
+                requestMemberId, method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
             ).then(Mono.just(
                     ResponseEntity
                             .badRequest()
@@ -93,6 +94,7 @@ public class WebExceptionHandler {
     }
 
     private Mono<ResponseEntity<String>> handleExceptionInternal(ServerWebExchange exchange, Exception exception, HttpStatus status) {
+        String requestMemberId = exchange.getRequest().getHeaders().getFirst("X-MEMBER-ID");
         String method = extractMethod(exchange);
         String userAgent = extractUserAgent(exchange);
         String fullPath = extractURI(exchange);
@@ -104,7 +106,7 @@ public class WebExceptionHandler {
 
             if (status == HttpStatus.INTERNAL_SERVER_ERROR) {
                 return slackService.sendErrorNotification(
-                        method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
+                        requestMemberId, method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
                 ).then(Mono.just(new ResponseEntity<>("Internal Server Error", status)));
             }
 

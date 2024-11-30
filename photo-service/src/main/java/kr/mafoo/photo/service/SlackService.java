@@ -28,7 +28,7 @@ public class SlackService {
 
     private final MethodsClient methodsClient;
 
-    public Mono<Void> sendNotification(String channel, String headerText, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
+    public Mono<Void> sendNotification(String channel, String headerText, String requestMemberId, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
         return Mono.fromCallable(() -> {
             List<LayoutBlock> layoutBlocks = new ArrayList<>();
 
@@ -43,6 +43,15 @@ public class SlackService {
             layoutBlocks.add(divider());
 
             // Content 삽입
+            MarkdownTextObject errorRequestMemberIdMarkdown =
+                MarkdownTextObject.builder().text("`사용자 ID`\n" + requestMemberId).build();
+
+            layoutBlocks.add(
+                section(
+                    section -> section.fields(List.of(errorRequestMemberIdMarkdown))
+                )
+            );
+
             MarkdownTextObject errorMethodMarkdown =
                     MarkdownTextObject.builder().text("`METHOD`\n" + method).build();
 
@@ -56,7 +65,7 @@ public class SlackService {
             );
 
             MarkdownTextObject requestBodyMarkdown =
-                    MarkdownTextObject.builder().text("`요청 바디`\n" + requestBody).build();
+                    MarkdownTextObject.builder().text("`Request Body`\n" + requestBody).build();
 
             layoutBlocks.add(
                     section(
@@ -98,11 +107,11 @@ public class SlackService {
         }).then();
     }
 
-    public Mono<Void> sendErrorNotification(String method, String uri, String requestBody, String originIp, String userAgent, String message) {
-        return sendNotification(errorChannel, "🚨 예상하지 못한 에러 발생", method, uri, requestBody, originIp, userAgent, message);
+    public Mono<Void> sendErrorNotification(String requestMemberId, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
+        return sendNotification(errorChannel, "🚨 예상하지 못한 에러 발생", requestMemberId, method, uri, requestBody, originIp, userAgent, message);
     }
 
-    public Mono<Void> sendQrRelatedErrorNotification(String method, String uri, String requestBody, String originIp, String userAgent, String message) {
-        return sendNotification(qrErrorChannel, "📸 지원하지 않는 QR 브랜드 에러 발생", method, uri, requestBody, originIp, userAgent, message);
+    public Mono<Void> sendQrRelatedErrorNotification(String requestMemberId, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
+        return sendNotification(qrErrorChannel, "📸 지원하지 않는 QR 브랜드 에러 발생", requestMemberId, method, uri, requestBody, originIp, userAgent, message);
     }
 }
