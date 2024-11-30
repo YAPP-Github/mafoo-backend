@@ -28,7 +28,7 @@ public class SlackService {
 
     private final MethodsClient methodsClient;
 
-    public Mono<Void> sendErrorNotification(String method, String uri, String originIp, String userAgent, String message) {
+    public Mono<Void> sendErrorNotification(String requestMemberId, String method, String uri, String requestBody, String originIp, String userAgent, String message) {
         return Mono.fromCallable(() -> {
             List<LayoutBlock> layoutBlocks = new ArrayList<>();
 
@@ -43,46 +43,64 @@ public class SlackService {
             layoutBlocks.add(divider());
 
             // Content 삽입
-            MarkdownTextObject errorMethodMarkdown =
-                    MarkdownTextObject.builder().text("`METHOD`\n" + method).build();
-
-            MarkdownTextObject errorUriMarkdown =
-                    MarkdownTextObject.builder().text("`URI`\n" + uri).build();
+            MarkdownTextObject errorRequestMemberIdMarkdown =
+                MarkdownTextObject.builder().text("`사용자 ID`\n" + requestMemberId).build();
 
             layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(errorMethodMarkdown, errorUriMarkdown))
-                    )
+                section(
+                    section -> section.fields(List.of(errorRequestMemberIdMarkdown))
+                )
+            );
+
+            MarkdownTextObject errorMethodMarkdown =
+                MarkdownTextObject.builder().text("`METHOD`\n" + method).build();
+
+            MarkdownTextObject errorUriMarkdown =
+                MarkdownTextObject.builder().text("`URI`\n" + uri).build();
+
+            layoutBlocks.add(
+                section(
+                    section -> section.fields(List.of(errorMethodMarkdown, errorUriMarkdown))
+                )
+            );
+
+            MarkdownTextObject requestBodyMarkdown =
+                MarkdownTextObject.builder().text("`Request Body`\n" + requestBody).build();
+
+            layoutBlocks.add(
+                section(
+                    section -> section.fields(List.of(requestBodyMarkdown))
+                )
             );
 
             MarkdownTextObject errorOriginIpMarkdown =
-                    MarkdownTextObject.builder().text("`에러 발생 IP`\n" + originIp).build();
+                MarkdownTextObject.builder().text("`에러 발생 IP`\n" + originIp).build();
 
             MarkdownTextObject errorUserAgentMarkdown =
-                    MarkdownTextObject.builder().text("`에러 발생 환경`\n" + userAgent).build();
+                MarkdownTextObject.builder().text("`에러 발생 환경`\n" + userAgent).build();
 
             layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(errorOriginIpMarkdown, errorUserAgentMarkdown))
-                    )
+                section(
+                    section -> section.fields(List.of(errorOriginIpMarkdown, errorUserAgentMarkdown))
+                )
             );
 
             MarkdownTextObject errorMessageMarkdown =
-                    MarkdownTextObject.builder().text("`메세지`\n" + message).build();
+                MarkdownTextObject.builder().text("`메세지`\n" + message).build();
 
             layoutBlocks.add(
-                    section(
-                            section -> section.fields(List.of(errorMessageMarkdown))
-                    )
+                section(
+                    section -> section.fields(List.of(errorMessageMarkdown))
+                )
             );
 
             ChatPostMessageRequest chatPostMessageRequest =
-                    ChatPostMessageRequest
-                            .builder()
-                            .text("예상하지 못한 에러 발생 알림")
-                            .channel(errorChannel)
-                            .blocks(layoutBlocks)
-                            .build();
+                ChatPostMessageRequest
+                    .builder()
+                    .text("에러 발생 알림")
+                    .channel(errorChannel)  // 동적으로 채널 선택
+                    .blocks(layoutBlocks)
+                    .build();
 
             return methodsClient.chatPostMessage(chatPostMessageRequest);
 
