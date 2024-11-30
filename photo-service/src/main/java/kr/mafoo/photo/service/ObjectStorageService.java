@@ -6,8 +6,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import kr.mafoo.photo.exception.PreSignedUrlBannedFileType;
-import kr.mafoo.photo.exception.PreSignedUrlExceedMaximum;
+import kr.mafoo.photo.exception.PreSignedUrlBannedFileTypeException;
+import kr.mafoo.photo.exception.PreSignedUrlExceedMaximumException;
 import kr.mafoo.photo.util.RecapProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -95,7 +95,7 @@ public class ObjectStorageService {
 
     public Mono<String[]> createPreSignedUrls(String[] fileNames, String memberId) {
         if (fileNames.length > 30) {
-            return Mono.error(new PreSignedUrlExceedMaximum());
+            return Mono.error(new PreSignedUrlExceedMaximumException());
         }
 
         return Flux.fromArray(fileNames)
@@ -120,14 +120,14 @@ public class ObjectStorageService {
                             .withExpiration(expiration))
                     );
                 } else {
-                    return Mono.error(new PreSignedUrlBannedFileType());
+                    return Mono.error(new PreSignedUrlBannedFileTypeException());
                 }
             });
     }
 
     public Mono<String[]> createRecapPreSignedUrls(String[] fileNames) {
         if (fileNames.length > 10) {
-            return Mono.error(new PreSignedUrlExceedMaximum());
+            return Mono.error(new PreSignedUrlExceedMaximumException());
         }
 
         return Flux.fromArray(fileNames)
@@ -152,7 +152,7 @@ public class ObjectStorageService {
                             .withExpiration(expiration))
                     );
                 } else {
-                    return Mono.error(new PreSignedUrlBannedFileType());
+                    return Mono.error(new PreSignedUrlBannedFileTypeException());
                 }
             });
     }

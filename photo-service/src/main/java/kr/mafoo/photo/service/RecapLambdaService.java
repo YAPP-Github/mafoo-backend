@@ -3,7 +3,7 @@ package kr.mafoo.photo.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import kr.mafoo.photo.exception.MafooUserApiFailed;
+import kr.mafoo.photo.exception.MafooRecapLambdaApiFailedException;
 import kr.mafoo.photo.service.dto.RecapUrlDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,20 +13,20 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Service
-public class LambdaService {
+public class RecapLambdaService {
 
     @Value("${lambda.endpoint}")
     private String lambdaEndpoint;
 
     private final WebClient client;
 
-    public Mono<RecapUrlDto> generateRecap(List<String> recapPhotoUrls) {
+    public Mono<RecapUrlDto> generateVideo(List<String> recapPhotoUrls) {
         return client
             .post()
             .uri(lambdaEndpoint)
             .bodyValue(createRequestBody(recapPhotoUrls))
             .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooRecapLambdaApiFailedException()))
             .bodyToMono(RecapUrlDto.class);
     }
 

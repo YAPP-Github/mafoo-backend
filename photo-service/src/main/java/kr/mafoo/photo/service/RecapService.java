@@ -15,11 +15,11 @@ import reactor.core.publisher.Mono;
 public class RecapService {
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
-    private final LambdaService lambdaService;
+    private final RecapLambdaService recapLambdaService;
 
     public Mono<RecapUrlDto> generateRecapVideo(List<String> recapPhotoUrls, String albumId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, DOWNLOAD_ACCESS)
-            .then(lambdaService.generateRecap(recapPhotoUrls));
+            .then(recapLambdaService.generateVideo(recapPhotoUrls));
     }
 
 }

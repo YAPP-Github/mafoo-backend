@@ -1,7 +1,7 @@
 package kr.mafoo.photo.service;
 
 import kr.mafoo.photo.service.dto.MemberDto;
-import kr.mafoo.photo.exception.MafooUserApiFailed;
+import kr.mafoo.photo.exception.MafooUserApiFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class MemberService {
             .uri(endpoint + "/user/v1/me")
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToMono(MemberDto.class);
     }
 
@@ -34,7 +34,7 @@ public class MemberService {
             .uri(endpoint + "/user/v1/members/" + memberId)
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToMono(MemberDto.class);
     }
 
@@ -44,7 +44,7 @@ public class MemberService {
             .uri(endpoint + "/user/v1/members?keyword=" + keyword)
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailed()))
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToFlux(MemberDto.class);
     }
 
