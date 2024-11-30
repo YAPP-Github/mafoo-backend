@@ -58,3 +58,6 @@ recap:
   path:
     tmp: /usr/bin/recap/tmp/
     src: /usr/bin/recap/src/
+
+lambda:
+  endpoint: ${LAMBDA_URL}
