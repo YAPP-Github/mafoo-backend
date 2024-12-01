@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.atomic.AtomicInteger;
 import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
+import kr.mafoo.photo.controller.dto.request.SumoneAlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SumoneRecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
 import kr.mafoo.photo.controller.dto.response.RecapResponse;
@@ -58,7 +59,9 @@ public class SumoneController {
 
     @Operation(summary = "앨범 생성 api")
     @PostMapping("/albums")
-    public Mono<SumoneAlbumResponse> createAlbum() {
+    public Mono<SumoneAlbumResponse> createAlbum(
+            @RequestBody SumoneAlbumCreateRequest request
+            ) {
         return albumCommand
                 .addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId)
                 .map(SumoneAlbumResponse::fromEntity);
