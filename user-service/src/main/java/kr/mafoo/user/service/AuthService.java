@@ -25,6 +25,8 @@ import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.util.NicknameGenerator;
 import kr.mafoo.user.util.ProfileImageGenerator;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,6 +35,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final WebClient externalWebClient;
     private final SocialMemberRepository socialMemberRepository;
     private final MemberService memberService;
@@ -56,7 +60,10 @@ public class AuthService {
     }
 
     private String generateDefaultProfileImageUrl(String kakaoProfileImageUrl) {
+        log.info("카카오 ProfileImageUrl: {}", kakaoProfileImageUrl);
+
         if (kakaoProfileImageUrl.contains(DEFAULT_KAKAO_PROFILE_IMAGE_URL)) {
+            log.info("기본 프로필 생성");
             return ProfileImageGenerator.generate();
         }
         return kakaoProfileImageUrl;
