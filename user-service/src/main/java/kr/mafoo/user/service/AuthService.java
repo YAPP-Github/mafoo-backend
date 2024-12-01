@@ -60,10 +60,7 @@ public class AuthService {
     }
 
     private String generateDefaultProfileImageUrl(String kakaoProfileImageUrl) {
-        log.info("카카오 ProfileImageUrl: {}", kakaoProfileImageUrl);
-
         if (kakaoProfileImageUrl.contains(DEFAULT_KAKAO_PROFILE_IMAGE_URL)) {
-            log.info("기본 프로필 생성");
             return ProfileImageGenerator.generate();
         }
         return kakaoProfileImageUrl;
