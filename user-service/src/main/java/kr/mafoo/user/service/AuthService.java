@@ -23,6 +23,7 @@ import kr.mafoo.user.enums.IdentityProvider;
 import kr.mafoo.user.exception.KakaoLoginFailedException;
 import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.util.NicknameGenerator;
+import kr.mafoo.user.util.ProfileImageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,8 +40,6 @@ public class AuthService {
     private final KakaoOAuthProperties kakaoOAuthProperties;
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
-
-    private final static String DEFAULT_PROFILE_IMG_URL = "https://www.gravatar.com/avatar/?d=identicon";
 
     @Transactional
     public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, String userAgent) {
@@ -62,7 +61,7 @@ public class AuthService {
                         IdentityProvider.APPLE,
                         appleLoginInfo.id(),
                         NicknameGenerator.generate(),
-                        DEFAULT_PROFILE_IMG_URL,
+                        ProfileImageGenerator.generate(),
                         userAgent
                 ));
     }
