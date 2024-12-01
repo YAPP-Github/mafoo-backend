@@ -41,6 +41,8 @@ public class AuthService {
     private final AppleOAuthProperties appleOAuthProperties;
     private final ObjectMapper objectMapper;
 
+    private final String DEFAULT_KAKAO_PROFILE_IMAGE_URL = "http://t1.kakaocdn.net/account_images/default_profile.jpeg";
+
     @Transactional
     public Mono<AuthToken> loginWithKakao(String kakaoAccessToken, String userAgent) {
         return getUserInfoWithKakaoToken(kakaoAccessToken)
@@ -48,9 +50,16 @@ public class AuthService {
                         IdentityProvider.KAKAO,
                         kakaoLoginInfo.id(),
                         kakaoLoginInfo.nickname(),
-                        kakaoLoginInfo.profileImageUrl(),
+                        generateDefaultProfileImageUrl(kakaoLoginInfo.profileImageUrl()),
                         userAgent
                 ));
+    }
+
+    private String generateDefaultProfileImageUrl(String kakaoProfileImageUrl) {
+        if (kakaoProfileImageUrl.contains(DEFAULT_KAKAO_PROFILE_IMAGE_URL)) {
+            return ProfileImageGenerator.generate();
+        }
+        return kakaoProfileImageUrl;
     }
 
     @Transactional
