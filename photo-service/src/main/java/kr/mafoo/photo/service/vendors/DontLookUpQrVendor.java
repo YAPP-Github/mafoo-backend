@@ -1,13 +1,17 @@
 package kr.mafoo.photo.service.vendors;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import kr.mafoo.photo.exception.PhotoQrUrlExpiredException;
 import kr.mafoo.photo.exception.RedirectUriNotFoundException;
 import kr.mafoo.photo.util.WebClientUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class DontLookUpQrVendor implements QrVendor {
@@ -15,16 +19,16 @@ public class DontLookUpQrVendor implements QrVendor {
 
     @Override
     public Mono<byte[]> extractImageFromQrUrl(String qrUrl) {
-        String imageName = qrUrl.split(".kr/image/")[1];
+        try {
+            URI uri = new URI(qrUrl);
+            String path = uri.getPath();
+            String[] pathSegments = path.split("/");
 
-        String baseUrl = "https://x.dontlxxkup.kr/uploads/";
-        String imageUrl = baseUrl + imageName;
+            String baseUrl = uri.getScheme() + "://" + uri.getHost() + "/uploads/";
+            String imageName = pathSegments[pathSegments.length - 1];
+            String imageUrl = baseUrl + imageName;
 
-        // TODO : 추후 비디오 URL 추가 예정
-        // String videoName = imageName.replace("image", "video").replace(".jpg", ".mp4");
-        // String videoUrl = baseUrl + videoName;
-
-        return WebClientUtil.getRedirectUri(webClient, qrUrl)
+            return WebClientUtil.getRedirectUri(webClient, qrUrl)
                 .flatMap(redirectUri -> {
                     if (redirectUri.endsWith("/delete")) {
                         return Mono.error(new PhotoQrUrlExpiredException());
@@ -33,7 +37,11 @@ public class DontLookUpQrVendor implements QrVendor {
                     }
                 })
                 .onErrorResume(
-                        RedirectUriNotFoundException.class, e -> WebClientUtil.getBlob(webClient, imageUrl)
+                    RedirectUriNotFoundException.class, e -> WebClientUtil.getBlob(webClient, imageUrl)
                 );
+        } catch (URISyntaxException e) {
+            return Mono.error(new IllegalArgumentException("Invalid QR URL: " + qrUrl, e));
+        }
     }
+
 }
