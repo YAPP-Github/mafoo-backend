@@ -16,7 +16,7 @@ public class RecapController implements Function<RecapCreateRequest, RecapRespon
 
     @Override
     public RecapResponse apply(RecapCreateRequest request) {
-        return RecapResponse.fromString(
+        return new RecapResponse(
             recapService.generateCombinedVideo(Arrays.stream(request.fileUrls()).toList())
         );
     }
