@@ -156,6 +156,7 @@ public class WebExceptionHandler {
     }
 
     private void logException(String method, String fullPath, String originIp, String userAgent, Exception exception) {
-        logger.error("Exception occurred: {} {} {} ERROR {} {}", method, fullPath, originIp, exception.getMessage(), userAgent);
+        String exceptionMessage = "Exception occurred: " + method + " " + fullPath + " " + originIp + " ERROR " + exception.getMessage() + " " + userAgent;
+        logger.error(exceptionMessage, exception);
     }
 }
