@@ -5,25 +5,22 @@ import java.util.List;
 import java.util.Map;
 import kr.mafoo.photo.exception.MafooRecapLambdaApiFailedException;
 import kr.mafoo.photo.service.dto.RecapUrlDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-@RequiredArgsConstructor
 @Service
 public class RecapLambdaService {
-
-    @Value("${lambda.endpoint}")
-    private String lambdaEndpoint;
-
     private final WebClient client;
+
+    public RecapLambdaService(@Qualifier("recapLambdaClient") WebClient client) {
+        this.client = client;
+    }
 
     public Mono<RecapUrlDto> generateVideo(List<String> recapPhotoUrls) {
         return client
             .post()
-            .uri(lambdaEndpoint)
             .bodyValue(createRequestBody(recapPhotoUrls))
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooRecapLambdaApiFailedException()))
@@ -35,6 +32,5 @@ public class RecapLambdaService {
         requestBody.put("fileUrls", recapPhotoUrls);
         return requestBody;
     }
-
 }
 

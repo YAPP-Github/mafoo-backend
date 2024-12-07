@@ -137,8 +137,12 @@ public class SumoneController {
         if(request.fileUrls().size() < 2 || request.fileUrls().size() > 10) {
             return Mono.error(new RecapPhotoCountNotValidException());
         }
-        return recapLambdaService.generateVideo(request.fileUrls());
-//        return recapService.generateRecapVideo(request.fileUrls(), albumId, sumoneAlbumCommonMemberId)
-//            .map(RecapResponse::fromDto);
+        return albumQuery.findById(albumId).flatMap(album -> {
+            if(album.getType() != AlbumType.SUMONE) {
+                return Mono.error(new AlbumNotFoundException());
+            }
+            //TODO: add timeout
+            return recapLambdaService.generateVideo(request.fileUrls());
+        });
     }
 }
