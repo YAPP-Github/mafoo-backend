@@ -7,7 +7,6 @@ import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
 import kr.mafoo.photo.controller.dto.request.SumoneAlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SumoneRecapCreateRequest;
 import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
-import kr.mafoo.photo.controller.dto.response.RecapResponse;
 import kr.mafoo.photo.controller.dto.response.SumoneAlbumResponse;
 import kr.mafoo.photo.controller.dto.request.SumoneBulkUrlRequest;
 import kr.mafoo.photo.controller.dto.response.SumonePhotoResponse;
@@ -16,12 +15,15 @@ import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoNotFoundException;
+import kr.mafoo.photo.exception.RecapPhotoCountNotValidException;
 import kr.mafoo.photo.service.AlbumCommand;
 import kr.mafoo.photo.service.AlbumQuery;
 import kr.mafoo.photo.service.ObjectStorageService;
 import kr.mafoo.photo.service.PhotoCommand;
 import kr.mafoo.photo.service.PhotoQuery;
+import kr.mafoo.photo.service.RecapLambdaService;
 import kr.mafoo.photo.service.RecapService;
+import kr.mafoo.photo.service.dto.RecapUrlDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +50,7 @@ public class SumoneController {
     private final AlbumCommand albumCommand;
     private final ObjectStorageService objectStorageService;
     private final RecapService recapService;
+    private final RecapLambdaService recapLambdaService;
 
     @Operation(summary = "통계 api")
     @GetMapping("/summary")
@@ -126,12 +129,16 @@ public class SumoneController {
 
     @Operation(summary = "리캡 영상 생성", description = "리캡 영상을 생성합니다.")
     @PostMapping("/albums/{albumId}/recap")
-    Mono<RecapResponse> createRecapVideo(
+    Mono<RecapUrlDto> createRecapVideo(
         @PathVariable String albumId,
         @RequestBody
         SumoneRecapCreateRequest request
     ) {
-        return recapService.generateRecapVideo(request.fileUrls(), albumId, sumoneAlbumCommonMemberId)
-            .map(RecapResponse::fromDto);
+        if(request.fileUrls().size() < 2 || request.fileUrls().size() > 10) {
+            return Mono.error(new RecapPhotoCountNotValidException());
+        }
+        return recapLambdaService.generateVideo(request.fileUrls());
+//        return recapService.generateRecapVideo(request.fileUrls(), albumId, sumoneAlbumCommonMemberId)
+//            .map(RecapResponse::fromDto);
     }
 }
