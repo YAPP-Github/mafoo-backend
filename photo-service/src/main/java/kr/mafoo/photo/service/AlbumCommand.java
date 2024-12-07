@@ -14,9 +14,9 @@ public class AlbumCommand {
 
     private final AlbumRepository albumRepository;
 
-    public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String ownerMemberId) {
+    public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String ownerMemberId, String externalId) {
         return albumRepository.save(
-            AlbumEntity.newAlbum(IdGenerator.generate(), albumName, AlbumType.valueOf(albumType), ownerMemberId)
+            AlbumEntity.newAlbum(IdGenerator.generate(), albumName, AlbumType.valueOf(albumType), ownerMemberId, externalId)
         );
     }
 

@@ -77,7 +77,7 @@ public class AlbumService {
 
     @Transactional
     public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String requestMemberId) {
-        return albumCommand.addAlbum(albumName, albumType, requestMemberId);
+        return albumCommand.addAlbum(albumName, albumType, requestMemberId, null);
     }
 
     @Transactional

@@ -25,6 +25,7 @@ import kr.mafoo.photo.service.RecapLambdaService;
 import kr.mafoo.photo.service.RecapService;
 import kr.mafoo.photo.service.dto.RecapUrlDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,13 +61,14 @@ public class SumoneController {
                 .map(SumoneSummaryResponse::new);
     }
 
+    @Transactional
     @Operation(summary = "앨범 생성 api")
     @PostMapping("/albums")
     public Mono<SumoneAlbumResponse> createAlbum(
             @RequestBody SumoneAlbumCreateRequest request
             ) {
         return albumCommand
-                .addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId)
+                .addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId, "SUMONE_" + request.userId())
                 .map(SumoneAlbumResponse::fromEntity);
     }
 

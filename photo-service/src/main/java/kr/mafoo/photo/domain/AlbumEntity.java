@@ -36,6 +36,9 @@ public class AlbumEntity implements Persistable<String> {
     @Column("display_index")
     private Integer displayIndex;
 
+    @Column("external_id")
+    private String externalId;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
@@ -96,11 +99,12 @@ public class AlbumEntity implements Persistable<String> {
         return this;
     }
 
-    public static AlbumEntity newAlbum(String albumId, String albumName, AlbumType albumType, String ownerMemberId) {
+    public static AlbumEntity newAlbum(String albumId, String albumName, AlbumType albumType, String ownerMemberId, String externalId) {
         AlbumEntity album = new AlbumEntity();
         album.albumId = albumId;
         album.name = albumName;
         album.type = albumType;
+        album.externalId = externalId;
         album.ownerMemberId = ownerMemberId;
         album.isNew = true;
         album.photoCount = 0;
