@@ -18,15 +18,13 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
 
 @EnableWebFlux
 @Configuration
 @EnableCaching
 public class WebFluxConfig implements WebFluxConfigurer {
-    @Value("${lambda.endpoint}")
-    private String lambdaEndpoint;
-
     @Override
     public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
         configurer.addCustomResolver(new MemberIdParameterResolver());
@@ -48,19 +46,27 @@ public class WebFluxConfig implements WebFluxConfigurer {
     }
 
     @Bean("recapLambdaClient")
-    public WebClient recapLambdaClient() {
-        HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.SO_BACKLOG, 1024)
+    public WebClient recapLambdaClient(
+            @Value("${lambda.endpoint}") String lambdaEndpoint
+    ) {
+        ConnectionProvider provider = ConnectionProvider.builder("lambda-provider")
+                .maxConnections(100)
+                .maxIdleTime(Duration.ofSeconds(58))
+                .maxLifeTime(Duration.ofSeconds(58))
+                .pendingAcquireTimeout(Duration.ofMillis(5000))
+                .pendingAcquireMaxCount(-1)
+                .evictInBackground(Duration.ofSeconds(30))
+                .lifo()
+                .metrics(true)
+                .build();
+
+        HttpClient httpClient = HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000) // 연결 타임아웃
                 .responseTimeout(Duration.ofSeconds(15))
-                .keepAlive(true)
-                .runOn(LoopResources.create("custom-loop", 32, true));
+                .keepAlive(true);
 
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
         return WebClient.builder()
                 .baseUrl(lambdaEndpoint)
-                .uriBuilderFactory(factory)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .codecs(clientCodecConfigurer -> {
                     clientCodecConfigurer
