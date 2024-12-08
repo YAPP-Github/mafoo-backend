@@ -6,16 +6,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
 import kr.mafoo.photo.controller.dto.request.SumoneAlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SumoneRecapCreateRequest;
-import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
-import kr.mafoo.photo.controller.dto.response.SumoneAlbumResponse;
+import kr.mafoo.photo.controller.dto.response.*;
 import kr.mafoo.photo.controller.dto.request.SumoneBulkUrlRequest;
-import kr.mafoo.photo.controller.dto.response.SumonePhotoResponse;
-import kr.mafoo.photo.controller.dto.response.SumoneSummaryResponse;
+import kr.mafoo.photo.domain.SumoneEventMappingEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.BrandType;
-import kr.mafoo.photo.exception.AlbumNotFoundException;
-import kr.mafoo.photo.exception.PhotoNotFoundException;
-import kr.mafoo.photo.exception.RecapPhotoCountNotValidException;
+import kr.mafoo.photo.exception.*;
+import kr.mafoo.photo.repository.SumoneEventMappingRepository;
 import kr.mafoo.photo.service.AlbumCommand;
 import kr.mafoo.photo.service.AlbumQuery;
 import kr.mafoo.photo.service.ObjectStorageService;
@@ -24,15 +21,11 @@ import kr.mafoo.photo.service.PhotoQuery;
 import kr.mafoo.photo.service.RecapLambdaService;
 import kr.mafoo.photo.service.RecapService;
 import kr.mafoo.photo.service.dto.RecapUrlDto;
+import kr.mafoo.photo.util.RandomCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -52,6 +45,7 @@ public class SumoneController {
     private final ObjectStorageService objectStorageService;
     private final RecapService recapService;
     private final RecapLambdaService recapLambdaService;
+    private final SumoneEventMappingRepository sumoneEventMappingRepository;
 
     @Operation(summary = "통계 api")
     @GetMapping("/summary")
@@ -67,9 +61,18 @@ public class SumoneController {
     public Mono<SumoneAlbumResponse> createAlbum(
             @RequestBody SumoneAlbumCreateRequest request
             ) {
-        return albumCommand
-                .addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId, "SUMONE_" + request.userId())
-                .map(SumoneAlbumResponse::fromEntity);
+        if(request.userId() == null || request.userId().isEmpty()) {
+            return Mono.error(new DomainException(ErrorCode.REQUEST_INPUT_NOT_VALID));
+        }
+
+        return sumoneEventMappingRepository
+                .findById(request.userId())
+                .switchIfEmpty(sumoneEventMappingRepository.save(SumoneEventMappingEntity.newEventMember(
+                        request.userId(),
+                        RandomCodeGenerator.generateAlphanumericString(8)
+                )))
+                .then(albumCommand.addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId, "SUMONE_" + request.userId())
+                .map(SumoneAlbumResponse::fromEntity));
     }
 
     @Operation(summary = "앨범에 이미지 url 추가")
@@ -146,5 +149,15 @@ public class SumoneController {
             //TODO: add timeout
             return recapLambdaService.generateVideo(request.fileUrls());
         });
+    }
+
+    @Operation(summary = "초대 코드 반환", description = "초대 코드를 반환합니다")
+    @GetMapping("/invite-code")
+    Mono<SumoneInviteCodeResponse> getInviteCode(
+            @RequestParam String userId
+    ) {
+        return sumoneEventMappingRepository
+                .findById(userId)
+                .map(SumoneInviteCodeResponse::fromEntity);
     }
 }
