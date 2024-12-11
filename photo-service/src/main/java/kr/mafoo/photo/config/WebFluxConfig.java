@@ -61,8 +61,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 .build();
 
         HttpClient httpClient = HttpClient.create(provider)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000) // 연결 타임아웃
-                .responseTimeout(Duration.ofSeconds(15))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000) // 연결 타임아웃
+                .responseTimeout(Duration.ofSeconds(30))
                 .keepAlive(true);
 
         return WebClient.builder()
