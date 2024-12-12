@@ -34,4 +34,6 @@ public interface AlbumRepository extends R2dbcRepository<AlbumEntity, String> {
     Flux<AlbumEntity> findAllByOwnerMemberIdOrderByAlbumIdDesc(String ownerMemberId, Pageable pageable);
 
     Mono<Long> countAlbumEntityByType(AlbumType albumType);
+
+    Flux<AlbumEntity> findAllByExternalId(String externalId);
 }
