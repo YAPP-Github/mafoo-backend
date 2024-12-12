@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import kr.mafoo.photo.controller.dto.response.ErrorResponse;
 import kr.mafoo.photo.exception.DomainException;
 import kr.mafoo.photo.exception.ErrorCode;
+import kr.mafoo.photo.exception.MafooRecapLambdaApiFailedException;
 import kr.mafoo.photo.exception.PhotoBrandNotExistsException;
 import kr.mafoo.photo.service.SlackService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class WebExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(WebExceptionHandler.class);
     private final SlackService slackService;
+
+    @ExceptionHandler(MafooRecapLambdaApiFailedException.class)
+    public Mono<ResponseEntity<String>> handleMafooRecapLambdaApiFailedException(ServerWebExchange exchange, MafooRecapLambdaApiFailedException exception) {
+        return handleExceptionInternal(exchange, exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException exception) {
