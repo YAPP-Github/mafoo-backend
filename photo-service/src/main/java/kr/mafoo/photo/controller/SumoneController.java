@@ -139,7 +139,7 @@ public class SumoneController {
         @RequestBody
         SumoneRecapCreateRequest request
     ) {
-        if(request.fileUrls().size() < 2 || request.fileUrls().size() > 10) {
+        if(request.fileUrls().size() < 1 || request.fileUrls().size() > 10) {
             return Mono.error(new RecapPhotoCountNotValidException());
         }
         return albumQuery.findById(albumId).flatMap(album -> {
