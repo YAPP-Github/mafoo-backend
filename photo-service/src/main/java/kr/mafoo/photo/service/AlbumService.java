@@ -6,6 +6,7 @@ import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
@@ -94,10 +95,12 @@ public class AlbumService {
 
     @Transactional
     public Mono<AlbumEntity> addSumoneAlbum(String albumName, String albumType, String requestMemberId, String inviteCode) {
+        AtomicInteger displayIndex = new AtomicInteger(0);
         return albumCommand
                 .addAlbum(albumName, albumType, requestMemberId, null)
                 .flatMap(album -> sumoneEventMappingRepository
                         .findByInviteCode(inviteCode)
+                        .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
                         .flatMap(sumoneEventMappingEntity ->
                                 sumoneEventMappingRepository.delete(sumoneEventMappingEntity).then(Mono.just(sumoneEventMappingEntity)))
                         .map(entity -> "SUMONE_" + entity.getId())
@@ -108,12 +111,13 @@ public class AlbumService {
                                                 photo.getPhotoUrl(),
                                                 BrandType.EXTERNAL,
                                                 album.getAlbumId(),
-                                                0,
+                                                displayIndex.getAndIncrement(),
                                                 requestMemberId
                                         )
                                 )
                         )
-                        .then(Mono.just(album)));
+                        .then(Mono.just(album)))
+                        .flatMap(album -> albumCommand.increaseAlbumPhotoCount(album, displayIndex.get()));
     }
 
     @Transactional
