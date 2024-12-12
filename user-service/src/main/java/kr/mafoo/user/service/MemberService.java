@@ -63,4 +63,16 @@ public class MemberService {
                         .then(Mono.just(savedMember))
                 );
     }
+
+    @Transactional
+    public Mono<MemberEntity> changeName(String memberId, String name) {
+        return memberRepository
+                .findById(memberId)
+                .switchIfEmpty(Mono.error(new MemberNotFoundException()))
+                .map(member -> {
+                    member.setName(name);
+                    return member;
+                })
+                .flatMap(memberRepository::save);
+    }
 }

@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.annotation.RequestMemberId;
+import kr.mafoo.user.controller.dto.request.ChangeNameRequest;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @Tag(name = "로그인 사용자 정보 API", description = "현재 토큰 주인의 정보를 다루는 API")
@@ -25,5 +24,12 @@ public interface MeApi {
     @DeleteMapping
     Mono<Void> deleteMemberWhoRequested(
             @RequestMemberId @Parameter(hidden = true) String memberId
+    );
+
+    @Operation(summary = "이름 변경", description = "현재 토큰 주인의 이름을 변경합니다.")
+    @PostMapping("/name")
+    Mono<MemberResponse> changeName(
+            @RequestMemberId @Parameter(hidden = true) String memberId,
+            @RequestBody ChangeNameRequest name
     );
 }
