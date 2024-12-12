@@ -116,8 +116,8 @@ public class AlbumService {
                                         )
                                 )
                         )
-                        .then(Mono.just(album)))
-                        .flatMap(album -> albumCommand.increaseAlbumPhotoCount(album, displayIndex.get()));
+                        .then(albumQuery.findById(album.getAlbumId()))
+                        .flatMap(newAlbum -> albumCommand.increaseAlbumPhotoCount(newAlbum, displayIndex.get())));
     }
 
     @Transactional
