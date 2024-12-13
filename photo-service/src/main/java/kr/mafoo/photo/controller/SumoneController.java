@@ -12,6 +12,7 @@ import kr.mafoo.photo.domain.SumoneEventMappingEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.exception.*;
+import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.SumoneEventMappingRepository;
 import kr.mafoo.photo.service.AlbumCommand;
 import kr.mafoo.photo.service.AlbumQuery;
@@ -46,6 +47,7 @@ public class SumoneController {
     private final RecapService recapService;
     private final RecapLambdaService recapLambdaService;
     private final SumoneEventMappingRepository sumoneEventMappingRepository;
+    private final AlbumRepository albumRepository;
 
     @Operation(summary = "통계 api")
     @GetMapping("/summary")
@@ -58,21 +60,10 @@ public class SumoneController {
     @Transactional
     @Operation(summary = "앨범 생성 api")
     @PostMapping("/albums")
-    public Mono<SumoneAlbumResponse> createAlbum(
-            @RequestBody SumoneAlbumCreateRequest request
-            ) {
-        if(request.userId() == null || request.userId().isEmpty()) {
-            return Mono.error(new DomainException(ErrorCode.REQUEST_INPUT_NOT_VALID));
-        }
-
-        return sumoneEventMappingRepository
-                .findById(request.userId())
-                .switchIfEmpty(sumoneEventMappingRepository.save(SumoneEventMappingEntity.newEventMember(
-                        request.userId(),
-                        RandomCodeGenerator.generateAlphanumericString(8)
-                )))
-                .then(albumCommand.addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId, "SUMONE_" + request.userId())
-                .map(SumoneAlbumResponse::fromEntity));
+    public Mono<SumoneAlbumResponse> createAlbum() {
+        return albumCommand
+                .addAlbum(sumoneAlbumCommonName, "SUMONE", sumoneAlbumCommonMemberId, null)
+                .map(SumoneAlbumResponse::fromEntity);
     }
 
     @Operation(summary = "앨범에 이미지 url 추가")
@@ -139,15 +130,26 @@ public class SumoneController {
         @RequestBody
         SumoneRecapCreateRequest request
     ) {
-        if(request.fileUrls().size() < 1 || request.fileUrls().size() > 10) {
+        if(request.fileUrls().isEmpty() || request.fileUrls().size() > 10) {
             return Mono.error(new RecapPhotoCountNotValidException());
+        }
+        if(request.userId() == null || request.userId().isEmpty()) {
+            return Mono.error(new DomainException(ErrorCode.REQUEST_INPUT_NOT_VALID));
         }
         return albumQuery.findById(albumId).flatMap(album -> {
             if(album.getType() != AlbumType.SUMONE) {
                 return Mono.error(new AlbumNotFoundException());
             }
             //TODO: add timeout
-            return recapLambdaService.generateVideo(request.fileUrls());
+
+            return sumoneEventMappingRepository
+                    .findById(request.userId())
+                    .switchIfEmpty(sumoneEventMappingRepository.save(SumoneEventMappingEntity.newEventMember(
+                            request.userId(),
+                            RandomCodeGenerator.generateAlphanumericString(8)
+                    )))
+                    .then(albumRepository.save(album.setExternalId("SUMONE_" + request.userId())))
+                    .then(recapLambdaService.generateVideo(request.fileUrls()));
         });
     }
 

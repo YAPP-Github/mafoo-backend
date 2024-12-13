@@ -10,6 +10,9 @@ public record SumoneRecapCreateRequest(
         schema = @Schema(description = "파일 URL 목록"),
         arraySchema = @Schema(example = "[\"file_url_1\", \"file_url_2\", \"file_url_3\"]")
     )
-    List<String> fileUrls
+    List<String> fileUrls,
+
+    @Schema(description = "썸원 유저ID")
+    String userId
 ) {
 }

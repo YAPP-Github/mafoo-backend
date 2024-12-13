@@ -99,6 +99,11 @@ public class AlbumEntity implements Persistable<String> {
         return this;
     }
 
+    public AlbumEntity setExternalId(String externalId) {
+        this.externalId = externalId;
+        return this;
+    }
+
     public static AlbumEntity newAlbum(String albumId, String albumName, AlbumType albumType, String ownerMemberId, String externalId) {
         AlbumEntity album = new AlbumEntity();
         album.albumId = albumId;
