@@ -15,6 +15,9 @@ public record AlbumCreateRequest(
 
         @MatchEnum(enumClass = AlbumType.class)
         @Schema(description = "앨범 타입")
-        String type
+        String type,
+
+        @Schema(description = "초대 코드")
+        String sumoneInviteCode
 ) {
 }
