@@ -23,6 +23,9 @@ public class MemberEntity implements Persistable<String> {
     @Column("name")
     private String name;
 
+    @Column("is_default_name")
+    private boolean isDefaultName;
+
     @Column("serial_number")
     private Integer serialNumber;
 
@@ -50,7 +53,7 @@ public class MemberEntity implements Persistable<String> {
         return id.hashCode();
     }
 
-    public static MemberEntity newMember(String id, String name, String profileImageUrl) {
+    public static MemberEntity newMember(String id, String name, String profileImageUrl, boolean isDefaultName) {
         MemberEntity member = new MemberEntity();
         member.id = id;
         member.name = name;

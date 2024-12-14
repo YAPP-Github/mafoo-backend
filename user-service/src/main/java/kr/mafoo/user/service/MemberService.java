@@ -49,7 +49,7 @@ public class MemberService {
 
     @Transactional
     public Mono<MemberEntity> createNewMember(String username, String profileImageUrl, String userAgent) {
-        MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl);
+        MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl, true);
 
         return memberRepository.save(memberEntity)
                 .flatMap(savedMember ->
@@ -71,6 +71,7 @@ public class MemberService {
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()))
                 .map(member -> {
                     member.setName(name);
+                    member.setDefaultName(false);
                     return member;
                 })
                 .flatMap(memberRepository::save);
