@@ -5,6 +5,14 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+    pool:
+      enabled: true
+      initial-size: 30
+      max-acquire-time: 5s
+      max-create-connection-time: 5s
+      max-idle-time: 60m
+      max-life-time: 60m
+      max-size: 50
   flyway:
     url: ${FLYWAY_URL}
     baseline-on-migrate: true
