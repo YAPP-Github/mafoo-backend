@@ -93,6 +93,7 @@ jib {
 				"-XX:MaxRAMPercentage=80",
 				"-XX:MaxGCPauseMillis=200",
 				"-XX:+DisableExplicitGC", // System.gc() 방어
+				"-XX:+AlwaysPreTouch",
 				"-server",
 			)
 		ports = listOf(serverPort)
