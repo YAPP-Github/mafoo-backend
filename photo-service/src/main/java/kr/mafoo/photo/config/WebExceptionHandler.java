@@ -113,7 +113,7 @@ public class WebExceptionHandler {
             if (status == HttpStatus.INTERNAL_SERVER_ERROR) {
                 return slackService.sendErrorNotification(
                         requestMemberId, method, fullPath, requestBody, originIp, userAgent, exception.getMessage()
-                ).then(Mono.just(new ResponseEntity<>("Internal Server Error", status)));
+                ).then(Mono.error(exception));
             }
 
             return Mono.just(new ResponseEntity<>(status.getReasonPhrase(), status));

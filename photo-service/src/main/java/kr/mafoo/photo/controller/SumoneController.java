@@ -162,4 +162,9 @@ public class SumoneController {
                 .findById(userId)
                 .map(SumoneInviteCodeResponse::fromEntity);
     }
+
+    @PostMapping("/error")
+    Mono<String> error() {
+        return Mono.error(new RuntimeException("error"));
+    }
 }
