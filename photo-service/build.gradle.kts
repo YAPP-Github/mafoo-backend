@@ -70,8 +70,10 @@ jib {
 				"-XX:+UnlockExperimentalVMOptions",
 				"-XX:+UseContainerSupport",
 				"-XX:+UseG1GC",
-				"-XX:InitialHeapSize=1g",
-				"-XX:MaxHeapSize=1g",
+				"-Xms1500M",
+				"-Xmx3G",
+				"-XX:MaxRAMPercentage=80",
+				"-XX:MaxGCPauseMillis=200",
 				"-XX:+DisableExplicitGC", // System.gc() 방어
 				"-server",
 			)
