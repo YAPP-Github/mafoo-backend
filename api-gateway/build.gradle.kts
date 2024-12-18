@@ -77,6 +77,7 @@ jib {
 				"-Xmx3G",
 				"-XX:MaxRAMPercentage=80",
 				"-XX:MaxGCPauseMillis=200",
+				"-XX:+AlwaysPreTouch",
 				"-XX:+DisableExplicitGC", // System.gc() 방어
 				"-server",
 			)
