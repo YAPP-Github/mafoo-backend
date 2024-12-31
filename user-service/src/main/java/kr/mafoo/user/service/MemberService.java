@@ -54,6 +54,7 @@ public class MemberService {
         return memberRepository.save(memberEntity)
                 .flatMap(savedMember ->
                         slackService.sendNewMemberNotification(
+                                memberEntity.getSerialNumber(),
                                 memberEntity.getId(),
                                 memberEntity.getName(),
                                 memberEntity.getProfileImageUrl(),
