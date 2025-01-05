@@ -107,7 +107,7 @@ public class SlackService {
         }).then();
     }
 
-    public Mono<Void> sendNewMemberNotification(String memberId, String memberName, String memberProfileImageUrl, String memberCreatedAt, String userAgent) {
+    public Mono<Void> sendNewMemberNotification(Integer serialNumber, String memberId, String memberName, String memberProfileImageUrl, String memberCreatedAt, String userAgent) {
         return Mono.fromCallable(() -> {
             List<LayoutBlock> layoutBlocks = new ArrayList<>();
 
@@ -122,6 +122,15 @@ public class SlackService {
             layoutBlocks.add(divider());
 
             // Content 삽입
+            MarkdownTextObject serialNumberMarkdown =
+                MarkdownTextObject.builder().text("`Serial #`\n" + serialNumber).build();
+
+            layoutBlocks.add(
+                section(
+                    section -> section.fields(List.of(serialNumberMarkdown))
+                )
+            );
+
             MarkdownTextObject userIdMarkdown =
                     MarkdownTextObject.builder().text("`사용자 ID`\n" + memberId).build();
 
@@ -146,12 +155,12 @@ public class SlackService {
                     )
             );
 
-            MarkdownTextObject userUserAgentMarkdown =
+            MarkdownTextObject userAgentMarkdown =
                     MarkdownTextObject.builder().text("`가입 환경`\n" + userAgent).build();
 
             layoutBlocks.add(
                     section(
-                            section -> section.fields(List.of(userUserAgentMarkdown))
+                            section -> section.fields(List.of(userAgentMarkdown))
                     )
             );
 
