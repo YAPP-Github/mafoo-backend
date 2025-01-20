@@ -3,8 +3,10 @@ package kr.mafoo.user;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
 import reactor.blockhound.BlockHound;
 
+@EnableR2dbcAuditing
 @ConfigurationPropertiesScan
 @SpringBootApplication
 public class UserServiceApplication {

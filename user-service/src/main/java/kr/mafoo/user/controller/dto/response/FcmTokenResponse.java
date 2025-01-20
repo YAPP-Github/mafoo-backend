@@ -1,5 +1,6 @@
 package kr.mafoo.user.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.FcmTokenEntity;
@@ -15,9 +16,11 @@ public record FcmTokenResponse(
     @Schema(description = "토큰 값", example = "fcm_token")
     String token,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "토큰 생성 일시")
     LocalDateTime createdAt,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "토큰 수정 일시")
     LocalDateTime updatedAt
 ) {

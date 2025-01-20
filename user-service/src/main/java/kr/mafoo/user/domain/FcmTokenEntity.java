@@ -42,6 +42,7 @@ public class FcmTokenEntity implements Persistable<String> {
        if (obj == null || getClass() != obj.getClass()) return false;
 
         FcmTokenEntity that = (FcmTokenEntity) obj;
+
         return fcmTokenId.equals(that.fcmTokenId);
     }
 
@@ -55,11 +56,17 @@ public class FcmTokenEntity implements Persistable<String> {
         return fcmTokenId;
     }
 
+    public FcmTokenEntity updateToken(String token) {
+        this.token = token;
+        return this;
+    }
+
     public static FcmTokenEntity newFcmToken(String fcmTokenId, String ownerMemberId, String token) {
         FcmTokenEntity fcmToken = new FcmTokenEntity();
         fcmToken.fcmTokenId = fcmTokenId;
         fcmToken.ownerMemberId = ownerMemberId;
         fcmToken.token = token;
+        fcmToken.isNew = true;
         return fcmToken;
     }
 }
