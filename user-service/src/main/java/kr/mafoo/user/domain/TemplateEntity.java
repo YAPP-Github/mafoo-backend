@@ -62,6 +62,14 @@ public class TemplateEntity implements Persistable<String> {
         return templateId;
     }
 
+    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
+        this.notificationType = notificationType;
+        this.thumbnailImageUrl = thumbnailImageUrl;
+        this.title = title;
+        this.body = body;
+        return this;
+    }
+
     public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
         TemplateEntity template = new TemplateEntity();
         template.templateId = templateId;

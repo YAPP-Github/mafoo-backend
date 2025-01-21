@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 @Validated
 @Tag(name = "FCM 토큰 관련 API", description = "FCM 토큰 조회, 생성, 수정, 삭제 등 API")
-@RequestMapping("/v1/fcm-token")
+@RequestMapping("/v1/fcm-tokens")
 public interface FcmTokenApi {
     @Operation(summary = "토큰 목록 조회")
     @GetMapping

@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 
 @Validated
 @Tag(name = "템플릿 관련 API", description = "템플릿 조회, 생성, 수정, 삭제 등 API")
-@RequestMapping("/v1/notification/template")
+@RequestMapping("/v1/notifications/templates")
 public interface TemplateApi {
     @Operation(summary = "템플릿 목록 조회")
     @GetMapping
