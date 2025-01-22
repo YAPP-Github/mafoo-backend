@@ -64,6 +64,11 @@ public class NotificationEntity implements Persistable<String> {
         return notificationId;
     }
 
+    public NotificationEntity updateNotificationIsReadTrue() {
+        this.isRead = true;
+        return this;
+    }
+
     public static NotificationEntity newNotification(String notificationId, String templateId, String receiverMemberId, String title, String body) {
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.notificationId = notificationId;

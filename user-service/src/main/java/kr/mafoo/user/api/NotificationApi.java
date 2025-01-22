@@ -6,11 +6,12 @@ import jakarta.validation.Valid;
 import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.controller.dto.request.NotificationBulkDeleteRequest;
 import kr.mafoo.user.controller.dto.request.NotificationBulkUpdateIsReadRequest;
+import kr.mafoo.user.controller.dto.response.NotificationDetailResponse;
 import kr.mafoo.user.controller.dto.response.NotificationResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import reactor.core.publisher.Flux;
@@ -23,13 +24,13 @@ public interface NotificationApi {
 
     @Operation(summary = "알림 목록 조회")
     @GetMapping
-    Flux<NotificationResponse> getNotificationList(
+    Flux<NotificationDetailResponse> getNotificationList(
         @RequestMemberId
         String memberId
     );
 
     @Operation(summary = "알림 읽음 여부 n건 수정")
-    @PutMapping
+    @PatchMapping
     Flux<NotificationResponse> updateNotificationBulkIsRead(
         @RequestMemberId
         String memberId,

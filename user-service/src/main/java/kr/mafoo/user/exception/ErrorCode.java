@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     TEMPLATE_NOT_FOUND("TE0001", "템플릿을 찾을 수 없습니다"),
 
+    MAFOO_PHOTO_API_FAILED("MPE0001", "마푸의 photo-service API 호출이 실패했습니다")
     ;
     private final String code;
     private final String message;
