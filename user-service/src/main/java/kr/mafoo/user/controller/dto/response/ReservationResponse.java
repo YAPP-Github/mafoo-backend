@@ -1,5 +1,6 @@
 package kr.mafoo.user.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.ReservationEntity;
@@ -31,15 +32,18 @@ public record ReservationResponse(
     @Schema(description = "전송 사용자 ID 목록", example = "test_receiver_member_id")
     String receiverMemberIds,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "전송 일시")
     LocalDateTime sendAt,
 
     @Schema(description = "전송 반복 주기", example = "7")
     Integer sendRepeatInterval,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "예약 생성 일시")
     LocalDateTime createdAt,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "예약 수정 일시")
     LocalDateTime updatedAt
 ) {

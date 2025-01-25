@@ -77,6 +77,28 @@ public class ReservationEntity implements Persistable<String> {
         return reservationId;
     }
 
+    public ReservationEntity updateStatus(ReservationStatus status) {
+        this.status = status;
+        return this;
+    }
+
+    public ReservationEntity updateSendAt(LocalDateTime sendAt) {
+        this.sendAt = sendAt;
+        return this;
+    }
+
+    public ReservationEntity updateReservation(String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
+        this.templateId = templateId;
+        this.status = status;
+        this.variableDomain = variableDomain;
+        this.variableType = variableType;
+        this.variableSort = variableSort;
+        this.receiverMemberIds = receiverMemberIds;
+        this.sendAt = sendAt;
+        this.sendRepeatInterval = sendRepeatInterval;
+        return this;
+    }
+
     public static ReservationEntity newReservation(String reservationId, String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
         ReservationEntity reservation = new ReservationEntity();
         reservation.reservationId = reservationId;
@@ -88,6 +110,7 @@ public class ReservationEntity implements Persistable<String> {
         reservation.receiverMemberIds = receiverMemberIds;
         reservation.sendAt = sendAt;
         reservation.sendRepeatInterval = sendRepeatInterval;
+        reservation.isNew = true;
         return reservation;
     }
 }

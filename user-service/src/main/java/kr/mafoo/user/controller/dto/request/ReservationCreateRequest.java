@@ -31,6 +31,6 @@ public record ReservationCreateRequest(
     LocalDateTime sendAt,
 
     @Schema(description = "전송 반복 주기", example = "7")
-    Integer repeatInterval
+    Integer sendRepeatInterval
 ) {
 }

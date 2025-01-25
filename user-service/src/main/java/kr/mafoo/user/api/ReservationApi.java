@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 @Validated
 @Tag(name = "예약 관련 API", description = "예약 생성, 수정, 삭제 등 API")
-@RequestMapping("/v1/notifications/reservation")
+@RequestMapping("/v1/notifications/reservations")
 public interface ReservationApi {
     @Operation(summary = "예약 생성")
     @PostMapping

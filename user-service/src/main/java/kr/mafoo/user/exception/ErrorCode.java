@@ -21,6 +21,9 @@ public enum ErrorCode {
 
     TEMPLATE_NOT_FOUND("TE0001", "템플릿을 찾을 수 없습니다"),
 
+    RESERVATION_NOT_FOUND("RE0001", "예약을 찾을 수 없습니다"),
+    RESERVATION_DUPLICATED("RE0002", "동일한 예약이 존재합니다"),
+
     MAFOO_PHOTO_API_FAILED("MPE0001", "마푸의 photo-service API 호출이 실패했습니다")
     ;
     private final String code;

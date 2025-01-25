@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum VariableType {
+    NONE(null),
+
     HEART("albumType"),
     FIRE("albumType"),
     BASKETBALL("albumType"),

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum VariableSort {
+    NONE(null, null, null),
+
     COUNT_MIN("photoCount", "COUNT", "DESC"),
     COUNT_MAX("photoCount", "COUNT", "ASC"),
     NEWEST("updatedAt", "createdAt", "DESC"),
