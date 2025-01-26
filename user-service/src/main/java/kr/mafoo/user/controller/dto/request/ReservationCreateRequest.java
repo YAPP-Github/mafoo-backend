@@ -1,5 +1,6 @@
 package kr.mafoo.user.controller.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public record ReservationCreateRequest(
     List<String> receiverMemberIds,
 
     @Schema(description = "전송 일시")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     LocalDateTime sendAt,
 
     @Schema(description = "전송 반복 주기", example = "7")
