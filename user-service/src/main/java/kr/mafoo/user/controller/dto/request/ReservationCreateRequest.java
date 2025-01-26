@@ -1,7 +1,9 @@
 package kr.mafoo.user.controller.dto.request;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
@@ -24,8 +26,11 @@ public record ReservationCreateRequest(
     @Schema(description = "변수 정렬", example = "")
     VariableSort variableSort,
 
-    @Schema(description = "전송 사용자 ID 목록", example = "test_receiver_member_id")
-    String receiverMemberIds,
+    @ArraySchema(
+        schema = @Schema(description = "전송 사용자 ID 목록"),
+        arraySchema = @Schema(example = "[\"test_member_id_1\", \"test_member_id_2\", \"test_member_id_3\"]")
+    )
+    List<String> receiverMemberIds,
 
     @Schema(description = "전송 일시")
     LocalDateTime sendAt,

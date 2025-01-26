@@ -3,6 +3,7 @@ package kr.mafoo.user.controller;
 import kr.mafoo.user.api.NotificationApi;
 import kr.mafoo.user.controller.dto.request.NotificationBulkDeleteRequest;
 import kr.mafoo.user.controller.dto.request.NotificationBulkUpdateIsReadRequest;
+import kr.mafoo.user.controller.dto.request.NotificationSendRequest;
 import kr.mafoo.user.controller.dto.response.NotificationDetailResponse;
 import kr.mafoo.user.controller.dto.response.NotificationResponse;
 import kr.mafoo.user.service.NotificationService;
@@ -24,6 +25,14 @@ public class NotificationController implements NotificationApi {
         return notificationService
             .findNotificationListByMemberId(memberId)
             .map(NotificationDetailResponse::fromDto);
+    }
+
+    @Override
+    public Flux<NotificationResponse> sendNotification(
+        String memberId,
+        NotificationSendRequest request
+    ){
+        return Flux.empty();
     }
 
     @Override

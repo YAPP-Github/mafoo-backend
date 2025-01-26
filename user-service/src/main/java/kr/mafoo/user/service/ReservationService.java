@@ -1,6 +1,7 @@
 package kr.mafoo.user.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.mafoo.user.domain.ReservationEntity;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
@@ -25,14 +26,14 @@ public class ReservationService {
         VariableDomain variableDomain,
         VariableType variableType,
         VariableSort variableSort,
-        String receiverMemberIds,
+        List<String> receiverMemberIds,
         LocalDateTime sendAt,
         Integer sendRepeatInterval
     ) {
         return reservationQuery.checkDuplicateExists(templateId, sendAt)
             .then(
                 reservationCommand.addReservation(templateId, status, variableDomain, variableType,
-                    variableSort, receiverMemberIds, sendAt, sendRepeatInterval));
+                    variableSort, receiverMemberIds.toString(), sendAt, sendRepeatInterval));
     }
 
     @Transactional
@@ -43,14 +44,14 @@ public class ReservationService {
         VariableDomain variableDomain,
         VariableType variableType,
         VariableSort variableSort,
-        String receiverMemberIds,
+        List<String> receiverMemberIds,
         LocalDateTime sendAt,
         Integer sendRepeatInterval
     ) {
         return reservationQuery.findById(reservationId)
             .flatMap(
                 reservation -> reservationCommand.modifyReservation(reservation, templateId, status,
-                    variableDomain, variableType, variableSort, receiverMemberIds, sendAt,
+                    variableDomain, variableType, variableSort, receiverMemberIds.toString(), sendAt,
                     sendRepeatInterval));
     }
 
