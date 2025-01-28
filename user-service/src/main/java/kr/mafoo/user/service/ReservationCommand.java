@@ -18,17 +18,17 @@ public class ReservationCommand {
 
     private final ReservationRepository reservationRepository;
 
-    public Mono<ReservationEntity> addReservation(String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String targetMemberId, LocalDateTime sendAt, Integer repeatInterval) {
+    public Mono<ReservationEntity> addReservation(String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer repeatInterval) {
         return reservationRepository.save(
             ReservationEntity.newReservation(IdGenerator.generate(), templateId, status,
-                variableDomain, variableType, variableSort, targetMemberId, sendAt, repeatInterval)
+                variableDomain, variableType, variableSort, receiverMemberIds, sendAt, repeatInterval)
         );
     }
 
     public Mono<ReservationEntity> modifyReservation(
-        ReservationEntity reservation, String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String targetMemberId, LocalDateTime sendAt, Integer repeatInterval) {
+        ReservationEntity reservation, String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer repeatInterval) {
         return reservationRepository.save(
-            reservation.updateReservation(templateId, status, variableDomain, variableType, variableSort, targetMemberId, sendAt, repeatInterval)
+            reservation.updateReservation(templateId, status, variableDomain, variableType, variableSort, receiverMemberIds, sendAt, repeatInterval)
         );
     }
 

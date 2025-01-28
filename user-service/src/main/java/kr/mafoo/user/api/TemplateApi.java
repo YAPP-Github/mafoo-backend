@@ -8,6 +8,7 @@ import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.annotation.ULID;
 import kr.mafoo.user.controller.dto.request.TemplateCreateRequest;
 import kr.mafoo.user.controller.dto.request.TemplateUpdateRequest;
+import kr.mafoo.user.controller.dto.response.TemplateDetailResponse;
 import kr.mafoo.user.controller.dto.response.TemplateResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +34,7 @@ public interface TemplateApi {
 
     @Operation(summary = "템플릿 단건 상세 조회")
     @GetMapping("/{templateId}")
-    Mono<TemplateResponse> getTemplate(
+    Mono<TemplateDetailResponse> getTemplate(
         @RequestMemberId
         String memberId,
 

@@ -33,7 +33,7 @@ public record ReservationCreateRequest(
     )
     List<String> receiverMemberIds,
 
-    @Schema(description = "전송 일시")
+    @Schema(description = "전송 일시", example = "2025-01-01 00:00:00")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     LocalDateTime sendAt,
 

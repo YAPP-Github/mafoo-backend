@@ -3,6 +3,7 @@ package kr.mafoo.user.service;
 import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.exception.TemplateNotFoundException;
+import kr.mafoo.user.service.dto.TemplateDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,8 @@ public class TemplateService {
 
     private final TemplateQuery templateQuery;
     private final TemplateCommand templateCommand;
+
+    private final ReservationQuery reservationQuery;
     
     @Transactional(readOnly = true)
     public Flux<TemplateEntity> findTemplateList() {
@@ -23,10 +26,14 @@ public class TemplateService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<TemplateEntity> findTemplateById(
+    public Mono<TemplateDetailDto> findTemplateById(
         String templateId
     ) {
-        return templateQuery.findById(templateId);
+        return templateQuery.findById(templateId)
+            .flatMap(template -> reservationQuery.findByTemplateId(template.getTemplateId())
+                .collectList()
+                .flatMap(reservationList -> Mono.just(TemplateDetailDto.fromEntities(template, reservationList)))
+            );
     }
 
     @Transactional

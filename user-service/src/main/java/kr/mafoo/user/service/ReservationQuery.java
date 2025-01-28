@@ -7,6 +7,7 @@ import kr.mafoo.user.exception.ReservationNotFoundException;
 import kr.mafoo.user.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -17,6 +18,11 @@ public class ReservationQuery {
 
     public Mono<ReservationEntity> findById(String reservationId) {
         return reservationRepository.findById(reservationId)
+            .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
+    }
+
+    public Flux<ReservationEntity> findByTemplateId(String templateId) {
+        return reservationRepository.findByTemplateId(templateId)
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 

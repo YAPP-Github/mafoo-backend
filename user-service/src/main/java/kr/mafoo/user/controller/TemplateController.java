@@ -3,6 +3,7 @@ package kr.mafoo.user.controller;
 import kr.mafoo.user.api.TemplateApi;
 import kr.mafoo.user.controller.dto.request.TemplateCreateRequest;
 import kr.mafoo.user.controller.dto.request.TemplateUpdateRequest;
+import kr.mafoo.user.controller.dto.response.TemplateDetailResponse;
 import kr.mafoo.user.controller.dto.response.TemplateResponse;
 import kr.mafoo.user.service.TemplateService;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class TemplateController implements TemplateApi {
     }
 
     @Override
-    public Mono<TemplateResponse> getTemplate(
+    public Mono<TemplateDetailResponse> getTemplate(
         String memberId,
         String templateId
     ){
         return templateService
             .findTemplateById(templateId)
-            .map(TemplateResponse::fromEntity);
+            .map(TemplateDetailResponse::fromDto);
     }
 
     @Override
