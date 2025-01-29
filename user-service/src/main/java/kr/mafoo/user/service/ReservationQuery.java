@@ -2,6 +2,7 @@ package kr.mafoo.user.service;
 
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.ReservationEntity;
+import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.exception.ReservationDuplicatedException;
 import kr.mafoo.user.exception.ReservationNotFoundException;
 import kr.mafoo.user.repository.ReservationRepository;
@@ -21,8 +22,13 @@ public class ReservationQuery {
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 
+    public Flux<ReservationEntity> findAllByStatusAndSendAtBefore(ReservationStatus status, LocalDateTime sendAt) {
+        return reservationRepository.findAllByStatusAndSendAtBefore(status, sendAt)
+            .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
+    }
+
     public Flux<ReservationEntity> findByTemplateId(String templateId) {
-        return reservationRepository.findByTemplateId(templateId)
+        return reservationRepository.findAllByTemplateId(templateId)
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 
