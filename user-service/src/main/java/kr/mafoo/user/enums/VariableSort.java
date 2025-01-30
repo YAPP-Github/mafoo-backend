@@ -4,16 +4,18 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum VariableSort {
-    NONE(null, null, null),
+    PHOTO_COUNT_MIN("photoCount", "asc"),
+    PHOTO_COUNT_MAX("photoCount", "desc"),
 
-    COUNT_MIN("photoCount", "COUNT", "DESC"),
-    COUNT_MAX("photoCount", "COUNT", "ASC"),
-    NEWEST("updatedAt", "createdAt", "DESC"),
-    OLDEST("updatedAt", "createdAt", "ASC")
+    NEWEST("createdAt", "asc"),
+    OLDEST("createdAt", "desc"),
     ;
 
-    private final String albumColumnName;
-    private final String shareMemberColumnName;
+    private final String columnName;
     private final String order;
+
+    public String toQueryParam() {
+        return "sort=" + columnName + "&order=" + order;
+    }
 }
 

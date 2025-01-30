@@ -20,9 +20,13 @@ public enum VariableType {
 
     ACCEPTED("inviteStatus"),
     PENDING("inviteStatus"),
-    REJECTED("inviteStatus")
+    REJECTED("inviteStatus"),
     ;
 
     private final String columnName;
+
+    public String toQueryParam() {
+        return (this != NONE) ? columnName + "=" + this : "";
+    }
 }
 
