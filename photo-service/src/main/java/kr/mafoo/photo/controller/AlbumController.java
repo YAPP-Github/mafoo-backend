@@ -7,6 +7,9 @@ import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.ViewableAlbumResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import kr.mafoo.photo.controller.dto.response.ViewableAlbumDetailResponse;
+import kr.mafoo.photo.domain.enums.AlbumSortType;
+import kr.mafoo.photo.domain.enums.AlbumType;
+import kr.mafoo.photo.domain.enums.SortOrder;
 import kr.mafoo.photo.service.AlbumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +29,14 @@ public class AlbumController implements AlbumApi {
         return albumService
                 .findViewableAlbumListByMemberId(memberId)
                 .map(ViewableAlbumResponse::fromDto);
+    }
+
+    @Override
+    public Mono<ViewableAlbumResponse> getAlbumVariablesByTypeAndSort(
+        AlbumType type, AlbumSortType sort, SortOrder order, String memberId) {
+        return albumService
+            .findViewableAlbumByTypeAndSort(type, sort, order, memberId)
+            .map(ViewableAlbumResponse::fromDto);
     }
 
     @Override

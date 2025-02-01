@@ -1,16 +1,20 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.AlbumSortType.PHOTO_COUNT;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.VIEW_ACCESS;
 import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
+import static kr.mafoo.photo.domain.enums.SortOrder.DESC;
 
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import kr.mafoo.photo.domain.AlbumEntity;
+import kr.mafoo.photo.domain.enums.AlbumSortType;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.BrandType;
+import kr.mafoo.photo.domain.enums.SortOrder;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.AlbumOwnerChangeDeniedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
@@ -51,7 +55,43 @@ public class AlbumService {
         return Flux.merge(
                 findOwnedAlbumListByMemberId(memberId),
                 findSharedAlbumListByMemberId(memberId)
-        ).sort(Comparator.comparing(ViewableAlbumDto::createdAt).reversed());
+            )
+            .collectSortedList(Comparator.comparing(ViewableAlbumDto::createdAt).reversed())
+            .flatMapIterable(albumList -> albumList);
+    }
+
+    @Transactional(readOnly = true)
+    public Mono<ViewableAlbumDto> findViewableAlbumByTypeAndSort(AlbumType type, AlbumSortType sort, SortOrder order, String memberId) {
+        Comparator<ViewableAlbumDto> comparator = getComparator(sort, order);
+
+        return Flux.merge(
+                findOwnedAlbumListByMemberId(memberId),
+                findSharedAlbumListByMemberId(memberId)
+            )
+            .filter(album -> isTypeMatching(album, type))
+            .collectSortedList(comparator)
+            .flatMapIterable(albumList -> albumList)
+            .next();
+    }
+
+    private boolean isTypeMatching(ViewableAlbumDto album, AlbumType type) {
+        return type == null || album.type().equals(type);
+    }
+
+    private Comparator<ViewableAlbumDto> getComparator(AlbumSortType sort, SortOrder order) {
+        Comparator<ViewableAlbumDto> comparator;
+
+        if (PHOTO_COUNT.equals(sort)) {
+            comparator = Comparator.comparing(ViewableAlbumDto::photoCount);
+        } else {
+            comparator = Comparator.comparing(ViewableAlbumDto::createdAt);
+        }
+
+        if (DESC.equals(order)) {
+            return comparator.reversed();
+        } else {
+            return comparator;
+        }
     }
 
     private Flux<ViewableAlbumDto> findOwnedAlbumListByMemberId(String memberId) {

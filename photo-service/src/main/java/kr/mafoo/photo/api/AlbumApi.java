@@ -12,6 +12,9 @@ import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
 import kr.mafoo.photo.controller.dto.response.ViewableAlbumResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import kr.mafoo.photo.controller.dto.response.ViewableAlbumDetailResponse;
+import kr.mafoo.photo.domain.enums.AlbumSortType;
+import kr.mafoo.photo.domain.enums.AlbumType;
+import kr.mafoo.photo.domain.enums.SortOrder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -26,6 +29,21 @@ public interface AlbumApi {
     Flux<ViewableAlbumResponse> getAlbumListByMember(
             @RequestMemberId
             String memberId
+    );
+
+    @GetMapping("/variables")
+    Mono<ViewableAlbumResponse> getAlbumVariablesByTypeAndSort(
+        @RequestParam(required = false)
+        AlbumType type,
+
+        @RequestParam
+        AlbumSortType sort,
+
+        @RequestParam
+        SortOrder order,
+
+        @RequestParam
+        String memberId
     );
 
     @Operation(summary = "앨범 단건 조회", description = "앨범 단건을 조회합니다.")
