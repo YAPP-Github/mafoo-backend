@@ -1,6 +1,6 @@
 package kr.mafoo.photo.api;
 
-import kr.mafoo.photo.controller.dto.response.AlbumRawResponse;
+import kr.mafoo.photo.controller.dto.response.AlbumResponse;
 import kr.mafoo.photo.controller.dto.response.PageResponse;
 import kr.mafoo.photo.controller.dto.response.PhotoResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/v1/admin")
 public interface AdminApi {
     @GetMapping("/albums")
-    Mono<PageResponse<AlbumRawResponse>> queryAlbums(
+    Mono<PageResponse<AlbumResponse>> queryAlbums(
             @RequestParam(defaultValue = "1")
             int page,
 

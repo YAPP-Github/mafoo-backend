@@ -17,8 +17,8 @@ import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.repository.SumoneEventMappingRepository;
-import kr.mafoo.photo.service.dto.AlbumDto;
-import kr.mafoo.photo.service.dto.SharedAlbumDto;
+import kr.mafoo.photo.service.dto.ViewableAlbumDto;
+import kr.mafoo.photo.service.dto.ViewableAlbumDetailDto;
 import kr.mafoo.photo.service.dto.SharedMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,44 +47,45 @@ public class AlbumService {
     private final SumoneEventMappingRepository sumoneEventMappingRepository;
 
     @Transactional(readOnly = true)
-    public Flux<AlbumDto> findAlbumListByMemberId(String memberId, String token) {
+    public Flux<ViewableAlbumDto> findViewableAlbumListByMemberId(String memberId) {
         return Flux.merge(
                 findOwnedAlbumListByMemberId(memberId),
-                findSharedAlbumListByMemberId(memberId, token)
-        ).sort(Comparator.comparing(AlbumDto::createdAt).reversed());
+                findSharedAlbumListByMemberId(memberId)
+        ).sort(Comparator.comparing(ViewableAlbumDto::createdAt).reversed());
     }
 
-    private Flux<AlbumDto> findOwnedAlbumListByMemberId(String memberId) {
+    private Flux<ViewableAlbumDto> findOwnedAlbumListByMemberId(String memberId) {
         return albumQuery.findByMemberId(memberId)
                 .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
-                .map(AlbumDto::fromOwnedAlbum);
+                .map(ViewableAlbumDto::fromOwnedAlbum);
     }
 
-    private Flux<AlbumDto> findSharedAlbumListByMemberId(String memberId, String token) {
+    private Flux<ViewableAlbumDto> findSharedAlbumListByMemberId(String memberId) {
         return sharedMemberQuery.findAllByMemberIdWhereStatusNotRejected(memberId)
                 .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
                 .concatMap(sharedMember -> albumQuery.findById(sharedMember.getAlbumId())
-                        .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId(), token)
-                                .flatMap(member -> Mono.just(AlbumDto.fromSharedAlbum(album, sharedMember, member)))
+                        .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                                .flatMap(member -> Mono.just(
+                                    ViewableAlbumDto.fromSharedAlbum(album, member, sharedMember)))
                         )
                 );
     }
 
     @Transactional(readOnly = true)
-    public Mono<SharedAlbumDto> findAlbumDetailById(String albumId, String requestMemberId, String token) {
+    public Mono<ViewableAlbumDetailDto> findViewableAlbumDetailById(String albumId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
                 .flatMap(album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
                         .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
-                        .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId(), token)
+                        .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
                                 .map(memberInfo -> SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
                         .sort(Comparator.comparing(SharedMemberDto::shareStatus))
                         .collectList()
-                        .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId(), token)
-                                .map(ownerMember -> SharedAlbumDto.fromSharedAlbum(album, ownerMember, sharedMembers))
+                        .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                                .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
                         )
 
-                        .switchIfEmpty(Mono.just(SharedAlbumDto.fromOwnedAlbum(album)))
+                        .switchIfEmpty(Mono.just(ViewableAlbumDetailDto.fromOwnedAlbum(album)))
                 );
     }
 

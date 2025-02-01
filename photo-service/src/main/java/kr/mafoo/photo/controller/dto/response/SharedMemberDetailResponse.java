@@ -5,7 +5,7 @@ import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 import kr.mafoo.photo.service.dto.SharedMemberDto;
 
-@Schema(description = "사용자 응답")
+@Schema(description = "공유 사용자 상세 응답")
 public record SharedMemberDetailResponse(
         @Schema(description = "공유 사용자 ID", example = "test_shared_member_id")
         String sharedMemberId,

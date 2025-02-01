@@ -1,4 +1,4 @@
-package kr.mafoo.user.util.dto;
+package kr.mafoo.user.service.dto;
 
 import java.util.List;
 import java.util.Map;

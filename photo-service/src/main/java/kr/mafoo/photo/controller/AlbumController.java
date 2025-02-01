@@ -4,12 +4,11 @@ import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
-import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
+import kr.mafoo.photo.controller.dto.response.ViewableAlbumResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
-import kr.mafoo.photo.controller.dto.response.SharedAlbumResponse;
+import kr.mafoo.photo.controller.dto.response.ViewableAlbumDetailResponse;
 import kr.mafoo.photo.service.AlbumService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,28 +20,22 @@ public class AlbumController implements AlbumApi {
     private final AlbumService albumService;
 
     @Override
-    public Flux<AlbumDetailResponse> getAlbumListByMember(
-            String memberId,
-            ServerHttpRequest serverHttpRequest
+    public Flux<ViewableAlbumResponse> getAlbumListByMember(
+            String memberId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
         return albumService
-                .findAlbumListByMemberId(memberId, authorizationToken)
-                .map(AlbumDetailResponse::fromDto);
+                .findViewableAlbumListByMemberId(memberId)
+                .map(ViewableAlbumResponse::fromDto);
     }
 
     @Override
-    public Mono<SharedAlbumResponse> getAlbum(
+    public Mono<ViewableAlbumDetailResponse> getAlbum(
             String memberId,
-            String albumId,
-            ServerHttpRequest serverHttpRequest
+            String albumId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
         return albumService
-                .findAlbumDetailById(albumId, memberId, authorizationToken)
-                .map(SharedAlbumResponse::fromDto);
+                .findViewableAlbumDetailById(albumId, memberId)
+                .map(ViewableAlbumDetailResponse::fromDto);
     }
 
     @Override

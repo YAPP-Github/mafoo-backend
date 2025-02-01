@@ -3,10 +3,10 @@ package kr.mafoo.photo.controller.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import kr.mafoo.photo.domain.enums.AlbumType;
-import kr.mafoo.photo.service.dto.SharedAlbumDto;
+import kr.mafoo.photo.service.dto.ViewableAlbumDetailDto;
 
-@Schema(description = "공유 앨범 응답")
-public record SharedAlbumResponse(
+@Schema(description = "접근 권한이 있는 앨범 상세 응답")
+public record ViewableAlbumDetailResponse(
         @Schema(description = "앨범 ID", example = "test_album_id")
         String albumId,
 
@@ -34,10 +34,10 @@ public record SharedAlbumResponse(
         @Schema(description = "공유 앨범 사용자 정보 목록")
         List<SharedMemberDetailResponse> sharedMembers
 ) {
-        public static SharedAlbumResponse fromDto(
-            SharedAlbumDto dto
+        public static ViewableAlbumDetailResponse fromDto(
+            ViewableAlbumDetailDto dto
         ) {
-                return new SharedAlbumResponse(
+                return new ViewableAlbumDetailResponse(
                     dto.albumId(),
                     dto.name(),
                     dto.type(),
