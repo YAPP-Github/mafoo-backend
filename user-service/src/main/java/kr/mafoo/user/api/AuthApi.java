@@ -3,7 +3,9 @@ package kr.mafoo.user.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.controller.dto.request.AppleLoginRequest;
+import kr.mafoo.user.controller.dto.request.AppleNativeLoginRequest;
 import kr.mafoo.user.controller.dto.request.KakaoLoginRequest;
+import kr.mafoo.user.controller.dto.request.KakaoNativeLoginRequest;
 import kr.mafoo.user.controller.dto.request.TokenRefreshRequest;
 import kr.mafoo.user.controller.dto.response.LoginResponse;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +31,20 @@ public interface AuthApi {
     @PostMapping("/login/apple")
     Mono<LoginResponse> loginWithApple(
             @RequestBody AppleLoginRequest request,
+            ServerWebExchange exchange
+    );
+
+    @Operation(summary = "카카오 네티이브 로그인", description = "카카오 인가 코드로 로그인(토큰 발행)합니다.")
+    @PostMapping("/login/kakao-native")
+    Mono<LoginResponse> loginWithKakaoNative(
+            @RequestBody KakaoNativeLoginRequest request,
+            ServerWebExchange exchange
+    );
+
+    @Operation(summary = "애플 네이티브 로그인" , description = "애플 인가 코드로 로그인(토큰 발행)합니다.")
+    @PostMapping("/login/apple-native")
+    Mono<LoginResponse> loginWithAppleNative(
+            @RequestBody AppleNativeLoginRequest request,
             ServerWebExchange exchange
     );
 

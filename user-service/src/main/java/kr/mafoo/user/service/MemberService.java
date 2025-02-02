@@ -52,17 +52,20 @@ public class MemberService {
         MemberEntity memberEntity = MemberEntity.newMember(IdGenerator.generate(), username, profileImageUrl, true);
 
         return memberRepository.save(memberEntity)
-                .flatMap(savedMember ->
+            .flatMap(savedMember ->
+                memberRepository.findById(savedMember.getId())
+                    .flatMap(fetchedMember ->
                         slackService.sendNewMemberNotification(
-                                memberEntity.getSerialNumber(),
-                                memberEntity.getId(),
-                                memberEntity.getName(),
-                                memberEntity.getProfileImageUrl(),
-                                memberEntity.getCreatedAt().toString(),
-                                userAgent
+                            fetchedMember.getSerialNumber(),
+                            fetchedMember.getId(),
+                            fetchedMember.getName(),
+                            fetchedMember.getProfileImageUrl(),
+                            fetchedMember.getCreatedAt().toString(),
+                            userAgent
                         )
-                        .then(Mono.just(savedMember))
-                );
+                    )
+                    .then(Mono.just(savedMember))
+            );
     }
 
     @Transactional
