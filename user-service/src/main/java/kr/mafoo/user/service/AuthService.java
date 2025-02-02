@@ -172,8 +172,8 @@ public class AuthService {
                     .parseSignedClaims(identityToken);
 
             Set<String> audienceList = claims.getPayload().get("aud", Set.class);
-            if (audienceList == null || !audienceList.contains(appleOAuthProperties.clientId())) {
-                throw new RuntimeException();
+            if (audienceList == null || (!audienceList.contains(appleOAuthProperties.clientId()) && !audienceList.contains(appleOAuthProperties.nativeClientId()))) {
+                throw new RuntimeException("Invalid audience: " + audienceList);
             }
 
             return new AppleLoginInfo(claims.getPayload().get("sub", String.class));
