@@ -48,7 +48,6 @@ dependencies {
 
 	implementation("io.projectreactor.tools:blockhound:1.0.9.RELEASE")
 	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
-	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
 	implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
 
 	implementation("com.slack.api:slack-api-client:1.40.3")
