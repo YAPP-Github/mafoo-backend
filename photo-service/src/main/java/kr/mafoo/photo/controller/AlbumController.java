@@ -32,11 +32,15 @@ public class AlbumController implements AlbumApi {
     }
 
     @Override
-    public Mono<ViewableAlbumResponse> getAlbumVariablesByTypeAndSort(
-        AlbumType type, AlbumSortType sort, SortOrder order, String memberId) {
+    public Mono<ViewableAlbumResponse> getAlbumVariables(
+            AlbumType albumType,
+            AlbumSortType sort,
+            SortOrder order,
+            String memberId
+    ) {
         return albumService
-            .findViewableAlbumByTypeAndSort(type, sort, order, memberId)
-            .map(ViewableAlbumResponse::fromDto);
+                .findViewableAlbumVariables(albumType, sort, order, memberId)
+                .map(ViewableAlbumResponse::fromDto);
     }
 
     @Override

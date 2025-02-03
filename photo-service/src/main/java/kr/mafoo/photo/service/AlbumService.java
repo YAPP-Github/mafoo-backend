@@ -23,7 +23,7 @@ import kr.mafoo.photo.repository.PhotoRepository;
 import kr.mafoo.photo.repository.SumoneEventMappingRepository;
 import kr.mafoo.photo.service.dto.ViewableAlbumDto;
 import kr.mafoo.photo.service.dto.ViewableAlbumDetailDto;
-import kr.mafoo.photo.service.dto.SharedMemberDto;
+import kr.mafoo.photo.service.dto.SharedMemberForAlbumDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +61,7 @@ public class AlbumService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<ViewableAlbumDto> findViewableAlbumByTypeAndSort(AlbumType type, AlbumSortType sort, SortOrder order, String memberId) {
+    public Mono<ViewableAlbumDto> findViewableAlbumVariables(AlbumType type, AlbumSortType sort, SortOrder order, String memberId) {
         Comparator<ViewableAlbumDto> comparator = getComparator(sort, order);
 
         return Flux.merge(
@@ -118,8 +118,8 @@ public class AlbumService {
                         .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
                         .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
-                                .map(memberInfo -> SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
-                        .sort(Comparator.comparing(SharedMemberDto::shareStatus))
+                                .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
+                        .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
                         .collectList()
                         .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
                                 .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))

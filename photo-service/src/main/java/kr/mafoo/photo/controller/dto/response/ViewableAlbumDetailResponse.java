@@ -32,7 +32,7 @@ public record ViewableAlbumDetailResponse(
         String ownerSerialNumber,
 
         @Schema(description = "공유 앨범 사용자 정보 목록")
-        List<SharedMemberDetailResponse> sharedMembers
+        List<SharedMemberForAlbumResponse> sharedMembers
 ) {
         public static ViewableAlbumDetailResponse fromDto(
             ViewableAlbumDetailDto dto
@@ -46,7 +46,7 @@ public record ViewableAlbumDetailResponse(
                     dto.ownerName(),
                     dto.ownerProfileImageUrl(),
                     dto.ownerSerialNumber(),
-                    dto.sharedMemberDtoList().stream().map(SharedMemberDetailResponse::fromDto).toList()
+                    dto.sharedMemberForAlbumDtoList().stream().map(SharedMemberForAlbumResponse::fromDto).toList()
                 );
         }
 }

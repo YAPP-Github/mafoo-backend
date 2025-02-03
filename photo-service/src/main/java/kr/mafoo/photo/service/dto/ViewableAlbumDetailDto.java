@@ -13,7 +13,7 @@ public record ViewableAlbumDetailDto(
     String ownerName,
     String ownerProfileImageUrl,
     String ownerSerialNumber,
-    List<SharedMemberDto> sharedMemberDtoList
+    List<SharedMemberForAlbumDto> sharedMemberForAlbumDtoList
 ) {
     public static ViewableAlbumDetailDto fromOwnedAlbum(
         AlbumEntity albumEntity
@@ -34,7 +34,7 @@ public record ViewableAlbumDetailDto(
     public static ViewableAlbumDetailDto fromSharedAlbum(
         AlbumEntity albumEntity,
         MemberDto ownerMemberDto,
-        List<SharedMemberDto> sharedMemberDtoList
+        List<SharedMemberForAlbumDto> sharedMemberForAlbumDtoList
     ) {
         return new ViewableAlbumDetailDto(
                 albumEntity.getAlbumId(),
@@ -45,7 +45,7 @@ public record ViewableAlbumDetailDto(
                 ownerMemberDto.name(),
                 ownerMemberDto.profileImageUrl(),
                 ownerMemberDto.serialNumber(),
-                sharedMemberDtoList
+            sharedMemberForAlbumDtoList
         );
     }
 }

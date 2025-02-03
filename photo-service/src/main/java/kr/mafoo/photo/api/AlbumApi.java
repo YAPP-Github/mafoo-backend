@@ -32,9 +32,9 @@ public interface AlbumApi {
     );
 
     @GetMapping("/variables")
-    Mono<ViewableAlbumResponse> getAlbumVariablesByTypeAndSort(
+    Mono<ViewableAlbumResponse> getAlbumVariables(
         @RequestParam(required = false)
-        AlbumType type,
+        AlbumType albumType,
 
         @RequestParam
         AlbumSortType sort,
