@@ -9,7 +9,7 @@ public class VariableUriGenerator {
         StringBuilder uri = new StringBuilder(endpoint)
             .append("/photo/v1/")
             .append(domain.getName())
-            .append("?memberId=").append(receiverMemberId)
+            .append("/variables?memberId=").append(receiverMemberId)
             .append("&").append(sort.toQueryParam());
 
         if (type != VariableType.NONE) {

@@ -10,7 +10,9 @@ public enum VariableDomain {
 
     MEMBER("members"),
     ALBUM("albums"),
-    SHARE_MEMBER("shared-members"),
+
+    SHARE_MEMBER_IN_OWNED_ALBUM("shared-members/owned-albums"),
+    SHARE_MEMBER_IN_SHARED_ALBUM("shared-members/shared-albums"),
     ;
 
     private final String name;

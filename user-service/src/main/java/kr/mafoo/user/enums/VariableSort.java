@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum VariableSort {
-    PHOTO_COUNT_MIN("photoCount", "asc"),
-    PHOTO_COUNT_MAX("photoCount", "desc"),
+    PHOTO_COUNT_MIN("PHOTO_COUNT", "ASC"),
+    PHOTO_COUNT_MAX("PHOTO_COUNT", "DESC"),
 
-    NEWEST("createdAt", "asc"),
-    OLDEST("createdAt", "desc"),
+    NEWEST("CREATED_AT", "ASC"),
+    OLDEST("CREATED_AT", "DESC"),
     ;
 
     private final String columnName;

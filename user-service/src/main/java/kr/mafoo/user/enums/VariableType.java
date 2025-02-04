@@ -18,9 +18,9 @@ public enum VariableType {
     DOWNLOAD_ACCESS("permissionLevel"),
     VIEW_ACCESS("permissionLevel"),
 
-    ACCEPTED("inviteStatus"),
-    PENDING("inviteStatus"),
-    REJECTED("inviteStatus"),
+    ACCEPTED("shareStatus"),
+    PENDING("shareStatus"),
+    REJECTED("shareStatus"),
     ;
 
     private final String columnName;
