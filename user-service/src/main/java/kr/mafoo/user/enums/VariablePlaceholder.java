@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum VariablePlaceholder {
-    ME_NAME("name", "{{사용자 이름}}"),
+    ME_NAME("memberName", "{{사용자 이름}}"),
 
     ALBUM_NAME("name","{{앨범 이름}}"),
     ALBUM_TYPE("type", "{{앨범 종류}}"),
@@ -25,7 +25,7 @@ public enum VariablePlaceholder {
     SHARED_MEMBER_ALBUM_PHOTO_COUNT("albumPhotoCount", "{{공유 사용자 앨범 사진 수}}")
     ;
 
-    private final String placeholderKey;
+    private final String key;
     private final String placeholder;
 }
 

@@ -35,12 +35,22 @@ public record MessageDto(
     }
 
     private static String convertWithVariables(String text, Map<String, String> variables) {
+        StringBuilder result = new StringBuilder(text);
 
         for (VariablePlaceholder variablePlaceholder : VariablePlaceholder.values()) {
-            String value = variables.get(variablePlaceholder.getPlaceholderKey());
-            text = text.replace(variablePlaceholder.getPlaceholder(), value);
+            String placeholder = variablePlaceholder.getPlaceholder();
+            String key = variablePlaceholder.getKey();
+
+            String replacement = variables.getOrDefault(key, "");
+
+            int index;
+            while ((index = result.indexOf(placeholder)) != -1) {
+                result.replace(index, index + placeholder.length(), replacement);
+            }
         }
 
-        return text;
+        return result.toString();
     }
+
+
 }
