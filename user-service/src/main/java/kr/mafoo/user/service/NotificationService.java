@@ -3,6 +3,7 @@ package kr.mafoo.user.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import kr.mafoo.user.domain.FcmTokenEntity;
 import kr.mafoo.user.domain.NotificationEntity;
 import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.enums.VariableDomain;
@@ -28,6 +29,8 @@ public class NotificationService {
 
     private final VariableService variableService;
 
+    private final FcmTokenQuery fcmTokenQuery;
+
     @Transactional(readOnly = true)
     public Flux<NotificationDetailDto> findNotificationListByMemberId(String requestMemberId) {
         return notificationQuery.findAllByReceiverMemberId(requestMemberId)
@@ -43,10 +46,14 @@ public class NotificationService {
     }
 
     private Flux<NotificationEntity> sendNotificationWithVariables(String templateId, List<String> receiverMemberIds, String title, String body, Map<String, String> variables) {
-        return Flux.defer(() -> {
-            MessageDto messageDto = MessageDto.fromTemplateWithVariables(receiverMemberIds, title, body, variables);
-            return addNotificationBulk(templateId, messageDto);
-        });
+        return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .collectList()
+            .flatMapMany(fcmTokenList -> {
+                List<String> ownerMemberList = fcmTokenList.stream().map(FcmTokenEntity::getOwnerMemberId).toList();
+                List<String> tokenList = fcmTokenList.stream().map(FcmTokenEntity::getToken).toList();
+                MessageDto messageDto = MessageDto.fromTemplateWithVariables(ownerMemberList, tokenList, title, body, variables);
+                return addNotificationBulk(templateId, messageDto);
+            });
     }
 
     @Transactional
@@ -62,18 +69,21 @@ public class NotificationService {
     }
 
     private Flux<NotificationEntity> sendNotificationWithoutVariables(String templateId, List<String> receiverMemberIds, String title, String body) {
-        return Flux.defer(() -> {
-            MessageDto messageDto = MessageDto.fromTemplateWithoutVariables(receiverMemberIds, title, body);
-            return addNotificationBulk(templateId, messageDto);
-        });
+        return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .collectList()
+            .flatMapMany(fcmTokenList -> {
+                List<String> ownerMemberList = fcmTokenList.stream().map(FcmTokenEntity::getOwnerMemberId).toList();
+                List<String> tokenList = fcmTokenList.stream().map(FcmTokenEntity::getToken).toList();
+                MessageDto messageDto = MessageDto.fromTemplateWithoutVariables(ownerMemberList, tokenList, title, body);
+                return addNotificationBulk(templateId, messageDto);
+            });
     }
 
     private Flux<NotificationEntity> sendNotificationWithDynamicVariables(String templateId, List<String> receiverMemberIds, String title, String body, VariableDomain domain, VariableSort sort, VariableType type) {
-        return Flux.fromIterable(receiverMemberIds)
-            .flatMap(receiverMemberId ->
-                variableService.getVariableMap(receiverMemberId, domain, sort, type)
+        return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .flatMap(fcmToken -> variableService.getVariableMap(fcmToken.getOwnerMemberId(), domain, sort, type)
                     .map(variableMap -> MessageDto.fromTemplateWithVariables(
-                        List.of(receiverMemberId), title, body, variableMap))
+                        List.of(fcmToken.getOwnerMemberId()), List.of(fcmToken.getToken()), title, body, variableMap))
             )
             .collectList()
             .flatMapMany(messageDtoList -> addDynamicNotificationBulk(templateId, messageDtoList));

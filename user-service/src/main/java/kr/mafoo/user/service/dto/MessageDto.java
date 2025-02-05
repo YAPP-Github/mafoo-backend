@@ -6,16 +6,19 @@ import kr.mafoo.user.enums.VariablePlaceholder;
 
 public record MessageDto(
     List<String> receiverMemberIds,
+    List<String> tokens,
     String title,
     String body
 ) {
     public static MessageDto fromTemplateWithoutVariables(
         List<String> receiverMemberIds,
+        List<String> tokens,
         String title,
         String body
     ) {
         return new MessageDto(
             receiverMemberIds,
+            tokens,
             title,
             body
         );
@@ -23,18 +26,20 @@ public record MessageDto(
 
     public static MessageDto fromTemplateWithVariables(
         List<String> receiverMemberIds,
+        List<String> tokens,
         String title,
         String body,
         Map<String, String> variables
     ) {
         return new MessageDto(
             receiverMemberIds,
-            convertWithVariables(title, variables),
-            convertWithVariables(body, variables)
+            tokens,
+            convertVariables(title, variables),
+            convertVariables(body, variables)
         );
     }
 
-    private static String convertWithVariables(String text, Map<String, String> variables) {
+    private static String convertVariables(String text, Map<String, String> variables) {
         StringBuilder result = new StringBuilder(text);
 
         for (VariablePlaceholder variablePlaceholder : VariablePlaceholder.values()) {

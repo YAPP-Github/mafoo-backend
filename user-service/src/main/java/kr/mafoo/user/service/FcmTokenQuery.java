@@ -1,5 +1,6 @@
 package kr.mafoo.user.service;
 
+import java.util.List;
 import kr.mafoo.user.domain.FcmTokenEntity;
 import kr.mafoo.user.exception.FcmTokenDuplicatedException;
 import kr.mafoo.user.exception.FcmTokenNotFoundException;
@@ -22,6 +23,11 @@ public class FcmTokenQuery {
 
     public Mono<FcmTokenEntity> findByOwnerMemberId(String ownerMemberId) {
         return fcmTokenRepository.findByOwnerMemberId(ownerMemberId)
+            .switchIfEmpty(Mono.error(new FcmTokenNotFoundException()));
+    }
+
+    public Flux<FcmTokenEntity> findAllByOwnerMemberIdList(List<String> ownerMemberIdList) {
+        return fcmTokenRepository.findAllByOwnerMemberIdList(ownerMemberIdList)
             .switchIfEmpty(Mono.error(new FcmTokenNotFoundException()));
     }
 
