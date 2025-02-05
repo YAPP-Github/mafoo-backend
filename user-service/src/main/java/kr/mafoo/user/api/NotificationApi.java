@@ -31,12 +31,9 @@ public interface NotificationApi {
         String memberId
     );
 
-    @Operation(summary = "알림 전송")
+    @Operation(summary = "시나리오 알림 전송")
     @PostMapping
-    Flux<NotificationResponse> sendNotification(
-        @RequestMemberId
-        String memberId,
-
+    Flux<NotificationResponse> sendScenarioNotification(
         @Valid
         @RequestBody
         NotificationSendRequest request

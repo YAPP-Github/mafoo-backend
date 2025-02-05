@@ -37,6 +37,19 @@ public class NotificationService {
     }
 
     @Transactional
+    public Flux<NotificationEntity> sendNotificationByScenario(NotificationType notificationType, List<String> receiverMemberIds, Map<String, String> variables) {
+        return templateQuery.findByNotificationType(notificationType)
+            .flatMapMany(template -> sendNotificationWithVariables(template.getTemplateId(), receiverMemberIds, template.getTitle(), template.getBody(), variables));
+    }
+
+    private Flux<NotificationEntity> sendNotificationWithVariables(String templateId, List<String> receiverMemberIds, String title, String body, Map<String, String> variables) {
+        return Flux.defer(() -> {
+            MessageDto messageDto = MessageDto.fromTemplateWithVariables(receiverMemberIds, title, body, variables);
+            return addNotificationBulk(templateId, messageDto);
+        });
+    }
+
+    @Transactional
     public Flux<NotificationEntity> sendNotificationByReservation(String templateId, String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
         return templateQuery.findById(templateId)
             .flatMapMany(template -> {

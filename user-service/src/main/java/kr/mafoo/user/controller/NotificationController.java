@@ -28,11 +28,11 @@ public class NotificationController implements NotificationApi {
     }
 
     @Override
-    public Flux<NotificationResponse> sendNotification(
-        String memberId,
+    public Flux<NotificationResponse> sendScenarioNotification(
         NotificationSendRequest request
     ){
-        return Flux.empty();
+        return notificationService.sendNotificationByScenario(request.notificationType(), request.receiverMemberIds(), request.variables())
+            .map(NotificationResponse::fromEntity);
     }
 
     @Override
