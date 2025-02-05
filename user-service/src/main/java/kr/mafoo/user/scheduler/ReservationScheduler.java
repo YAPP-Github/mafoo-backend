@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
@@ -25,18 +26,17 @@ public class ReservationScheduler {
     private final NotificationService notificationService;
 
     @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
-    public Flux<NotificationEntity> checkReservation() {
+    public Mono<Void> checkReservation() {
         return reservationQuery.findAllByStatusAndSendAtBefore(ACTIVE, LocalDateTime.now())
             .onErrorResume(ReservationNotFoundException.class, ex -> Flux.empty())
             .collectList()
             .filter(reservations -> !reservations.isEmpty())
             .flatMapMany(reservations -> reservationCommand.modifyReservationAfterSent(reservations)
                 .thenMany(this.processReservation(reservations))
-            );
+            ).then();
     }
 
-    public Flux<NotificationEntity> processReservation(
-        List<ReservationEntity> reservations) {
+    public Flux<NotificationEntity> processReservation(List<ReservationEntity> reservations) {
         return Flux.fromIterable(reservations)
             .flatMap(reservation -> notificationService.sendNotificationByReservation(
                 reservation.getTemplateId(),
