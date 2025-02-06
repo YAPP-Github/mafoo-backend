@@ -31,6 +31,8 @@ public class NotificationService {
 
     private final FcmTokenQuery fcmTokenQuery;
 
+    private final MessageService messageService;
+
     @Transactional(readOnly = true)
     public Flux<NotificationDetailDto> findNotificationListByMemberId(String requestMemberId) {
         return notificationQuery.findAllByReceiverMemberId(requestMemberId)
@@ -93,7 +95,10 @@ public class NotificationService {
         return Flux.fromIterable(messageDto.receiverMemberIds())
             .flatMap(receiverMemberId -> notificationCommand.addNotification(
                 templateId, receiverMemberId, messageDto.title(), messageDto.body()
-            ));
+            ))
+            .flatMap(notifications -> messageService.sendMessage(messageDto)
+                .thenReturn(notifications)
+            );
     }
 
     private Flux<NotificationEntity> addDynamicNotificationBulk(String templateId, List<MessageDto> messageDtos) {
