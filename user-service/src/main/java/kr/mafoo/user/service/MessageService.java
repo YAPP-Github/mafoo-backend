@@ -5,6 +5,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import kr.mafoo.user.service.dto.MessageDto;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,31 @@ public class MessageService {
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message)))
             .then();
+    }
+
+    public Mono<Void> sendDynamicMessageToMultipleMember(List<MessageDto> messageDtoList) {
+
+        List<MulticastMessage> multicastMessages = new java.util.ArrayList<>();
+
+        for (int i = 0; i < messageDtoList.size(); i += 500) {
+            List<MessageDto> batchMessages = messageDtoList.subList(i, Math.min(i + 500, messageDtoList.size()));
+
+            MulticastMessage.Builder builder = MulticastMessage.builder();
+            for (int j = 0; j < batchMessages.size(); j++) {
+                builder.addToken(batchMessages.get(j).tokens().get(0))
+                    .setNotification(Notification.builder()
+                        .setTitle(batchMessages.get(j).title())
+                        .setBody(batchMessages.get(j).body())
+                        .build());
+            }
+            multicastMessages.add(builder.build());
+        }
+
+        List<Mono<Void>> sendOperations = multicastMessages.stream()
+            .map(message -> Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message))).then())
+            .toList();
+
+        return Mono.when(sendOperations);
     }
 
     private <T> CompletableFuture<T> toCompletableFuture(ApiFuture<T> apiFuture) {

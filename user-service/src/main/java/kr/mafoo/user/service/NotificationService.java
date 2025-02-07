@@ -101,11 +101,14 @@ public class NotificationService {
             );
     }
 
-    private Flux<NotificationEntity> addDynamicNotificationBulk(String templateId, List<MessageDto> messageDtos) {
-        return Flux.fromIterable(messageDtos)
+    private Flux<NotificationEntity> addDynamicNotificationBulk(String templateId, List<MessageDto> messageDtoList) {
+        return Flux.fromIterable(messageDtoList)
             .flatMap(messageDto -> notificationCommand.addNotification(
                 templateId, messageDto.receiverMemberIds().get(0), messageDto.title(), messageDto.body()
-            ));
+            ))
+            .flatMap(notifications -> messageService.sendDynamicMessageToMultipleMember(messageDtoList)
+                .thenReturn(notifications)
+            );
     }
 
     @Transactional
