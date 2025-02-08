@@ -10,23 +10,34 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
-    Flux<PhotoEntity> findAllByAlbumIdOrderByDisplayIndexDesc(String ownerAlbumId);
 
-    Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtDesc(String ownerAlbumId);
+    Mono<PhotoEntity> findByIdAndDeletedAtIsNull(String id);
 
-    Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtAsc(String ownerAlbumId);
+    Flux<PhotoEntity> findAllByAlbumIdAndDeletedAtIsNullOrderByDisplayIndexDesc(String ownerAlbumId);
 
-    @Modifying
-    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex")
-    Mono<Void> popDisplayIndexGreaterThan(String albumId, int startIndex);
+    Flux<PhotoEntity> findAllByAlbumIdAndDeletedAtIsNullOrderByCreatedAtDesc(String ownerAlbumId);
 
-    @Modifying
-    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex")
-    Mono<Void> popDisplayIndexBetween(String albumId, int startIndex, int endIndex);
+    Flux<PhotoEntity> findAllByAlbumIdAndDeletedAtIsNullOrderByCreatedAtAsc(String ownerAlbumId);
 
     @Modifying
-    @Query("UPDATE photo SET display_index = display_index + 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex")
-    Mono<Void> pushDisplayIndexBetween(String albumId, int startIndex, int endIndex);
+    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex AND deleted_at IS NULL")
+    Flux<Void> updateAllByAlbumIdToDecreaseDisplayIndexGreaterThan(String albumId, int startIndex);
+
+    @Modifying
+    @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex AND deleted_at IS NULL")
+    Flux<Void> updateAllByAlbumIdToDecreaseDisplayIndexBetween(String albumId, int startIndex, int endIndex);
+
+    @Modifying
+    @Query("UPDATE photo SET display_index = display_index + 1 WHERE album_id = :albumId AND display_index BETWEEN :startIndex AND :endIndex AND deleted_at IS NULL")
+    Flux<Void> updateAllByAlbumIdToIncreaseDisplayIndexBetween(String albumId, int startIndex, int endIndex);
+
+    @Modifying
+    @Query("UPDATE photo SET deleted_at = NOW() WHERE id = :photoId AND deleted_at IS NULL")
+    Mono<Void> softDeleteById(String photoId);
+
+    @Modifying
+    @Query("UPDATE photo SET deleted_at = NOW() WHERE album_id = :albumId AND deleted_at IS NULL")
+    Flux<Void> softDeleteByAlbumId(String albumId);
 
     Flux<PhotoEntity> findAllByOrderByPhotoIdDesc(Pageable pageable);
     Flux<PhotoEntity> findAllByBrandOrderByPhotoIdDesc(BrandType brandType, Pageable pageable);

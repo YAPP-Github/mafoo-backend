@@ -6,17 +6,12 @@ import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
-import kr.mafoo.photo.domain.enums.BrandType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.AlbumOwnerChangeDeniedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
-import kr.mafoo.photo.repository.AlbumRepository;
-import kr.mafoo.photo.repository.PhotoRepository;
-import kr.mafoo.photo.repository.SumoneEventMappingRepository;
 import kr.mafoo.photo.service.dto.AlbumDto;
 import kr.mafoo.photo.service.dto.SharedAlbumDto;
 import kr.mafoo.photo.service.dto.SharedMemberDto;
@@ -32,19 +27,15 @@ public class AlbumService {
 
     private final AlbumQuery albumQuery;
     private final AlbumCommand albumCommand;
-    private final AlbumRepository albumRepository;
-
-    private final PhotoCommand photoCommand;
-    private final PhotoRepository photoRepository;
-
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
 
+    private final PhotoCommand photoCommand;
+
     private final SharedMemberQuery sharedMemberQuery;
-    private final MemberService memberService;
     private final SharedMemberCommand sharedMemberCommand;
 
-    private final SumoneEventMappingRepository sumoneEventMappingRepository;
+    private final MemberService memberService;
 
     @Transactional(readOnly = true)
     public Flux<AlbumDto> findAlbumListByMemberId(String memberId, String token) {
@@ -94,33 +85,6 @@ public class AlbumService {
     }
 
     @Transactional
-    public Mono<AlbumEntity> addSumoneAlbum(String albumName, String albumType, String requestMemberId, String inviteCode) {
-        AtomicInteger displayIndex = new AtomicInteger(0);
-        return albumCommand
-                .addAlbum(albumName, albumType, requestMemberId, null)
-                .flatMap(album -> sumoneEventMappingRepository
-                        .findByInviteCode(inviteCode)
-                        .switchIfEmpty(Mono.error(new AlbumNotFoundException()))
-                        .flatMap(sumoneEventMappingEntity ->
-                                sumoneEventMappingRepository.delete(sumoneEventMappingEntity).then(Mono.just(sumoneEventMappingEntity)))
-                        .map(entity -> "SUMONE_" + entity.getId())
-                        .flatMapMany(albumRepository::findAllByExternalId)
-                        .flatMap(sumoneAlbum ->
-                                photoRepository.findAllByAlbumIdOrderByCreatedAtAsc(sumoneAlbum.getAlbumId()).flatMap(photo ->
-                                        photoCommand.addPhoto(
-                                                photo.getPhotoUrl(),
-                                                BrandType.EXTERNAL,
-                                                album.getAlbumId(),
-                                                displayIndex.getAndIncrement(),
-                                                requestMemberId
-                                        )
-                                )
-                        )
-                        .then(albumQuery.findById(album.getAlbumId()))
-                        .flatMap(newAlbum -> albumCommand.increaseAlbumPhotoCount(newAlbum, displayIndex.get())));
-    }
-
-    @Transactional
     public Mono<AlbumEntity> modifyAlbumNameAndType(String albumId, String newAlbumName, String newAlbumType, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
                 .flatMap(album -> albumCommand.modifyAlbumNameAndType(album, newAlbumName, newAlbumType));
@@ -143,7 +107,10 @@ public class AlbumService {
     @Transactional
     public Mono<Void> removeAlbum(String albumId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnership(albumId, requestMemberId)
-                .flatMap(albumCommand::removeAlbum);
+                .flatMap(album -> sharedMemberCommand.removeShareMemberByAlbumId(albumId)
+                    .thenMany(photoCommand.removePhotoByAlbumId(albumId))
+                    .then(albumCommand.removeAlbum(albumId))
+                );
     }
 
     public Mono<Long> countAlbumByAlbumType(AlbumType albumType) {

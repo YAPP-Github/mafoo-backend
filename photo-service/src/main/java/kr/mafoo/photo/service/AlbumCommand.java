@@ -39,8 +39,8 @@ public class AlbumCommand {
         return albumRepository.save(album.decreasePhotoCount(count));
     }
 
-    public Mono<Void> removeAlbum(AlbumEntity album) {
-        return albumRepository.delete(album);
+    public Mono<Void> removeAlbum(String albumId) {
+        return albumRepository.softDeleteById(albumId);
     }
 
 }
