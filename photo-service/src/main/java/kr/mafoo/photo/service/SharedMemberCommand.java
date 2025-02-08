@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service;
 
+import java.util.List;
 import java.util.Optional;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.SharedMemberEntity;
@@ -43,6 +44,14 @@ public class SharedMemberCommand {
 
     public Flux<Void> removeShareMemberByAlbumId(String albumId) {
         return sharedMemberRepository.softDeleteByAlbumId(albumId);
+    }
+
+    public Flux<Void> removeShareMemberByMemberId(String memberId) {
+        return sharedMemberRepository.softDeleteByMemberId(memberId);
+    }
+
+    public Flux<Void> removeShareMemberByAlbumIds(List<String> albumIds) {
+        return sharedMemberRepository.softDeleteByAlbumIds(albumIds);
     }
 
 }

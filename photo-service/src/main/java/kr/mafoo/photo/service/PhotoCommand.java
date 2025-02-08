@@ -64,4 +64,8 @@ public class PhotoCommand {
         return photoRepository.softDeleteByAlbumId(albumId);
     }
 
+    public Flux<Void> removePhotoByOwnerMemberId(String ownerMemberId) {
+        return photoRepository.softDeleteByOwnerMemberId(ownerMemberId);
+    }
+
 }

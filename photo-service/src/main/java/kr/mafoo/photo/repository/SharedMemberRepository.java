@@ -1,5 +1,6 @@
 package kr.mafoo.photo.repository;
 
+import java.util.List;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 import org.springframework.data.r2dbc.repository.Modifying;
@@ -29,4 +30,12 @@ public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEnti
     @Modifying
     @Query("UPDATE shared_member SET deleted_at = NOW() WHERE album_id = :albumId AND deleted_at IS NULL")
     Flux<Void> softDeleteByAlbumId(String albumId);
+
+    @Modifying
+    @Query("UPDATE shared_member SET deleted_at = NOW() WHERE album_id IN (:albumIds) AND deleted_at IS NULL")
+    Flux<Void> softDeleteByAlbumIds(List<String> albumIds);
+
+    @Modifying
+    @Query("UPDATE shared_member SET deleted_at = NOW() WHERE member_id = :memberId AND deleted_at IS NULL")
+    Flux<Void> softDeleteByMemberId(String memberId);
 }

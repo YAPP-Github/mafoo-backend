@@ -39,6 +39,10 @@ public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
     @Query("UPDATE photo SET deleted_at = NOW() WHERE album_id = :albumId AND deleted_at IS NULL")
     Flux<Void> softDeleteByAlbumId(String albumId);
 
+    @Modifying
+    @Query("UPDATE photo SET deleted_at = NOW() WHERE owner_member_id = :ownerMemberId AND deleted_at IS NULL")
+    Flux<Void> softDeleteByOwnerMemberId(String ownerMemberId);
+
     Flux<PhotoEntity> findAllByOrderByPhotoIdDesc(Pageable pageable);
     Flux<PhotoEntity> findAllByBrandOrderByPhotoIdDesc(BrandType brandType, Pageable pageable);
     Flux<PhotoEntity> findAllByOwnerMemberIdOrderByPhotoIdDesc(String ownerMemberId, Pageable pageable);

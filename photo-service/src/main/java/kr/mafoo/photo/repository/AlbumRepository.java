@@ -1,5 +1,6 @@
 package kr.mafoo.photo.repository;
 
+import java.util.List;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,10 @@ public interface AlbumRepository extends R2dbcRepository<AlbumEntity, String> {
     @Modifying
     @Query("UPDATE album SET deleted_at = NOW() WHERE id = :albumId AND deleted_at IS NULL")
     Mono<Void> softDeleteById(String albumId);
+
+    @Modifying
+    @Query("UPDATE album SET deleted_at = NOW() WHERE owner_member_id = :ownerMemberId AND deleted_at IS NULL")
+    Flux<Void> softDeleteByOwnerMemberId(String ownerMemberId);
 
 //    @Modifying
 //    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId")
