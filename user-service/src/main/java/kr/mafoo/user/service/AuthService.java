@@ -92,7 +92,7 @@ public class AuthService {
 
     private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return socialMemberRepository
-                .findByIdentityProviderAndId(provider, id)
+                .findByIdentityProviderAndIdAndDeletedAtIsNull(provider, id)
                 .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl, userAgent))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
