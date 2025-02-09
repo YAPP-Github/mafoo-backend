@@ -17,22 +17,22 @@ public class PhotoQuery {
     private final PhotoRepository photoRepository;
 
     public Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtAsc(String albumId) {
-        return photoRepository.findAllByAlbumIdOrderByCreatedAtAsc(albumId)
+        return photoRepository.findAllByAlbumIdAndDeletedAtIsNullOrderByCreatedAtAsc(albumId)
             .switchIfEmpty(Mono.error(new PhotoNotFoundException()));
     }
 
     public Flux<PhotoEntity> findAllByAlbumIdOrderByCreatedAtDesc(String albumId) {
-        return photoRepository.findAllByAlbumIdOrderByCreatedAtDesc(albumId)
+        return photoRepository.findAllByAlbumIdAndDeletedAtIsNullOrderByCreatedAtDesc(albumId)
             .switchIfEmpty(Mono.error(new PhotoNotFoundException()));
     }
 
     public Flux<PhotoEntity> findAllByAlbumIdOrderByDisplayIndexDesc(String albumId) {
-        return photoRepository.findAllByAlbumIdOrderByDisplayIndexDesc(albumId)
+        return photoRepository.findAllByAlbumIdAndDeletedAtIsNullOrderByDisplayIndexDesc(albumId)
             .switchIfEmpty(Mono.error(new PhotoNotFoundException()));
     }
 
     public Mono<PhotoEntity> findByPhotoId(String photoId) {
-        return photoRepository.findById(photoId)
+        return photoRepository.findByIdAndDeletedAtIsNull(photoId)
             .switchIfEmpty(Mono.error(new PhotoNotFoundException()));
     }
 

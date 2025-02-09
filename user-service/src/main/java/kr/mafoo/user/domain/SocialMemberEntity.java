@@ -1,11 +1,11 @@
 package kr.mafoo.user.domain;
 
+import kr.mafoo.user.domain.key.SocialMemberEntityKey;
 import kr.mafoo.user.enums.IdentityProvider;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -25,12 +25,15 @@ public class SocialMemberEntity implements Persistable<SocialMemberEntityKey> {
     @Column("identifier")
     private String id;
 
+    @Column("member_id")
+    private String memberId;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
 
-    @Column("member_id")
-    private String memberId;
+    @Column("deleted_at")
+    private LocalDateTime deletedAt;
 
     @Transient
     private boolean isNew = false;

@@ -7,6 +7,7 @@ import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -36,13 +37,35 @@ public class PhotoCommand {
         );
     }
 
-    public Mono<Void> removePhoto(PhotoEntity photo) {
-        return popDisplayIndexGreaterThan(photo.getAlbumId(), photo.getDisplayIndex())
-            .then(photoRepository.delete(photo));
+    public Mono<PhotoEntity> modifyPhotoDisplayIndex(PhotoEntity photo, Integer newDisplayIndex) {
+        return photoRepository.save(
+            photo.updateDisplayIndex(newDisplayIndex)
+        );
     }
 
-    public Mono<Void> popDisplayIndexGreaterThan(String albumId, int startIndex) {
-        return photoRepository.popDisplayIndexGreaterThan(albumId, startIndex);
+    public Flux<Void> modifyPhotosByAlbumIdToDecreaseDisplayIndexGreaterThan(String albumId, int startIndex) {
+        return photoRepository.updateAllByAlbumIdToDecreaseDisplayIndexGreaterThan(albumId, startIndex);
+    }
+
+    public Flux<Void> modifyPhotosByAlbumIdToDecreaseDisplayIndexBetween(String albumId, int startIndex, int endIndex) {
+        return photoRepository.updateAllByAlbumIdToDecreaseDisplayIndexBetween(albumId, startIndex, endIndex);
+    }
+
+    public Flux<Void> modifyPhotosByAlbumIdToIncreaseDisplayIndexBetween(String albumId, int startIndex, int endIndex) {
+        return photoRepository.updateAllByAlbumIdToIncreaseDisplayIndexBetween(albumId, startIndex, endIndex);
+    }
+
+    public Mono<Void> removePhoto(PhotoEntity photo) {
+        return modifyPhotosByAlbumIdToDecreaseDisplayIndexGreaterThan(photo.getAlbumId(), photo.getDisplayIndex())
+            .then(photoRepository.softDeleteById(photo.getPhotoId()));
+    }
+
+    public Flux<Void> removePhotoByAlbumId(String albumId) {
+        return photoRepository.softDeleteByAlbumId(albumId);
+    }
+
+    public Flux<Void> removePhotoByOwnerMemberId(String ownerMemberId) {
+        return photoRepository.softDeleteByOwnerMemberId(ownerMemberId);
     }
 
 }

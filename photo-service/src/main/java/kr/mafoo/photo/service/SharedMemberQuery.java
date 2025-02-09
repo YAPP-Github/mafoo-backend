@@ -19,32 +19,32 @@ public class SharedMemberQuery {
     private final SharedMemberRepository sharedMemberRepository;
 
     public Flux<SharedMemberEntity> findAllByAlbumIdWhereStatusNotRejected(String albumId) {
-        return sharedMemberRepository.findAllByAlbumIdAndShareStatusNot(albumId, REJECTED)
+        return sharedMemberRepository.findAllByAlbumIdAndShareStatusNotAndDeletedAtIsNull(albumId, REJECTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Flux<SharedMemberEntity> findAllByMemberIdWhereStatusNotRejected(String memberId) {
-        return sharedMemberRepository.findAllByMemberIdAndShareStatusNot(memberId, REJECTED)
+        return sharedMemberRepository.findAllByMemberIdAndShareStatusNotAndDeletedAtIsNull(memberId, REJECTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Mono<SharedMemberEntity> findBySharedMemberId(String sharedMemberId) {
-        return sharedMemberRepository.findById(sharedMemberId)
+        return sharedMemberRepository.findByIdAndDeletedAtIsNull(sharedMemberId)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Mono<SharedMemberEntity> findByAlbumIdAndMemberIdWhereStatusAccepted(String albumId, String memberId) {
-        return sharedMemberRepository.findByAlbumIdAndMemberIdAndShareStatus(albumId, memberId, ACCEPTED)
+        return sharedMemberRepository.findByAlbumIdAndMemberIdAndShareStatusAndDeletedAtIsNull(albumId, memberId, ACCEPTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Mono<SharedMemberEntity> findByAlbumIdAndMemberId(String albumId, String memberId) {
-        return sharedMemberRepository.findByAlbumIdAndMemberId(albumId, memberId)
+        return sharedMemberRepository.findByAlbumIdAndMemberIdAndDeletedAtIsNull(albumId, memberId)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
     public Mono<Void> checkDuplicateByAlbumIdAndMemberId(String albumId, String memberId) {
-        return sharedMemberRepository.findByAlbumIdAndMemberId(albumId, memberId)
+        return sharedMemberRepository.findByAlbumIdAndMemberIdAndDeletedAtIsNull(albumId, memberId)
             .switchIfEmpty(Mono.empty())
             .flatMap(existingMember -> Mono.error(new SharedMemberDuplicatedException()));
     }
