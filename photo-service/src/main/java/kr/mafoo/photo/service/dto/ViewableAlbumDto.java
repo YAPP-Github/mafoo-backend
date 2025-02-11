@@ -22,7 +22,8 @@ public record ViewableAlbumDto(
     LocalDateTime createdAt
 ) {
     public static ViewableAlbumDto fromOwnedAlbum(
-        AlbumEntity albumEntity
+        AlbumEntity albumEntity,
+        MemberDto ownerMemberDto
     ) {
         return new ViewableAlbumDto(
             albumEntity.getAlbumId(),
@@ -30,9 +31,9 @@ public record ViewableAlbumDto(
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
             albumEntity.getOwnerMemberId(),
-            null,
-            null,
-            null,
+            ownerMemberDto.name(),
+            ownerMemberDto.profileImageUrl(),
+            ownerMemberDto.serialNumber(),
             null,
             null,
             null,

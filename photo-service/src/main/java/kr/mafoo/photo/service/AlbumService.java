@@ -97,7 +97,9 @@ public class AlbumService {
     private Flux<ViewableAlbumDto> findOwnedAlbumListByMemberId(String memberId) {
         return albumQuery.findByMemberId(memberId)
                 .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
-                .map(ViewableAlbumDto::fromOwnedAlbum);
+                .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                    .flatMap(member -> Mono.just(ViewableAlbumDto.fromOwnedAlbum(album, member)))
+                );
     }
 
     private Flux<ViewableAlbumDto> findSharedAlbumListByMemberId(String memberId) {
