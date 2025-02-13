@@ -23,6 +23,9 @@ public record NotificationDetailResponse(
     @Schema(description = "썸네일 이미지 URL", example = "thumbnail_image_url")
     String thumbnailImageUrl,
 
+    @Schema(description = "관련 URL")
+    String url,
+
     @Schema(description = "제목", example = "\'시금치파슷하\' 앨범을 공유받았어요")
     String title,
 
@@ -49,6 +52,7 @@ public record NotificationDetailResponse(
                     dto.receiverMemberId(),
                     dto.notificationType(),
                     dto.thumbnailImageUrl(),
+                    dto.url(),
                     dto.title(),
                     dto.body(),
                     dto.isRead(),

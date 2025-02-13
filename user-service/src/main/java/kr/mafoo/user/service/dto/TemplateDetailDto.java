@@ -10,8 +10,9 @@ public record TemplateDetailDto(
     String templateId,
     NotificationType notificationType,
     String thumbnailImageUrl,
+    String url,
     String title,
-    String content,
+    String body,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<ReservationDto> reservation
@@ -24,6 +25,7 @@ public record TemplateDetailDto(
                     templateEntity.getTemplateId(),
                     templateEntity.getNotificationType(),
                     templateEntity.getThumbnailImageUrl(),
+                    templateEntity.getUrl(),
                     templateEntity.getTitle(),
                     templateEntity.getBody(),
                     templateEntity.getCreatedAt(),

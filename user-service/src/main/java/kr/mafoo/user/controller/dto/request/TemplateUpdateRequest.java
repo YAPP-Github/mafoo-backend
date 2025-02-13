@@ -11,6 +11,9 @@ public record TemplateUpdateRequest(
     @Schema(description = "썸네일 이미지 URL", example = "thumbnail_image_url")
     String thumbnailImageUrl,
 
+    @Schema(description = "관련 URL")
+    String url,
+
     @Schema(description = "제목", example = "{{album_name}} 앨범을 공유받았어요")
     String title,
 

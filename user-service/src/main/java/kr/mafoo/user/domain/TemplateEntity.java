@@ -26,6 +26,9 @@ public class TemplateEntity implements Persistable<String> {
     @Column("thumbnail_image_url")
     private String thumbnailImageUrl;
 
+    @Column("url")
+    private String url;
+
     @Column("title")
     private String title;
 
@@ -62,19 +65,21 @@ public class TemplateEntity implements Persistable<String> {
         return templateId;
     }
 
-    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
+    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String url, String title, String body) {
         this.notificationType = notificationType;
         this.thumbnailImageUrl = thumbnailImageUrl;
+        this.url = url;
         this.title = title;
         this.body = body;
         return this;
     }
 
-    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
+    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String url, String title, String body) {
         TemplateEntity template = new TemplateEntity();
         template.templateId = templateId;
         template.notificationType = notificationType;
         template.thumbnailImageUrl = thumbnailImageUrl;
+        template.url = url;
         template.title = title;
         template.body = body;
         template.isNew = true;

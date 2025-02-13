@@ -18,11 +18,14 @@ public record TemplateDetailResponse(
     @Schema(description = "썸네일 이미지 URL", example = "thumbnail_image_url")
     String thumbnailImageUrl,
 
+    @Schema(description = "관련 URL")
+    String url,
+
     @Schema(description = "제목", example = "{{album_name}} 앨범을 공유받았어요")
     String title,
 
     @Schema(description = "내용", example = "{{album_name}} 앨범 공유를 수락하시겠어요?")
-    String content,
+    String body,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "템플릿 생성 일시")
@@ -41,8 +44,9 @@ public record TemplateDetailResponse(
                     dto.templateId(),
                     dto.notificationType(),
                     dto.thumbnailImageUrl(),
+                    dto.url(),
                     dto.title(),
-                    dto.content(),
+                    dto.body(),
                     dto.createdAt(),
                     dto.updatedAt(),
                     dto.reservation().stream().map(ReservationResponse::fromDto).toList()
