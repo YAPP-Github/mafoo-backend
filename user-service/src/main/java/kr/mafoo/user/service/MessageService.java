@@ -27,10 +27,13 @@ public class MessageService {
     public Mono<Void> sendMessageToSingleMember(MessageDto messageDto) {
         Message message = Message.builder()
             .setToken(messageDto.tokens().get(0))
-            .setNotification(Notification.builder()
-                .setTitle(messageDto.title())
-                .setBody(messageDto.body())
-                .build())
+            .setNotification(
+                Notification.builder()
+                    .setTitle(messageDto.title())
+                    .setBody(messageDto.body())
+                    .build()
+            )
+            .putData("redirectUrl", messageDto.url())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message)))
@@ -40,10 +43,13 @@ public class MessageService {
     public Mono<Void> sendMessageToMultipleMember(MessageDto messageDto) {
         MulticastMessage message = MulticastMessage.builder()
             .addAllTokens(messageDto.tokens())
-            .setNotification(Notification.builder()
-                .setTitle(messageDto.title())
-                .setBody(messageDto.body())
-                .build())
+            .setNotification(
+                Notification.builder()
+                    .setTitle(messageDto.title())
+                    .setBody(messageDto.body())
+                    .build()
+            )
+            .putData("redirectUrl", messageDto.url())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message)))
@@ -58,12 +64,15 @@ public class MessageService {
             List<MessageDto> batchMessages = messageDtoList.subList(i, Math.min(i + 500, messageDtoList.size()));
 
             MulticastMessage.Builder builder = MulticastMessage.builder();
-            for (int j = 0; j < batchMessages.size(); j++) {
-                builder.addToken(batchMessages.get(j).tokens().get(0))
-                    .setNotification(Notification.builder()
-                        .setTitle(batchMessages.get(j).title())
-                        .setBody(batchMessages.get(j).body())
-                        .build());
+            for (MessageDto dto : batchMessages) {
+                builder.addAllTokens(dto.tokens())
+                    .setNotification(
+                        Notification.builder()
+                            .setTitle(dto.title())
+                            .setBody(dto.body())
+                            .build()
+                    )
+                    .putData("redirectUrl", dto.url());
             }
             multicastMessages.add(builder.build());
         }

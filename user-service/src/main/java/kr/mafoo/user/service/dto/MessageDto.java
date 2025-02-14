@@ -8,19 +8,22 @@ public record MessageDto(
     List<String> receiverMemberIds,
     List<String> tokens,
     String title,
-    String body
+    String body,
+    String url
 ) {
     public static MessageDto fromTemplateWithoutVariables(
         List<String> receiverMemberIds,
         List<String> tokens,
         String title,
-        String body
+        String body,
+        String url
     ) {
         return new MessageDto(
             receiverMemberIds,
             tokens,
             title,
-            body
+            body,
+            url
         );
     }
 
@@ -29,13 +32,15 @@ public record MessageDto(
         List<String> tokens,
         String title,
         String body,
+        String url,
         Map<String, String> variables
     ) {
         return new MessageDto(
             receiverMemberIds,
             tokens,
             convertVariables(title, variables),
-            convertVariables(body, variables)
+            convertVariables(body, variables),
+            convertVariables(url, variables)
         );
     }
 
