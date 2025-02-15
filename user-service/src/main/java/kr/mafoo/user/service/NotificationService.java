@@ -9,6 +9,7 @@ import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
 import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import kr.mafoo.user.exception.NotificationNotFoundException;
 import kr.mafoo.user.service.dto.NotificationDetailDto;
 import kr.mafoo.user.service.dto.MessageDto;
@@ -49,6 +50,7 @@ public class NotificationService {
 
     private Flux<NotificationEntity> sendNotificationWithVariables(String templateId, List<String> receiverMemberIds, String title, String body, String url, Map<String, String> variables) {
         return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
             .collectList()
             .flatMapMany(fcmTokenList -> {
                 List<String> ownerMemberList = fcmTokenList.stream().map(FcmTokenEntity::getOwnerMemberId).toList();
@@ -72,6 +74,7 @@ public class NotificationService {
 
     private Flux<NotificationEntity> sendNotificationWithoutVariables(String templateId, List<String> receiverMemberIds, String title, String body, String url) {
         return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
             .collectList()
             .flatMapMany(fcmTokenList -> {
                 List<String> ownerMemberList = fcmTokenList.stream().map(FcmTokenEntity::getOwnerMemberId).toList();
@@ -83,6 +86,7 @@ public class NotificationService {
 
     private Flux<NotificationEntity> sendNotificationWithDynamicVariables(String templateId, List<String> receiverMemberIds, String title, String body, String url, VariableDomain domain, VariableSort sort, VariableType type) {
         return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
+            .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
             .flatMap(fcmToken -> variableService.getVariableMap(fcmToken.getOwnerMemberId(), domain, sort, type)
                     .map(variableMap -> MessageDto.fromTemplateWithVariables(
                         List.of(fcmToken.getOwnerMemberId()), List.of(fcmToken.getToken()), title, body, url, variableMap))
