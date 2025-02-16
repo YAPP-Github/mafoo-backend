@@ -42,6 +42,9 @@ public class NotificationEntity implements Persistable<String> {
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
+    @Column("deleted_at")
+    private LocalDateTime deletedAt;
+
     @Transient
     private boolean isNew = false;
 
