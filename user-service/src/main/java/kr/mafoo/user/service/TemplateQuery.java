@@ -16,17 +16,17 @@ public class TemplateQuery {
     private final TemplateRepository templateRepository;
 
     public Flux<TemplateEntity> findAll() {
-        return templateRepository.findAll()
+        return templateRepository.findAllByDeletedAtNull()
             .switchIfEmpty(Mono.error(new TemplateNotFoundException()));
     }
 
     public Mono<TemplateEntity> findById(String templateId) {
-        return templateRepository.findById(templateId)
+        return templateRepository.findByTemplateIdAndDeletedAtNull(templateId)
             .switchIfEmpty(Mono.error(new TemplateNotFoundException()));
     }
 
     public Mono<TemplateEntity> findByNotificationType(NotificationType notificationType) {
-        return templateRepository.findByNotificationType(notificationType)
+        return templateRepository.findByNotificationTypeAndDeletedAtNull(notificationType)
             .switchIfEmpty(Mono.error(new TemplateNotFoundException()));
     }
 }

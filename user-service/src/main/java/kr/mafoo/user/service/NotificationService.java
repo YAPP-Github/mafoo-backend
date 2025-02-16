@@ -126,8 +126,6 @@ public class NotificationService {
     @Transactional
     public Mono<Void> removeNotificationBulk(List<String> notificationIds, String requestMemberId) {
         return Flux.fromIterable(notificationIds)
-            .concatMap(notificationId -> notificationQuery.findById(notificationId)
-                .flatMap(notificationCommand::removeNotification)
-            ).then();
+            .concatMap(notificationCommand::removeNotification).then();
     }
 }

@@ -26,7 +26,7 @@ public class TemplateCommand {
         );
     }
 
-    public Mono<Void> removeTemplate(TemplateEntity template) {
-        return templateRepository.delete(template);
+    public Mono<Void> removeTemplate(String templateId) {
+        return templateRepository.softDeleteById(templateId);
     }
 }

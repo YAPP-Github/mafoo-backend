@@ -25,7 +25,7 @@ public class NotificationCommand {
         );
     }
 
-    public Mono<Void> removeNotification(NotificationEntity notification) {
-        return notificationRepository.delete(notification);
+    public Mono<Void> removeNotification(String notificationId) {
+        return notificationRepository.softDeleteById(notificationId);
     }
 }

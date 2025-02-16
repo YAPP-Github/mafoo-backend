@@ -43,7 +43,6 @@ public class FcmTokenService {
     public Mono<Void> removeFcmToken(
         String requestMemberId
     ) {
-        return fcmTokenQuery.findByOwnerMemberId(requestMemberId)
-            .flatMap(fcmTokenCommand::removeFcmToken);
+        return fcmTokenCommand.removeFcmToken(requestMemberId);
     }
 }

@@ -17,12 +17,12 @@ public class FcmTokenQuery {
     private final FcmTokenRepository fcmTokenRepository;
 
     public Flux<FcmTokenEntity> findAll() {
-        return fcmTokenRepository.findAll()
+        return fcmTokenRepository.findByDeletedAtNull()
             .switchIfEmpty(Mono.error(new FcmTokenNotFoundException()));
     }
 
     public Mono<FcmTokenEntity> findByOwnerMemberId(String ownerMemberId) {
-        return fcmTokenRepository.findByOwnerMemberId(ownerMemberId)
+        return fcmTokenRepository.findByOwnerMemberIdAndDeletedAtNull(ownerMemberId)
             .switchIfEmpty(Mono.error(new FcmTokenNotFoundException()));
     }
 
@@ -32,7 +32,7 @@ public class FcmTokenQuery {
     }
 
     public Mono<Void> checkDuplicateExists(String ownerMemberId) {
-        return fcmTokenRepository.findByOwnerMemberId(ownerMemberId)
+        return fcmTokenRepository.findByOwnerMemberIdAndDeletedAtNull(ownerMemberId)
             .switchIfEmpty(Mono.empty())
             .flatMap(fcmToken -> Mono.error(new FcmTokenDuplicatedException()));
     }

@@ -64,7 +64,7 @@ public class ReservationCommand {
         );
     }
 
-    public Mono<Void> removeReservation(ReservationEntity reservation) {
-        return reservationRepository.delete(reservation);
+    public Mono<Void> removeReservation(String reservationId) {
+        return reservationRepository.softDeleteById(reservationId);
     }
 }

@@ -15,12 +15,12 @@ public class NotificationQuery {
     private final NotificationRepository notificationRepository;
 
     public Mono<NotificationEntity> findById(String notificationId) {
-        return notificationRepository.findById(notificationId)
+        return notificationRepository.findByNotificationIdAndDeletedAtNull(notificationId)
             .switchIfEmpty(Mono.error(new NotificationNotFoundException()));
     }
 
     public Flux<NotificationEntity> findAllByReceiverMemberId(String receiverMemberId) {
-        return notificationRepository.findAllByReceiverMemberId(receiverMemberId)
+        return notificationRepository.findAllByReceiverMemberIdAndDeletedAtNull(receiverMemberId)
             .switchIfEmpty(Mono.error(new NotificationNotFoundException()));
     }
 }

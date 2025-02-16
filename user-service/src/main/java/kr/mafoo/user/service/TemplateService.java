@@ -64,7 +64,6 @@ public class TemplateService {
     public Mono<Void> removeTemplate(
         String templateId
     ) {
-        return templateQuery.findById(templateId)
-            .flatMap(templateCommand::removeTemplate);
+        return templateCommand.removeTemplate(templateId);
     }
 }

@@ -59,7 +59,6 @@ public class ReservationService {
     public Mono<Void> removeReservation(
         String reservationId
     ) {
-        return reservationQuery.findById(reservationId)
-            .flatMap(reservationCommand::removeReservation);
+        return reservationCommand.removeReservation(reservationId);
     }
 }

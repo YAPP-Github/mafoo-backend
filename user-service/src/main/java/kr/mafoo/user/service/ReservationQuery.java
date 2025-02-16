@@ -18,22 +18,22 @@ public class ReservationQuery {
     private final ReservationRepository reservationRepository;
 
     public Mono<ReservationEntity> findById(String reservationId) {
-        return reservationRepository.findById(reservationId)
+        return reservationRepository.findByReservationIdAndDeletedAtNull(reservationId)
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 
     public Flux<ReservationEntity> findAllByStatusAndSendAtBefore(ReservationStatus status, LocalDateTime sendAt) {
-        return reservationRepository.findAllByStatusAndSendAtBefore(status, sendAt)
+        return reservationRepository.findAllByStatusAndSendAtBeforeAndDeletedAtNull(status, sendAt)
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 
     public Flux<ReservationEntity> findByTemplateId(String templateId) {
-        return reservationRepository.findAllByTemplateId(templateId)
+        return reservationRepository.findAllByTemplateIdAndDeletedAtNull(templateId)
             .switchIfEmpty(Mono.error(new ReservationNotFoundException()));
     }
 
     public Mono<Void> checkDuplicateExists(String templateId, LocalDateTime sendAt) {
-        return reservationRepository.findByTemplateIdAndSendAt(templateId, sendAt)
+        return reservationRepository.findByTemplateIdAndSendAtAndDeletedAtNull(templateId, sendAt)
             .switchIfEmpty(Mono.empty())
             .flatMap(reservation -> Mono.error(new ReservationDuplicatedException()));
     }

@@ -25,7 +25,7 @@ public class FcmTokenCommand {
         );
     }
 
-    public Mono<Void> removeFcmToken(FcmTokenEntity fcmToken) {
-        return fcmTokenRepository.delete(fcmToken);
+    public Mono<Void> removeFcmToken(String memberId) {
+        return fcmTokenRepository.softDeleteByMemberId(memberId);
     }
 }
