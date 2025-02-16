@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
+import kr.mafoo.photo.controller.dto.request.ObjectStorageRecapPreSignedUrlRequest;
 import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public interface ObjectStorageApi {
     @PostMapping
     Mono<PreSignedUrlResponse> createPreSignedUrls(
             @RequestMemberId
-            String memberId,
+            String requestMemberId,
 
             @RequestBody
             ObjectStoragePreSignedUrlRequest request
@@ -28,10 +29,10 @@ public interface ObjectStorageApi {
     @PostMapping("/recap")
     Mono<PreSignedUrlResponse> createRecapPreSignedUrls(
             @RequestMemberId
-            String memberId,
+            String requestMemberId,
 
             @RequestBody
-            ObjectStoragePreSignedUrlRequest request
+            ObjectStorageRecapPreSignedUrlRequest request
     );
 
 }
