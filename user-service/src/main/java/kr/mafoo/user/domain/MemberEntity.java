@@ -29,11 +29,14 @@ public class MemberEntity implements Persistable<String> {
     @Column("serial_number")
     private Integer serialNumber;
 
+    @Column("profile_img_url")
+    private String profileImageUrl;
+
     @Column("created_at")
     private LocalDateTime createdAt;
 
-    @Column("profile_img_url")
-    private String profileImageUrl;
+    @Column("deleted_at")
+    private LocalDateTime deletedAt;
 
     @Transient
     private boolean isNew = false;

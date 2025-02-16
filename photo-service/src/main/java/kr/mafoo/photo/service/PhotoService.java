@@ -8,8 +8,6 @@ import kr.mafoo.photo.domain.PhotoEntity;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexIsSameException;
 import kr.mafoo.photo.exception.PhotoDisplayIndexNotValidException;
-import kr.mafoo.photo.repository.PhotoRepository;
-import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -41,9 +39,6 @@ public class PhotoService {
 
     private final QrService qrService;
     private final ObjectStorageService objectStorageService;
-
-    // FIXME : 추후 제거 필요
-    private final PhotoRepository photoRepository;
 
     @Transactional(readOnly = true)
     public Flux<PhotoEntity> findPhotoListByAlbumId(String albumId, String requestMemberId, String sort) {
@@ -105,10 +100,7 @@ public class PhotoService {
                                     return bytes;
                                 })
                                 .flatMap(bytes -> objectStorageService.uploadFile(bytes)
-                                        .flatMap(photoUrl -> {
-                                            PhotoEntity photoEntity = PhotoEntity.newPhoto(IdGenerator.generate(), photoUrl, BrandType.EXTERNAL, null, 0, requestMemberId);
-                                            return photoRepository.save(photoEntity);
-                                        }))
+                                        .flatMap(photoUrl -> photoCommand.addPhoto(photoUrl, BrandType.EXTERNAL, null, 0, requestMemberId)))
                                 .subscribeOn(Schedulers.boundedElastic())
 
                 ).sequential();
@@ -132,10 +124,9 @@ public class PhotoService {
                 return Flux.fromArray(photoIds)
                     .concatMap(photoId -> photoQuery.findByPhotoId(photoId)
                         .flatMap(photo -> albumPermissionVerifier.verifyOwnershipOrAccessPermission(photo.getAlbumId(), requestMemberId, FULL_ACCESS)
-                                .flatMap(oldAlbum -> albumCommand.decreaseAlbumPhotoCount(oldAlbum, 1))
-                                .then(photoCommand.popDisplayIndexGreaterThan(photo.getAlbumId(), photo.getDisplayIndex())
-                                    .thenReturn(photo)
-                                )
+                            .flatMap(oldAlbum -> albumCommand.decreaseAlbumPhotoCount(oldAlbum, 1))
+                            .thenMany(photoCommand.modifyPhotosByAlbumIdToDecreaseDisplayIndexGreaterThan(photo.getAlbumId(), photo.getDisplayIndex()))
+                            .then(Mono.just(photo))
                         )
                         .flatMap(photo -> photoCommand.modifyPhotoAlbumId(photo, albumId, displayIndex.getAndIncrement(), newAlbum.getOwnerMemberId())
                         )
@@ -148,7 +139,7 @@ public class PhotoService {
             });
     }
 
-    // FIXME : 추후 수정 필요
+    // FIXME : 추후 if문 개선 필요
     @Transactional
     public Mono<PhotoEntity> modifyPhotoDisplayIndex(String photoId, Integer newIndex, String requestMemberId) {
         return photoPermissionVerifier.verifyAccessPermission(photoId, requestMemberId, FULL_ACCESS)
@@ -166,13 +157,13 @@ public class PhotoService {
                                     }
 
                                     if (photoEntity.getDisplayIndex() < targetIndex) {
-                                        return photoRepository
-                                                .popDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
-                                                .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                                        return photoCommand
+                                                .modifyPhotosByAlbumIdToDecreaseDisplayIndexBetween(photoEntity.getAlbumId(), photoEntity.getDisplayIndex() + 1, targetIndex)
+                                                .then(photoCommand.modifyPhotoDisplayIndex(photoEntity, targetIndex));
                                     } else {
-                                        return photoRepository
-                                                .pushDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
-                                                .then(photoRepository.save(photoEntity.updateDisplayIndex(targetIndex)));
+                                        return photoCommand
+                                                .modifyPhotosByAlbumIdToIncreaseDisplayIndexBetween(photoEntity.getAlbumId(), targetIndex, photoEntity.getDisplayIndex() - 1)
+                                                .then(photoCommand.modifyPhotoDisplayIndex(photoEntity, targetIndex));
                                     }
                                 })
                 );

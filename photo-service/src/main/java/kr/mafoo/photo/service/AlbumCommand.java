@@ -1,11 +1,13 @@
 package kr.mafoo.photo.service;
 
+import java.util.List;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.repository.AlbumRepository;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -39,8 +41,12 @@ public class AlbumCommand {
         return albumRepository.save(album.decreasePhotoCount(count));
     }
 
-    public Mono<Void> removeAlbum(AlbumEntity album) {
-        return albumRepository.delete(album);
+    public Mono<Void> removeAlbum(String albumId) {
+        return albumRepository.softDeleteById(albumId);
+    }
+
+    public Flux<Void> removeAlbumByOwnerMemberId(String ownerMemberId) {
+        return albumRepository.softDeleteByOwnerMemberId(ownerMemberId);
     }
 
 }

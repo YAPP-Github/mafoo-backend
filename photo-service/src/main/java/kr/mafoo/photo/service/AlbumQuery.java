@@ -1,6 +1,5 @@
 package kr.mafoo.photo.service;
 
-import java.time.Duration;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.exception.AlbumNotFoundException;
@@ -21,12 +20,12 @@ public class AlbumQuery {
     private final AlbumRepository albumRepository;
 
     public Mono<AlbumEntity> findById(String albumId) {
-        return albumRepository.findById(albumId)
+        return albumRepository.findByAlbumIdAndDeletedAtIsNull(albumId)
             .switchIfEmpty(Mono.error(new AlbumNotFoundException()));
     }
 
     public Flux<AlbumEntity> findByMemberId(String memberId) {
-        return albumRepository.findAllByOwnerMemberIdOrderByDisplayIndex(memberId)
+        return albumRepository.findAllByOwnerMemberIdAndDeletedAtIsNullOrderByDisplayIndex(memberId)
             .switchIfEmpty(Mono.error(new AlbumNotFoundException()));
     }
 

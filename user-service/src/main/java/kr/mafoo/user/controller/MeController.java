@@ -5,6 +5,7 @@ import kr.mafoo.user.controller.dto.request.ChangeNameRequest;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -21,9 +22,14 @@ public class MeController implements MeApi {
     }
 
     @Override
-    public Mono<Void> deleteMemberWhoRequested(String memberId) {
+    public Mono<Void> deleteMemberWhoRequested(
+        String memberId,
+        ServerHttpRequest serverHttpRequest
+    ) {
+        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
+
         return memberService
-                .quitMemberByMemberId(memberId);
+                .quitMemberByMemberId(memberId, authorizationToken);
     }
 
     @Override

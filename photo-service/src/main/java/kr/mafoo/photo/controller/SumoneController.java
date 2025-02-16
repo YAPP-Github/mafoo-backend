@@ -119,7 +119,7 @@ public class SumoneController {
             }
             return objectStorageService
                     .createPreSignedUrls(request.fileNames(), album.getOwnerMemberId())
-                    .map(PreSignedUrlResponse::fromStringArray);
+                    .map(PreSignedUrlResponse::fromList);
         });
     }
 

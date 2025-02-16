@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.photo.annotation.RequestMemberId;
 import kr.mafoo.photo.controller.dto.request.ObjectStoragePreSignedUrlRequest;
+import kr.mafoo.photo.controller.dto.request.ObjectStorageRecapPreSignedUrlRequest;
 import kr.mafoo.photo.controller.dto.response.PreSignedUrlResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public interface ObjectStorageApi {
     @PostMapping
     Mono<PreSignedUrlResponse> createPreSignedUrls(
             @RequestMemberId
-            String memberId,
+            String requestMemberId,
 
             @RequestBody
             ObjectStoragePreSignedUrlRequest request
@@ -27,8 +28,11 @@ public interface ObjectStorageApi {
     @Operation(summary = "리캡 Pre-signed Url 요청", description = "리캡 생성을 위한 Pre-signed Url 목록을 발급합니다.")
     @PostMapping("/recap")
     Mono<PreSignedUrlResponse> createRecapPreSignedUrls(
+            @RequestMemberId
+            String requestMemberId,
+
             @RequestBody
-            ObjectStoragePreSignedUrlRequest request
+            ObjectStorageRecapPreSignedUrlRequest request
     );
 
 }

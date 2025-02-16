@@ -37,7 +37,6 @@ dependencies {
 	implementation("com.github.f4b6a3:ulid-creator:5.2.3")
 	implementation("io.awspring.cloud:spring-cloud-starter-aws:2.4.4")
 	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.2")
-	implementation("io.opentelemetry:opentelemetry-exporter-zipkin:1.40.0")
 	implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
 	implementation("com.slack.api:slack-api-client:1.40.3")
 	implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")

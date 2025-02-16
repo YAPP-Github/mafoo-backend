@@ -22,17 +22,19 @@ public class MemberService {
     private final SlackService slackService;
     private final SharedMemberService sharedMemberService;
 
+    private final MemberDataService memberDataService;
+
     @Transactional
-    public Mono<Void> quitMemberByMemberId(String memberId) {
-        return socialMemberRepository
-                .deleteSocialMemberByMemberId(memberId)
-                .then(memberRepository.deleteMemberById(memberId));
+    public Mono<Void> quitMemberByMemberId(String memberId, String token) {
+        return socialMemberRepository.softDeleteByMemberId(memberId)
+            .then(memberRepository.softDeleteById(memberId))
+            .then(memberDataService.deleteMemberData(token));
     }
 
     @Transactional(readOnly = true)
     public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId, String token) {
         return memberRepository
-            .findAllByNameContaining(keyword)
+            .findAllByNameContainingAndDeletedAtIsNull(keyword)
             .filter(member -> !member.getId().equals(memberId))
             .switchIfEmpty(Mono.empty())
             .concatMap(member -> sharedMemberService.getSharedMemberInfoByAlbumId(albumId, member.getId(), token)
@@ -43,7 +45,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Mono<MemberEntity> getMemberByMemberId(String memberId) {
         return memberRepository
-                .findById(memberId)
+                .findByIdAndDeletedAtIsNull(memberId)
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()));
     }
 
@@ -53,7 +55,7 @@ public class MemberService {
 
         return memberRepository.save(memberEntity)
             .flatMap(savedMember ->
-                memberRepository.findById(savedMember.getId())
+                memberRepository.findByIdAndDeletedAtIsNull(savedMember.getId())
                     .flatMap(fetchedMember ->
                         slackService.sendNewMemberNotification(
                             fetchedMember.getSerialNumber(),
@@ -71,7 +73,7 @@ public class MemberService {
     @Transactional
     public Mono<MemberEntity> changeName(String memberId, String name) {
         return memberRepository
-                .findById(memberId)
+                .findByIdAndDeletedAtIsNull(memberId)
                 .switchIfEmpty(Mono.error(new MemberNotFoundException()))
                 .map(member -> {
                     member.setName(name);

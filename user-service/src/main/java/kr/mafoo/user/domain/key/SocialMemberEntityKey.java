@@ -1,4 +1,4 @@
-package kr.mafoo.user.domain;
+package kr.mafoo.user.domain.key;
 
 import kr.mafoo.user.enums.IdentityProvider;
 import lombok.Data;

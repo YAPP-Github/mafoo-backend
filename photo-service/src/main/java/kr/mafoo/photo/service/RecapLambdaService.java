@@ -1,5 +1,7 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.PermissionLevel.DOWNLOAD_ACCESS;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +14,22 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class RecapLambdaService {
-    private final WebClient client;
 
-    public RecapLambdaService(@Qualifier("recapLambdaClient") WebClient client) {
+    private final WebClient client;
+    private final AlbumPermissionVerifier albumPermissionVerifier;
+
+    public RecapLambdaService(
+        @Qualifier("recapLambdaClient")
+        WebClient client,
+        AlbumPermissionVerifier albumPermissionVerifier
+    ) {
         this.client = client;
+        this.albumPermissionVerifier = albumPermissionVerifier;
+    }
+
+    public Mono<RecapUrlDto> generateMafooRecapVideo(List<String> recapPhotoUrls, String albumId, String requestMemberId) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, DOWNLOAD_ACCESS)
+                .then(generateVideo(recapPhotoUrls));
     }
 
     public Mono<RecapUrlDto> generateVideo(List<String> recapPhotoUrls) {
