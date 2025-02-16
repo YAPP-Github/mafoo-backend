@@ -11,6 +11,7 @@ import kr.mafoo.photo.domain.enums.AlbumSortType;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.SortOrder;
 import kr.mafoo.photo.service.AlbumService;
+import kr.mafoo.photo.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 public class AlbumController implements AlbumApi {
 
     private final AlbumService albumService;
+    private final EventService eventService;
 
     @Override
     public Flux<ViewableAlbumResponse> getAlbumListByMember(
@@ -62,7 +64,7 @@ public class AlbumController implements AlbumApi {
             throw new RuntimeException(); // should not be happened
         }
         if(request.sumoneInviteCode() != null) {
-            return albumService
+            return eventService
                     .addSumoneAlbum(request.name(), request.type(), memberId, request.sumoneInviteCode())
                     .map(AlbumResponse::fromEntity);
         }

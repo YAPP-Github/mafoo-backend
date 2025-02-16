@@ -33,6 +33,7 @@ app:
       redirect-uri: ${KAKAO_REDIRECT_URL}
     apple:
       client-id: ${APPLE_CLIENT_ID}
+      native-client-id: ${APPLE_NATIVE_CLIENT_ID}
   jwt:
     verify-key: ${JWT_VERIFY_KEY}
     expiration:

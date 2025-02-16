@@ -1,5 +1,6 @@
 package kr.mafoo.photo.repository;
 
+import java.util.List;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.enums.AlbumType;
 import org.springframework.data.domain.Pageable;
@@ -10,21 +11,32 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface AlbumRepository extends R2dbcRepository<AlbumEntity, String> {
-    Flux<AlbumEntity> findAllByOwnerMemberIdOrderByDisplayIndex(String ownerMemberId);
+
+    Mono<AlbumEntity> findByAlbumIdAndDeletedAtIsNull(String albumId);
+
+    Flux<AlbumEntity> findAllByOwnerMemberIdAndDeletedAtIsNullOrderByDisplayIndex(String ownerMemberId);
 
     @Modifying
-    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId")
-    Mono<Void> pushDisplayIndex(String ownerMemberId);
+    @Query("UPDATE album SET deleted_at = NOW() WHERE id = :albumId AND deleted_at IS NULL")
+    Mono<Void> softDeleteById(String albumId);
 
     @Modifying
-    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId " +
-            "AND display_index BETWEEN :startIndex AND :lastIndex")
-    Mono<Void> pushDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
+    @Query("UPDATE album SET deleted_at = NOW() WHERE owner_member_id = :ownerMemberId AND deleted_at IS NULL")
+    Flux<Void> softDeleteByOwnerMemberId(String ownerMemberId);
 
-    @Modifying
-    @Query("UPDATE album SET display_index = display_index -1 WHERE owner_member_id = :ownerMemberId " +
-            "AND display_index BETWEEN :startIndex AND :lastIndex")
-    Mono<Void> popDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
+//    @Modifying
+//    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId")
+//    Mono<Void> pushDisplayIndex(String ownerMemberId);
+//
+//    @Modifying
+//    @Query("UPDATE album SET display_index = display_index + 1 WHERE owner_member_id = :ownerMemberId " +
+//            "AND display_index BETWEEN :startIndex AND :lastIndex")
+//    Mono<Void> pushDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
+//
+//    @Modifying
+//    @Query("UPDATE album SET display_index = display_index -1 WHERE owner_member_id = :ownerMemberId " +
+//            "AND display_index BETWEEN :startIndex AND :lastIndex")
+//    Mono<Void> popDisplayIndexBetween(String ownerMemberId, Integer startIndex, Integer lastIndex);
 
     Flux<AlbumEntity> findAllByOrderByAlbumIdDesc(Pageable pageable);
 

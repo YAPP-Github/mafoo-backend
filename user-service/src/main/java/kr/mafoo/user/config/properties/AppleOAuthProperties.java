@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBindin
 @ConfigurationProperties(prefix = "app.oauth.apple")
 @ConfigurationPropertiesBinding
 public record AppleOAuthProperties(
-        String clientId
+        String clientId,
+        String nativeClientId
 ) {
 }

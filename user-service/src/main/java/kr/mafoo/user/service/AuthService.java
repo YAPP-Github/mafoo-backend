@@ -92,7 +92,7 @@ public class AuthService {
 
     private Mono<AuthToken> getOrCreateMember(IdentityProvider provider, String id, String username, String profileImageUrl, String userAgent) {
         return socialMemberRepository
-                .findByIdentityProviderAndId(provider, id)
+                .findByIdentityProviderAndIdAndDeletedAtIsNull(provider, id)
                 .switchIfEmpty(createNewSocialMember(provider, id, username, profileImageUrl, userAgent))
                 .map(socialMember -> {
                     String accessToken = jwtTokenService.generateAccessToken(socialMember.getMemberId());
@@ -172,8 +172,8 @@ public class AuthService {
                     .parseSignedClaims(identityToken);
 
             Set<String> audienceList = claims.getPayload().get("aud", Set.class);
-            if (audienceList == null || !audienceList.contains(appleOAuthProperties.clientId())) {
-                throw new RuntimeException();
+            if (audienceList == null || (!audienceList.contains(appleOAuthProperties.clientId()) && !audienceList.contains(appleOAuthProperties.nativeClientId()))) {
+                throw new RuntimeException("Invalid audience: " + audienceList);
             }
 
             return new AppleLoginInfo(claims.getPayload().get("sub", String.class));

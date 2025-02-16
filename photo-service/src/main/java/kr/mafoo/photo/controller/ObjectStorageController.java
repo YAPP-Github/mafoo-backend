@@ -26,6 +26,7 @@ public class ObjectStorageController implements ObjectStorageApi {
 
     @Override
     public Mono<PreSignedUrlResponse> createRecapPreSignedUrls(
+        String memberId,
         ObjectStoragePreSignedUrlRequest request
     ) {
         return objectStorageService
