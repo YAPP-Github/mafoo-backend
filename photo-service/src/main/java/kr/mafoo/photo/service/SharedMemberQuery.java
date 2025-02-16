@@ -30,7 +30,7 @@ public class SharedMemberQuery {
     }
 
     public Flux<SharedMemberEntity> findByMemberId(String memberId) {
-        return sharedMemberRepository.findByMemberId(memberId)
+        return sharedMemberRepository.findByMemberIdAndDeletedAtIsNull(memberId)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 

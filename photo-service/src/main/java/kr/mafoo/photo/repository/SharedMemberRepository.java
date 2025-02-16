@@ -13,17 +13,13 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEntity, String> {
-    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList)")
+    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND deleted_at IS NULL")
     Flux<SharedMemberEntity> findAllByAlbumIdList(List<String> albumIdList);
 
-    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND member_id != :memberId")
+    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND member_id != :memberId AND deleted_at IS NULL")
     Flux<SharedMemberEntity> findAllByAlbumIdListAndMemberIdNot(List<String> albumIdList, String memberId);
 
-    Flux<SharedMemberEntity> findByMemberId(String memberId);
-    Flux<SharedMemberEntity> findAllByAlbumIdAndShareStatusNot(String albumId, ShareStatus status);
-    Flux<SharedMemberEntity> findAllByMemberIdAndShareStatusNot(String memberId, ShareStatus status);
-    Mono<SharedMemberEntity> findByAlbumIdAndMemberIdAndShareStatus(String albumId, String memberId, ShareStatus status);
-    Mono<SharedMemberEntity> findByAlbumIdAndMemberId(String albumId, String memberId);
+    Flux<SharedMemberEntity> findByMemberIdAndDeletedAtIsNull(String memberId);
 
     Mono<SharedMemberEntity> findByIdAndDeletedAtIsNull(String id);
 
