@@ -3,6 +3,7 @@ package kr.mafoo.photo.repository;
 import java.util.List;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.ShareStatus;
+
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
@@ -12,6 +13,13 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEntity, String> {
+    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND deleted_at IS NULL")
+    Flux<SharedMemberEntity> findAllByAlbumIdList(List<String> albumIdList);
+
+    @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND member_id != :memberId AND deleted_at IS NULL")
+    Flux<SharedMemberEntity> findAllByAlbumIdListAndMemberIdNot(List<String> albumIdList, String memberId);
+
+    Flux<SharedMemberEntity> findByMemberIdAndDeletedAtIsNull(String memberId);
 
     Mono<SharedMemberEntity> findByIdAndDeletedAtIsNull(String id);
 

@@ -4,7 +4,7 @@ import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 
-public record SharedMemberDto(
+public record SharedMemberForAlbumDto(
     String sharedMemberId,
     ShareStatus shareStatus,
     PermissionLevel permissionLevel,
@@ -13,11 +13,11 @@ public record SharedMemberDto(
     String profileImageUrl,
     String serialNumber
 ) {
-    public static SharedMemberDto fromSharedMember(
+    public static SharedMemberForAlbumDto fromSharedMember(
         SharedMemberEntity entity,
         MemberDto dto
     ) {
-        return new SharedMemberDto(
+        return new SharedMemberForAlbumDto(
             entity.getSharedMemberId(),
             entity.getShareStatus(),
             entity.getPermissionLevel(),

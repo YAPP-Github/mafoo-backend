@@ -7,7 +7,7 @@ import kr.mafoo.photo.domain.enums.AlbumType;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
 
-public record AlbumDto(
+public record ViewableAlbumDto(
     String albumId,
     String name,
     AlbumType type,
@@ -21,18 +21,19 @@ public record AlbumDto(
     PermissionLevel permissionLevel,
     LocalDateTime createdAt
 ) {
-    public static AlbumDto fromOwnedAlbum(
-        AlbumEntity albumEntity
+    public static ViewableAlbumDto fromOwnedAlbum(
+        AlbumEntity albumEntity,
+        MemberDto ownerMemberDto
     ) {
-        return new AlbumDto(
+        return new ViewableAlbumDto(
             albumEntity.getAlbumId(),
             albumEntity.getName(),
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
             albumEntity.getOwnerMemberId(),
-            null,
-            null,
-            null,
+            ownerMemberDto.name(),
+            ownerMemberDto.profileImageUrl(),
+            ownerMemberDto.serialNumber(),
             null,
             null,
             null,
@@ -40,20 +41,20 @@ public record AlbumDto(
         );
     }
 
-    public static AlbumDto fromSharedAlbum(
+    public static ViewableAlbumDto fromSharedAlbum(
         AlbumEntity albumEntity,
-        SharedMemberEntity sharedMemberEntity,
-        MemberDto memberDto
+        MemberDto ownerMemberDto,
+        SharedMemberEntity sharedMemberEntity
     ) {
-        return new AlbumDto(
+        return new ViewableAlbumDto(
             albumEntity.getAlbumId(),
             albumEntity.getName(),
             albumEntity.getType(),
             albumEntity.getPhotoCount(),
             albumEntity.getOwnerMemberId(),
-            memberDto.name(),
-            memberDto.profileImageUrl(),
-            memberDto.serialNumber(),
+            ownerMemberDto.name(),
+            ownerMemberDto.profileImageUrl(),
+            ownerMemberDto.serialNumber(),
             sharedMemberEntity.getSharedMemberId(),
             sharedMemberEntity.getShareStatus(),
             sharedMemberEntity.getPermissionLevel(),

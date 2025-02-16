@@ -59,3 +59,6 @@ slack:
     channel:
       error: ${SLACK_ERROR_CHANNEL}
       member: ${SLACK_MEMBER_CHANNEL}
+
+cloud:
+  firebase: ${FIREBASE_SECRET}

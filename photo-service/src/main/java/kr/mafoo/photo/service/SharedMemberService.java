@@ -2,14 +2,25 @@ package kr.mafoo.photo.service;
 
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.ShareStatus.PENDING;
+import static kr.mafoo.photo.domain.enums.SortOrder.DESC;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.SharedMemberEntity;
+import kr.mafoo.photo.domain.enums.PermissionLevel;
 import kr.mafoo.photo.domain.enums.ShareStatus;
+import kr.mafoo.photo.domain.enums.SharedMemberSortType;
+import kr.mafoo.photo.domain.enums.SortOrder;
+import kr.mafoo.photo.exception.AlbumNotFoundException;
+import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.exception.SharedMemberPermissionDeniedException;
+import kr.mafoo.photo.service.dto.SharedMemberDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -20,6 +31,81 @@ public class SharedMemberService {
     private final SharedMemberCommand sharedMemberCommand;
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
+
+    private final MemberService memberService;
+    private final AlbumQuery albumQuery;
+
+    @Transactional(readOnly = true)
+    public Mono<SharedMemberDetailDto> findSharedMemberVariablesInOwnedAlbum(
+        ShareStatus shareStatus, PermissionLevel permissionLevel, SharedMemberSortType sort, SortOrder order, String memberId) {
+
+        return albumQuery.findByMemberId(memberId)
+            .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
+            .collectList()
+            .filter(albumList -> !albumList.isEmpty())
+            .flatMap(albumList -> {
+                List<String> albumIdList = albumList.stream().map(AlbumEntity::getAlbumId).toList();
+                return sharedMemberQuery.findAllByAlbumIdList(albumIdList)
+                    .onErrorResume(SharedMemberNotFoundException.class, ex -> Flux.empty())
+                    .collectList()
+                    .flatMap(sharedMembers -> findSharedMemberVariables(sharedMembers, shareStatus, permissionLevel, sort, order));
+            });
+    }
+
+    @Transactional(readOnly = true)
+    public Mono<SharedMemberDetailDto> findSharedMemberVariablesInSharedAlbum(
+        ShareStatus shareStatus, PermissionLevel permissionLevel, SharedMemberSortType sort, SortOrder order, String memberId) {
+
+        return sharedMemberQuery.findByMemberId(memberId)
+            .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
+            .collectList()
+            .filter(sharedMemberList -> !sharedMemberList.isEmpty())
+            .flatMap(sharedMemberList -> {
+                List<String> albumIdList = sharedMemberList.stream().map(SharedMemberEntity::getAlbumId).toList();
+                return sharedMemberQuery.findAllByAlbumIdListAndMemberIdNot(albumIdList, memberId)
+                    .onErrorResume(SharedMemberNotFoundException.class, ex -> Flux.empty())
+                    .collectList()
+                    .flatMap(sharedMembers -> findSharedMemberVariables(sharedMembers, shareStatus, permissionLevel, sort, order));
+            });
+    }
+
+    private Mono<SharedMemberDetailDto> findSharedMemberVariables(List<SharedMemberEntity> sharedMemberEntities, ShareStatus shareStatus, PermissionLevel permissionLevel, SharedMemberSortType sort, SortOrder order) {
+
+        Comparator<SharedMemberEntity> comparator = getComparator(sort, order);
+
+        return Flux.fromIterable(sharedMemberEntities)
+            .filter(sharedMember -> isShareStatusMatching(sharedMember, shareStatus))
+            .filter(sharedMember -> isPermissionLevelMatching(sharedMember, permissionLevel))
+            .collectSortedList(comparator)
+            .flatMapIterable(sharedMember -> sharedMember)
+            .next()
+            .flatMap(this::getSharedMemberDetail);
+    }
+
+    private Mono<SharedMemberDetailDto> getSharedMemberDetail(SharedMemberEntity sharedMember) {
+        return albumQuery.findById(sharedMember.getAlbumId())
+            .flatMap(album -> memberService.getMemberInfoById(sharedMember.getMemberId())
+                .map(memberInfo -> SharedMemberDetailDto.fromSharedMember(sharedMember, memberInfo, album))
+            );
+    }
+
+    private boolean isShareStatusMatching(SharedMemberEntity sharedMember, ShareStatus shareStatus) {
+        return shareStatus == null || sharedMember.getShareStatus().equals(shareStatus);
+    }
+
+    private boolean isPermissionLevelMatching(SharedMemberEntity sharedMember, PermissionLevel permissionLevel) {
+        return permissionLevel == null || sharedMember.getPermissionLevel().equals(permissionLevel);
+    }
+
+    private Comparator<SharedMemberEntity> getComparator(SharedMemberSortType sort, SortOrder order) {
+        Comparator<SharedMemberEntity> comparator = Comparator.comparing(SharedMemberEntity::getCreatedAt);
+
+        if (DESC.equals(order)) {
+            return comparator.reversed();
+        } else {
+            return comparator;
+        }
+    }
 
     @Transactional(readOnly = true)
     public Mono<SharedMemberEntity> findSharedMemberByAlbumIdAndMemberId(String albumId, String requestMemberId) {

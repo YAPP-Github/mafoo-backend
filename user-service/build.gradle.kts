@@ -52,6 +52,8 @@ dependencies {
 
 	implementation("com.slack.api:slack-api-client:1.40.3")
 
+	implementation("com.google.firebase:firebase-admin:9.3.0")
+
 }
 
 tasks.withType<Test>().all {

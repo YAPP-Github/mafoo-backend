@@ -9,7 +9,12 @@ import kr.mafoo.photo.annotation.ULID;
 import kr.mafoo.photo.controller.dto.request.SharedMemberCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdatePermissionRequest;
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdateStatusRequest;
+import kr.mafoo.photo.controller.dto.response.SharedMemberDetailResponse;
 import kr.mafoo.photo.controller.dto.response.SharedMemberResponse;
+import kr.mafoo.photo.domain.enums.PermissionLevel;
+import kr.mafoo.photo.domain.enums.ShareStatus;
+import kr.mafoo.photo.domain.enums.SharedMemberSortType;
+import kr.mafoo.photo.domain.enums.SortOrder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -18,6 +23,41 @@ import reactor.core.publisher.Mono;
 @Tag(name = "공유 사용자 관련 API", description = "공유 사용자 조회, 생성, 변경, 삭제 등 API")
 @RequestMapping("/v1/shared-members")
 public interface SharedMemberApi {
+    @GetMapping("/owned-albums/variables")
+    Mono<SharedMemberDetailResponse> getSharedMemberVariablesInOwnedAlbum(
+        @RequestParam(required = false)
+        ShareStatus shareStatus,
+
+        @RequestParam(required = false)
+        PermissionLevel permissionLevel,
+
+        @RequestParam
+        SharedMemberSortType sort,
+
+        @RequestParam
+        SortOrder order,
+
+        @RequestParam
+        String memberId
+    );
+
+    @GetMapping("/shared-albums/variables")
+    Mono<SharedMemberDetailResponse> getSharedMemberVariablesInSharedAlbum(
+        @RequestParam(required = false)
+        ShareStatus shareStatus,
+
+        @RequestParam(required = false)
+        PermissionLevel permissionLevel,
+
+        @RequestParam
+        SharedMemberSortType sort,
+
+        @RequestParam
+        SortOrder order,
+
+        @RequestParam
+        String memberId
+    );
 
     @Operation(summary = "공유 사용자 조회", description = "앨범 ID 및 사용자 ID에 해당하는 공유 사용자를 조회합니다.")
     @GetMapping

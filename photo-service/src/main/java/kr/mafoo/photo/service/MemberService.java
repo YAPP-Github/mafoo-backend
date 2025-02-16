@@ -18,20 +18,19 @@ public class MemberService {
 
     private final WebClient client;
 
-    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
+    public Mono<MemberDto> getMemberInfoById(String memberId) {
         return client
             .get()
-            .uri(endpoint + "/user/v1/me")
-            .header("Authorization", "Bearer " + authorizationToken)
+            .uri(endpoint + "/user/v1/members/" + memberId)
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToMono(MemberDto.class);
     }
 
-    public Mono<MemberDto> getMemberInfoById(String memberId, String authorizationToken) {
+    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
         return client
             .get()
-            .uri(endpoint + "/user/v1/members/" + memberId)
+            .uri(endpoint + "/user/v1/me")
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))

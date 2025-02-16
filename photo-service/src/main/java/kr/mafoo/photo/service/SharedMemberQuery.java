@@ -3,6 +3,7 @@ package kr.mafoo.photo.service;
 import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 import static kr.mafoo.photo.domain.enums.ShareStatus.REJECTED;
 
+import java.util.List;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.exception.SharedMemberDuplicatedException;
 import kr.mafoo.photo.exception.SharedMemberNotFoundException;
@@ -17,6 +18,21 @@ import reactor.core.publisher.Mono;
 public class SharedMemberQuery {
 
     private final SharedMemberRepository sharedMemberRepository;
+
+    public Flux<SharedMemberEntity> findAllByAlbumIdList(List<String> albumIdList) {
+        return sharedMemberRepository.findAllByAlbumIdList(albumIdList)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
+    public Flux<SharedMemberEntity> findAllByAlbumIdListAndMemberIdNot(List<String> albumIdList, String memberId) {
+        return sharedMemberRepository.findAllByAlbumIdListAndMemberIdNot(albumIdList, memberId)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
+    public Flux<SharedMemberEntity> findByMemberId(String memberId) {
+        return sharedMemberRepository.findByMemberIdAndDeletedAtIsNull(memberId)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
 
     public Flux<SharedMemberEntity> findAllByAlbumIdWhereStatusNotRejected(String albumId) {
         return sharedMemberRepository.findAllByAlbumIdAndShareStatusNotAndDeletedAtIsNull(albumId, REJECTED)

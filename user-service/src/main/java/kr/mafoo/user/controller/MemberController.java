@@ -30,7 +30,6 @@ public class MemberController implements MemberApi {
 
     @Override
     public Mono<MemberResponse> getMember(
-        String requesterId,
         String memberId
     ) {
         return memberService.getMemberByMemberId(memberId)

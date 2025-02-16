@@ -4,13 +4,15 @@ import kr.mafoo.photo.api.AlbumApi;
 import kr.mafoo.photo.controller.dto.request.AlbumCreateRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateNameAndTypeRequest;
 import kr.mafoo.photo.controller.dto.request.AlbumUpdateOwnershipRequest;
-import kr.mafoo.photo.controller.dto.response.AlbumDetailResponse;
+import kr.mafoo.photo.controller.dto.response.ViewableAlbumResponse;
 import kr.mafoo.photo.controller.dto.response.AlbumResponse;
-import kr.mafoo.photo.controller.dto.response.SharedAlbumResponse;
+import kr.mafoo.photo.controller.dto.response.ViewableAlbumDetailResponse;
+import kr.mafoo.photo.domain.enums.AlbumSortType;
+import kr.mafoo.photo.domain.enums.AlbumType;
+import kr.mafoo.photo.domain.enums.SortOrder;
 import kr.mafoo.photo.service.AlbumService;
 import kr.mafoo.photo.service.EventService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,28 +25,34 @@ public class AlbumController implements AlbumApi {
     private final EventService eventService;
 
     @Override
-    public Flux<AlbumDetailResponse> getAlbumListByMember(
-            String memberId,
-            ServerHttpRequest serverHttpRequest
+    public Flux<ViewableAlbumResponse> getAlbumListByMember(
+            String memberId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
         return albumService
-                .findAlbumListByMemberId(memberId, authorizationToken)
-                .map(AlbumDetailResponse::fromDto);
+                .findViewableAlbumListByMemberId(memberId)
+                .map(ViewableAlbumResponse::fromDto);
     }
 
     @Override
-    public Mono<SharedAlbumResponse> getAlbum(
-            String memberId,
-            String albumId,
-            ServerHttpRequest serverHttpRequest
+    public Mono<ViewableAlbumResponse> getAlbumVariables(
+            AlbumType albumType,
+            AlbumSortType sort,
+            SortOrder order,
+            String memberId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
         return albumService
-                .findAlbumDetailById(albumId, memberId, authorizationToken)
-                .map(SharedAlbumResponse::fromDto);
+                .findViewableAlbumVariables(albumType, sort, order, memberId)
+                .map(ViewableAlbumResponse::fromDto);
+    }
+
+    @Override
+    public Mono<ViewableAlbumDetailResponse> getAlbum(
+            String memberId,
+            String albumId
+    ) {
+        return albumService
+                .findViewableAlbumDetailById(albumId, memberId)
+                .map(ViewableAlbumDetailResponse::fromDto);
     }
 
     @Override
