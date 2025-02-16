@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum VariablePlaceholder {
     MEMBER_ID("memberId", "{{사용자 ID}}"),
     MEMBER_NAME("name", "{{사용자 이름}}"),
+    MEMBER_PROFILE_IMAGE_URL("profileImageUrl", "{{공유 대상 사용자 프로필 URL}}"),
+    MEMBER_SERIAL_NUMBER("serialNumber", "{{공유 대상 사용자 식별자}}"),
 
     ALBUM_ID("albumId", "{{앨범 ID}}"),
     ALBUM_NAME("name","{{앨범 이름}}"),

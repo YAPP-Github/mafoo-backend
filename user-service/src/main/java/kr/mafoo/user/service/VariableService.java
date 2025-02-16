@@ -1,6 +1,9 @@
 package kr.mafoo.user.service;
 
+import static kr.mafoo.user.enums.VariableDomain.MEMBER;
+
 import java.util.Map;
+import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
 import kr.mafoo.user.enums.VariableType;
@@ -23,12 +26,25 @@ public class VariableService {
 
     private final WebClient client;
 
+    private final MemberService memberService;
+
     public Mono<Map<String, String>> getVariableMap(
         String receiverMemberId,
         VariableDomain domain,
         VariableSort sort,
         VariableType type
     ) {
+        if (domain.equals(MEMBER)) {
+            return memberService.getMemberByMemberId(receiverMemberId)
+                .map(MemberResponse::fromEntity)
+                .map(member -> Map.of(
+                    "memberId", member.memberId(),
+                    "memberName", member.name(),
+                    "profileImageUrl", member.profileImageUrl(),
+                    "serialNumber", member.serialNumber()
+                ));
+        }
+
         String uri = VariableUriGenerator.generate(endpoint, receiverMemberId, domain, sort, type);
 
         return client
