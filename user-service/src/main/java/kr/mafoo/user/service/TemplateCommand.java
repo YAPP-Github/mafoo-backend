@@ -14,15 +14,15 @@ public class TemplateCommand {
 
     private final TemplateRepository templateRepository;
 
-    public Mono<TemplateEntity> addTemplate(NotificationType notificationType, String thumbnailImageUrl, String url, String title, String body) {
+    public Mono<TemplateEntity> addTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
         return templateRepository.save(
-            TemplateEntity.newTemplate(IdGenerator.generate(), notificationType, thumbnailImageUrl, url, title, body)
+            TemplateEntity.newTemplate(IdGenerator.generate(), notificationType, thumbnailImageUrl, title, body)
         );
     }
 
-    public Mono<TemplateEntity> modifyTemplate(TemplateEntity template, NotificationType notificationType, String thumbnailImageUrl, String url, String title, String body) {
+    public Mono<TemplateEntity> modifyTemplate(TemplateEntity template, NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
         return templateRepository.save(
-            template.updateTemplate(notificationType, thumbnailImageUrl, url, title, body)
+            template.updateTemplate(notificationType, thumbnailImageUrl, title, body)
         );
     }
 

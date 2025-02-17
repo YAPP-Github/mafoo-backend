@@ -40,11 +40,10 @@ public class TemplateService {
     public Mono<TemplateEntity> addTemplate(
         NotificationType notificationType,
         String thumbnailImageUrl,
-        String url,
         String title,
         String body
     ) {
-        return templateCommand.addTemplate(notificationType, thumbnailImageUrl, url, title, body);
+        return templateCommand.addTemplate(notificationType, thumbnailImageUrl, title, body);
     }
 
     @Transactional
@@ -52,12 +51,11 @@ public class TemplateService {
         String templateId,
         NotificationType notificationType,
         String thumbnailImageUrl,
-        String url,
         String title,
         String body
     ) {
         return templateQuery.findById(templateId)
-            .flatMap(template -> templateCommand.modifyTemplate(template, notificationType, thumbnailImageUrl, url, title, body));
+            .flatMap(template -> templateCommand.modifyTemplate(template, notificationType, thumbnailImageUrl, title, body));
     }
 
     @Transactional

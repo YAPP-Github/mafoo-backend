@@ -45,7 +45,6 @@ public class TemplateController implements TemplateApi {
             .addTemplate(
                 request.notificationType(),
                 request.thumbnailImageUrl(),
-                request.url(),
                 request.title(),
                 request.body()
             )
@@ -63,7 +62,6 @@ public class TemplateController implements TemplateApi {
                 templateId,
                 request.notificationType(),
                 request.thumbnailImageUrl(),
-                request.url(),
                 request.title(),
                 request.body()
             )

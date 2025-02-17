@@ -33,7 +33,6 @@ public class MessageService {
                     .setBody(messageDto.body())
                     .build()
             )
-            .putData("redirectUrl", messageDto.url())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message)))
@@ -49,7 +48,6 @@ public class MessageService {
                     .setBody(messageDto.body())
                     .build()
             )
-            .putData("redirectUrl", messageDto.url())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message)))
@@ -71,8 +69,7 @@ public class MessageService {
                             .setTitle(dto.title())
                             .setBody(dto.body())
                             .build()
-                    )
-                    .putData("redirectUrl", dto.url());
+                    );
             }
             multicastMessages.add(builder.build());
         }
