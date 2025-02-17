@@ -2,6 +2,7 @@ package kr.mafoo.user.domain;
 
 import java.time.LocalDateTime;
 import kr.mafoo.user.enums.NotificationType;
+import kr.mafoo.user.enums.RouteType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -32,14 +33,8 @@ public class TemplateEntity implements Persistable<String> {
     @Column("body")
     private String body;
 
-    @Column("route")
-    private String route;
-
-    @Column("route_key")
-    private String routeKey;
-
-    @Column("has_button")
-    private Boolean hasButton;
+    @Column("routeType")
+    private RouteType routeType;
 
     @CreatedDate
     @Column("created_at")
