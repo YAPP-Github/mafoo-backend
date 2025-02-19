@@ -33,6 +33,9 @@ public class MessageService {
                     .setBody(messageDto.body())
                     .build()
             )
+            .putData("route", messageDto.route())
+            .putData("key", messageDto.key())
+            .putData("buttonType", messageDto.buttonType().toString())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message)))
@@ -48,6 +51,9 @@ public class MessageService {
                     .setBody(messageDto.body())
                     .build()
             )
+            .putData("route", messageDto.route())
+            .putData("key", messageDto.key())
+            .putData("buttonType", messageDto.buttonType().toString())
             .build();
 
         return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message)))
@@ -69,7 +75,10 @@ public class MessageService {
                             .setTitle(dto.title())
                             .setBody(dto.body())
                             .build()
-                    );
+                    )
+                    .putData("route", dto.route())
+                    .putData("key", dto.key())
+                    .putData("buttonType", dto.buttonType().toString());
             }
             multicastMessages.add(builder.build());
         }

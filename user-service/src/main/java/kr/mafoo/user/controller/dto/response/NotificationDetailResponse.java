@@ -3,6 +3,7 @@ package kr.mafoo.user.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import kr.mafoo.user.enums.ButtonType;
 import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.service.dto.NotificationDetailDto;
 
@@ -29,6 +30,15 @@ public record NotificationDetailResponse(
     @Schema(description = "내용", example = "공유받은 앨범을 둘러보세요!")
     String body,
 
+    @Schema(description = "알림 route")
+    String route,
+
+    @Schema(description = "알림 key")
+    String key,
+
+    @Schema(description = "알림 button 종류")
+    ButtonType buttonType,
+
     @Schema(description = "읽음 여부", example = "true")
     Boolean isRead,
 
@@ -51,6 +61,9 @@ public record NotificationDetailResponse(
                     dto.thumbnailImageUrl(),
                     dto.title(),
                     dto.body(),
+                    dto.route(),
+                    dto.key(),
+                    dto.buttonType(),
                     dto.isRead(),
                     dto.createdAt(),
                     dto.updatedAt()

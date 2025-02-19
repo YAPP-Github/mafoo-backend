@@ -6,8 +6,10 @@ import static kr.mafoo.user.enums.VariablePlaceholder.RECAP_URL;
 import static kr.mafoo.user.enums.VariablePlaceholder.SHARED_MEMBER_ALBUM_ID;
 import static kr.mafoo.user.enums.VariablePlaceholder.SHARED_MEMBER_ID;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum RouteType {
     ALBUM_CREATE("AlbumCreate", null, null),

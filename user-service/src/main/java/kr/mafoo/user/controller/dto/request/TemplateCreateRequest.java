@@ -2,6 +2,7 @@ package kr.mafoo.user.controller.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.mafoo.user.enums.NotificationType;
+import kr.mafoo.user.enums.RouteType;
 
 @Schema(description = "템플릿 생성 요청")
 public record TemplateCreateRequest(
@@ -15,6 +16,9 @@ public record TemplateCreateRequest(
     String title,
 
     @Schema(description = "내용", example = "{{album_name}} 앨범 공유를 수락하시겠어요?")
-    String body
+    String body,
+
+    @Schema(description = "루트 종류", example = "SHARED_MEMBER_INVITATION")
+    RouteType routeType
 ) {
 }

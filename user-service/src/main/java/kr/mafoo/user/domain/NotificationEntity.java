@@ -31,6 +31,9 @@ public class NotificationEntity implements Persistable<String> {
     @Column("body")
     private String body;
 
+    @Column("key")
+    private String key;
+
     @Column("is_read")
     private Boolean isRead;
 
@@ -72,13 +75,14 @@ public class NotificationEntity implements Persistable<String> {
         return this;
     }
 
-    public static NotificationEntity newNotification(String notificationId, String templateId, String receiverMemberId, String title, String body) {
+    public static NotificationEntity newNotification(String notificationId, String templateId, String receiverMemberId, String title, String body, String key) {
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.notificationId = notificationId;
         notificationEntity.templateId = templateId;
         notificationEntity.receiverMemberId = receiverMemberId;
         notificationEntity.title = title;
         notificationEntity.body = body;
+        notificationEntity.key = key;
         notificationEntity.isNew = true;
         return notificationEntity;
     }

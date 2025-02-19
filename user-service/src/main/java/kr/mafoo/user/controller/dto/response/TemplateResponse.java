@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
+import kr.mafoo.user.enums.RouteType;
 
 @Schema(description = "템플릿 응답")
 public record TemplateResponse(
@@ -23,6 +24,9 @@ public record TemplateResponse(
         @Schema(description = "내용", example = "{{album_name}} 앨범 공유를 수락하시겠어요?")
         String body,
 
+        @Schema(description = "루트 종류", example = "SHARED_MEMBER_INVITATION")
+        RouteType routeType,
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         @Schema(description = "템플릿 생성 일시")
         LocalDateTime createdAt,
@@ -40,6 +44,7 @@ public record TemplateResponse(
                     entity.getThumbnailImageUrl(),
                     entity.getTitle(),
                     entity.getBody(),
+                    entity.getRouteType(),
                     entity.getCreatedAt(),
                     entity.getUpdatedAt()
                 );

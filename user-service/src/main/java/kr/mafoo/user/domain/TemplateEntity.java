@@ -69,21 +69,23 @@ public class TemplateEntity implements Persistable<String> {
         return templateId;
     }
 
-    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
+    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body, RouteType routeType) {
         this.notificationType = notificationType;
         this.thumbnailImageUrl = thumbnailImageUrl;
         this.title = title;
         this.body = body;
+        this.routeType = routeType;
         return this;
     }
 
-    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String title, String body) {
+    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String title, String body, RouteType routeType) {
         TemplateEntity template = new TemplateEntity();
         template.templateId = templateId;
         template.notificationType = notificationType;
         template.thumbnailImageUrl = thumbnailImageUrl;
         template.title = title;
         template.body = body;
+        template.routeType = routeType;
         template.isNew = true;
         return template;
     }

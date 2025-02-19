@@ -22,6 +22,9 @@ public record NotificationResponse(
     @Schema(description = "내용", example = "공유받은 앨범을 둘러보세요!")
     String body,
 
+    @Schema(description = "알림 key")
+    String key,
+
     @Schema(description = "읽음 여부", example = "true")
     Boolean isRead,
 
@@ -42,6 +45,7 @@ public record NotificationResponse(
                     entity.getReceiverMemberId(),
                     entity.getTitle(),
                     entity.getBody(),
+                    entity.getKey(),
                     entity.getIsRead(),
                     entity.getCreatedAt(),
                     entity.getUpdatedAt()

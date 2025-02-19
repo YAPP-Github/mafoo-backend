@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.mafoo.user.enums.NotificationType;
+import kr.mafoo.user.enums.RouteType;
 import kr.mafoo.user.service.dto.TemplateDetailDto;
 
 @Schema(description = "템플릿 상세 응답")
@@ -23,6 +24,9 @@ public record TemplateDetailResponse(
 
     @Schema(description = "내용", example = "{{album_name}} 앨범 공유를 수락하시겠어요?")
     String body,
+
+    @Schema(description = "루트 종류", example = "SHARED_MEMBER_INVITATION")
+    RouteType routeType,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @Schema(description = "템플릿 생성 일시")
@@ -43,6 +47,7 @@ public record TemplateDetailResponse(
                     dto.thumbnailImageUrl(),
                     dto.title(),
                     dto.body(),
+                    dto.routeType(),
                     dto.createdAt(),
                     dto.updatedAt(),
                     dto.reservation().stream().map(ReservationResponse::fromDto).toList()
