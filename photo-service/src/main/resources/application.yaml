@@ -23,6 +23,8 @@ spring:
 app:
   gateway:
     endpoint: https://gateway.mafoo.kr
+  user:
+    endpoint: http://user-service
 
 cloud:
   aws:

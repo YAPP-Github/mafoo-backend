@@ -56,6 +56,16 @@ public class PhotoService {
             );
     }
 
+    @Transactional(readOnly = true)
+    public Flux<PhotoEntity> findPhotoListByAlbumIdWithoutVerify(String albumId, String sort) {
+        String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
+        return switch (sortMethod) {
+            case "ASC" -> photoQuery.findAllByAlbumIdOrderByCreatedAtAsc(albumId);
+            case "DESC" -> photoQuery.findAllByAlbumIdOrderByCreatedAtDesc(albumId);
+            default -> photoQuery.findAllByAlbumIdOrderByDisplayIndexDesc(albumId);
+        };
+    }
+
     @Transactional
     public Mono<PhotoEntity> addPhotoWithQrUrl(String qrUrl) {
         return qrService
