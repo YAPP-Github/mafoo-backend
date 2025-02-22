@@ -47,7 +47,7 @@ public record MessageDto(
             convertVariables(title, variables),
             convertVariables(body, variables),
             routeType.getRoute(),
-            convertVariables(routeType.getKeyType().getPlaceholder(), variables),
+            routeType.getKeyType() != null ? convertVariables(routeType.getKeyType().getPlaceholder(), variables) : null,
             routeType.getButtonType()
         );
     }
