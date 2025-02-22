@@ -25,62 +25,21 @@ public class MessageService {
     }
 
     public Mono<Void> sendMessageToSingleMember(MessageDto messageDto) {
-        Message message = Message.builder()
-            .setToken(messageDto.tokens().get(0))
-            .setNotification(
-                Notification.builder()
-                    .setTitle(messageDto.title())
-                    .setBody(messageDto.body())
-                    .build()
-            )
-            .putData("route", messageDto.route())
-            .putData("key", messageDto.key())
-            .putData("buttonType", messageDto.buttonType().toString())
-            .build();
-
-        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message)))
-            .then();
+        Message message = buildMessage(messageDto);
+        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message))).then();
     }
 
     public Mono<Void> sendMessageToMultipleMember(MessageDto messageDto) {
-        MulticastMessage message = MulticastMessage.builder()
-            .addAllTokens(messageDto.tokens())
-            .setNotification(
-                Notification.builder()
-                    .setTitle(messageDto.title())
-                    .setBody(messageDto.body())
-                    .build()
-            )
-            .putData("route", messageDto.route())
-            .putData("key", messageDto.key())
-            .putData("buttonType", messageDto.buttonType().toString())
-            .build();
-
-        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message)))
-            .then();
+        MulticastMessage message = buildMulticastMessage(messageDto);
+        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message))).then();
     }
 
     public Mono<Void> sendDynamicMessageToMultipleMember(List<MessageDto> messageDtoList) {
-
         List<MulticastMessage> multicastMessages = new java.util.ArrayList<>();
 
         for (int i = 0; i < messageDtoList.size(); i += 500) {
             List<MessageDto> batchMessages = messageDtoList.subList(i, Math.min(i + 500, messageDtoList.size()));
-
-            MulticastMessage.Builder builder = MulticastMessage.builder();
-            for (MessageDto dto : batchMessages) {
-                builder.addAllTokens(dto.tokens())
-                    .setNotification(
-                        Notification.builder()
-                            .setTitle(dto.title())
-                            .setBody(dto.body())
-                            .build()
-                    )
-                    .putData("route", dto.route())
-                    .putData("key", dto.key())
-                    .putData("buttonType", dto.buttonType().toString());
-            }
-            multicastMessages.add(builder.build());
+            multicastMessages.addAll(batchMessages.stream().map(this::buildMulticastMessage).toList());
         }
 
         List<Mono<Void>> sendOperations = multicastMessages.stream()
@@ -88,6 +47,52 @@ public class MessageService {
             .toList();
 
         return Mono.when(sendOperations);
+    }
+
+    private Message buildMessage(MessageDto messageDto) {
+        Message.Builder builder = Message.builder()
+            .setToken(messageDto.tokens().get(0))
+            .setNotification(Notification.builder()
+                .setTitle(messageDto.title())
+                .setBody(messageDto.body())
+                .build()
+            )
+            .putData("route", messageDto.route());
+
+        addOptionalData(builder, messageDto);
+        return builder.build();
+    }
+
+    private MulticastMessage buildMulticastMessage(MessageDto messageDto) {
+        MulticastMessage.Builder builder = MulticastMessage.builder()
+            .addAllTokens(messageDto.tokens())
+            .setNotification(Notification.builder()
+                .setTitle(messageDto.title())
+                .setBody(messageDto.body())
+                .build()
+            )
+            .putData("route", messageDto.route());
+
+        addOptionalData(builder, messageDto);
+        return builder.build();
+    }
+
+    private void addOptionalData(Message.Builder builder, MessageDto messageDto) {
+        if (messageDto.key() != null) {
+            builder.putData("key", messageDto.key());
+        }
+        if (messageDto.buttonType() != null) {
+            builder.putData("buttonType", messageDto.buttonType().name());
+        }
+    }
+
+    private void addOptionalData(MulticastMessage.Builder builder, MessageDto messageDto) {
+        if (messageDto.key() != null) {
+            builder.putData("key", messageDto.key());
+        }
+        if (messageDto.buttonType() != null) {
+            builder.putData("buttonType", messageDto.buttonType().name());
+        }
     }
 
     private <T> CompletableFuture<T> toCompletableFuture(ApiFuture<T> apiFuture) {
@@ -101,5 +106,4 @@ public class MessageService {
         }, Runnable::run);
         return completableFuture;
     }
-
 }

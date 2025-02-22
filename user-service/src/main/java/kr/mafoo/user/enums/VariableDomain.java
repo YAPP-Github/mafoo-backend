@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum VariableDomain {
     NONE(null),
 
-    MEMBER("members"),
     ALBUM("albums"),
 
     SHARE_MEMBER_IN_OWNED_ALBUM("shared-members/owned-albums"),
