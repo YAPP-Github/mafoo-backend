@@ -50,7 +50,7 @@ public class MemberService {
             .bodyToFlux(MemberDto.class);
     }
 
-    public Mono<MemberDto> getMemberInfoById(String memberId) {
+    public Mono<MemberDto> getMemberInfoByIdV2(String memberId) {
         return client
                 .get()
                 .uri(userEndpoint + "/v1/members/" + memberId)

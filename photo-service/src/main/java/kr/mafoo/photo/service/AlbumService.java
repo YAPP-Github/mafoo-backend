@@ -123,19 +123,19 @@ public class AlbumService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<SharedAlbumDto> findAlbumDetailByIdWithoutVerify(String albumId) {
+    public Mono<ViewableAlbumDetailDto> findAlbumDetailByIdWithoutVerify(String albumId) {
         return albumQuery.findById(albumId).flatMap( album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
                 .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
-                .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
-                        .map(memberInfo -> SharedMemberDto.fromSharedMember(sharedMember, memberInfo)))
-                .sort(Comparator.comparing(SharedMemberDto::shareStatus))
+                .flatMap(sharedMember -> memberService.getMemberInfoByIdV2(sharedMember.getMemberId())
+                        .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
+                .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
                 .collectList()
-                .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
-                        .map(ownerMember -> SharedAlbumDto.fromSharedAlbum(album, ownerMember, sharedMembers))
+                .flatMap(sharedMembers -> memberService.getMemberInfoByIdV2(album.getOwnerMemberId())
+                        .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
                 )
 
-                .switchIfEmpty(Mono.just(SharedAlbumDto.fromOwnedAlbum(album))) );
+                .switchIfEmpty(Mono.just(ViewableAlbumDetailDto.fromOwnedAlbum(album))) );
     }
 
     @Transactional

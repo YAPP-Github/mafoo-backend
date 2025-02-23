@@ -3,7 +3,7 @@ package kr.mafoo.photo.controller.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import kr.mafoo.photo.domain.enums.AlbumType;
-import kr.mafoo.photo.service.dto.SharedAlbumDto;
+import kr.mafoo.photo.service.dto.ViewableAlbumDetailDto;
 
 @Schema(description = "공유받은 앨범 응답")
 public record ExportedAlbumResponse(
@@ -41,10 +41,10 @@ public record ExportedAlbumResponse(
         Boolean isMeLiked,
 
         @Schema(description = "공유 앨범 사용자 정보 목록")
-        List<SharedMemberDetailResponse> sharedMembers
+        List<SharedMemberForAlbumResponse> sharedMembers
 ) {
         public static ExportedAlbumResponse fromDto(
-            SharedAlbumDto dto,
+            ViewableAlbumDetailDto dto,
             Long likeCount,
             Long noteCount,
                 Boolean isMeLiked
@@ -61,7 +61,7 @@ public record ExportedAlbumResponse(
                     likeCount,
                     noteCount,
                     isMeLiked,
-                    dto.sharedMemberDtoList().stream().map(SharedMemberDetailResponse::fromDto).toList()
+                    dto.sharedMemberForAlbumDtoList().stream().map(SharedMemberForAlbumResponse::fromDto).toList()
                 );
         }
 }
