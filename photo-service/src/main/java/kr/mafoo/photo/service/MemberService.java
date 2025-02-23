@@ -16,6 +16,9 @@ public class MemberService {
     @Value("${app.gateway.endpoint}")
     private String endpoint;
 
+    @Value("${app.user.endpoint}")
+    private String userEndpoint;
+
     private final WebClient client;
 
     public Mono<MemberDto> getMemberInfoById(String memberId) {
@@ -45,6 +48,15 @@ public class MemberService {
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToFlux(MemberDto.class);
+    }
+
+    public Mono<MemberDto> getMemberInfoById(String memberId) {
+        return client
+                .get()
+                .uri(userEndpoint + "/v1/members/" + memberId)
+                .retrieve()
+                .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
+                .bodyToMono(MemberDto.class);
     }
 
 }
