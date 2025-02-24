@@ -39,7 +39,7 @@ public interface MemberApi {
     );
 
     @Operation(summary = "사용자 단건 조회", description = "사용자 단건 정보를 조회합니다.")
-    @GetMapping("{memberId}")
+    @GetMapping("/{memberId}")
     Mono<MemberResponse> getMember(
         @Parameter(description = "사용자 ID", example = "test_member_id")
         @PathVariable
