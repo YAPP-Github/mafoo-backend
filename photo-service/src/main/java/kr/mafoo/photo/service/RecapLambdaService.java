@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.NotificationType.RECAP_CREATED;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.DOWNLOAD_ACCESS;
 
 import java.util.HashMap;
@@ -18,18 +19,26 @@ public class RecapLambdaService {
     private final WebClient client;
     private final AlbumPermissionVerifier albumPermissionVerifier;
 
+    private final MemberService memberService;
+
     public RecapLambdaService(
         @Qualifier("recapLambdaClient")
         WebClient client,
-        AlbumPermissionVerifier albumPermissionVerifier
+        AlbumPermissionVerifier albumPermissionVerifier,
+        MemberService memberService
     ) {
         this.client = client;
         this.albumPermissionVerifier = albumPermissionVerifier;
+        this.memberService = memberService;
     }
 
     public Mono<RecapUrlDto> generateMafooRecapVideo(List<String> recapPhotoUrls, String albumId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, DOWNLOAD_ACCESS)
-                .then(generateVideo(recapPhotoUrls));
+                .then(generateVideo(recapPhotoUrls)
+                    .flatMap(recapUrlDto -> memberService.sendScenarioNotification(RECAP_CREATED, List.of(requestMemberId), Map.of("recapUrl", recapUrlDto.recapUrl()))
+                        .then(Mono.just(recapUrlDto))
+                    )
+                );
     }
 
     public Mono<RecapUrlDto> generateVideo(List<String> recapPhotoUrls) {
