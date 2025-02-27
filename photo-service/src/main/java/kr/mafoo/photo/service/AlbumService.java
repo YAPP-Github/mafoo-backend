@@ -127,11 +127,11 @@ public class AlbumService {
         return albumQuery.findById(albumId).flatMap( album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
                 .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
-                .flatMap(sharedMember -> memberService.getMemberInfoByIdV2(sharedMember.getMemberId())
+                .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
                         .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
                 .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
                 .collectList()
-                .flatMap(sharedMembers -> memberService.getMemberInfoByIdV2(album.getOwnerMemberId())
+                .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
                         .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
                 )
 

@@ -5,7 +5,6 @@ import kr.mafoo.photo.exception.MafooUserApiFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,42 +20,42 @@ public class MemberService {
 
     private final WebClient client;
 
+//    public Mono<MemberDto> getMemberInfoById(String memberId) {
+//        return client
+//            .get()
+//            .uri(endpoint + "/user/v1/members/" + memberId)
+//            .retrieve()
+//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
+//            .bodyToMono(MemberDto.class);
+//    }
+//
+//    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
+//        return client
+//            .get()
+//            .uri(endpoint + "/user/v1/me")
+//            .header("Authorization", "Bearer " + authorizationToken)
+//            .retrieve()
+//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
+//            .bodyToMono(MemberDto.class);
+//    }
+//
+//    public Flux<MemberDto> getMemberListByKeyword(String keyword, String authorizationToken) {
+//        return client
+//            .get()
+//            .uri(endpoint + "/user/v1/members?keyword=" + keyword)
+//            .header("Authorization", "Bearer " + authorizationToken)
+//            .retrieve()
+//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
+//            .bodyToFlux(MemberDto.class);
+//    }
+
     public Mono<MemberDto> getMemberInfoById(String memberId) {
         return client
             .get()
-            .uri(endpoint + "/user/v1/members/" + memberId)
+            .uri(userEndpoint + "/v1/members/" + memberId)
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToMono(MemberDto.class);
-    }
-
-    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
-        return client
-            .get()
-            .uri(endpoint + "/user/v1/me")
-            .header("Authorization", "Bearer " + authorizationToken)
-            .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-            .bodyToMono(MemberDto.class);
-    }
-
-    public Flux<MemberDto> getMemberListByKeyword(String keyword, String authorizationToken) {
-        return client
-            .get()
-            .uri(endpoint + "/user/v1/members?keyword=" + keyword)
-            .header("Authorization", "Bearer " + authorizationToken)
-            .retrieve()
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-            .bodyToFlux(MemberDto.class);
-    }
-
-    public Mono<MemberDto> getMemberInfoByIdV2(String memberId) {
-        return client
-                .get()
-                .uri(userEndpoint + "/v1/members/" + memberId)
-                .retrieve()
-                .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-                .bodyToMono(MemberDto.class);
     }
 
 }
