@@ -29,15 +29,15 @@ public class MemberService {
 //            .bodyToMono(MemberDto.class);
 //    }
 //
-//    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
-//        return client
-//            .get()
-//            .uri(endpoint + "/user/v1/me")
-//            .header("Authorization", "Bearer " + authorizationToken)
-//            .retrieve()
-//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-//            .bodyToMono(MemberDto.class);
-//    }
+    public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
+        return client
+            .get()
+            .uri(endpoint + "/user/v1/me")
+            .header("Authorization", "Bearer " + authorizationToken)
+            .retrieve()
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
+            .bodyToMono(MemberDto.class);
+    }
 //
 //    public Flux<MemberDto> getMemberListByKeyword(String keyword, String authorizationToken) {
 //        return client
