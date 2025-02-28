@@ -34,7 +34,10 @@ public enum ErrorCode {
 
     MAFOO_USER_API_FAILED("MUE0001", "마푸의 user-service API 호출이 실패했습니다"),
 
-    MAFOO_RECAP_LAMBDA_API_FAILED("MRE0001", "마푸의 recap-service AWS Lambda API 호출이 실패했습니다")
+    MAFOO_RECAP_LAMBDA_API_FAILED("MRE0001", "마푸의 recap-service AWS Lambda API 호출이 실패했습니다"),
+
+    ALBUM_EXPORT_ALREADY_EXISTS("AE0005", "같은 앨범에 대한 앨범 내보내기가 이미 존재합니다"),
+    ALBUM_EXPORT_NOT_FOUND("AE0006", "앨범 내보내기를 찾을 수 없습니다"),
 
     ;
     private final String code;

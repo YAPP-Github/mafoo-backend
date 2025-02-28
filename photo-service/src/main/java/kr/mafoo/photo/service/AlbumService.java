@@ -122,6 +122,22 @@ public class AlbumService {
                 );
     }
 
+    @Transactional(readOnly = true)
+    public Mono<ViewableAlbumDetailDto> findAlbumDetailByIdWithoutVerify(String albumId) {
+        return albumQuery.findById(albumId).flatMap( album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
+                .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
+
+                .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
+                        .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
+                .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
+                .collectList()
+                .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                        .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
+                )
+
+                .switchIfEmpty(Mono.just(ViewableAlbumDetailDto.fromOwnedAlbum(album))) );
+    }
+
     @Transactional
     public Mono<AlbumEntity> addAlbum(String albumName, String albumType, String requestMemberId) {
         return albumCommand.addAlbum(albumName, albumType, requestMemberId, null);
