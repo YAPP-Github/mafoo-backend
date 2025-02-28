@@ -1,7 +1,8 @@
 package kr.mafoo.user.service;
 
-import static kr.mafoo.user.enums.VariableDomain.MEMBER;
+import static kr.mafoo.user.enums.VariableDomain.NONE;
 
+import java.util.HashMap;
 import java.util.Map;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.enums.VariableDomain;
@@ -34,25 +35,33 @@ public class VariableService {
         VariableSort sort,
         VariableType type
     ) {
-        if (domain.equals(MEMBER)) {
-            return memberService.getMemberByMemberId(receiverMemberId)
-                .map(MemberResponse::fromEntity)
-                .map(member -> Map.of(
-                    "memberId", member.memberId(),
-                    "memberName", member.name(),
-                    "profileImageUrl", member.profileImageUrl(),
-                    "serialNumber", member.serialNumber()
-                ));
-        }
+        return memberService.getMemberByMemberId(receiverMemberId)
+            .map(MemberResponse::fromEntity)
+            .flatMap(member -> {
+                Map<String, String> variableMap = new HashMap<>();
 
-        String uri = VariableUriGenerator.generate(endpoint, receiverMemberId, domain, sort, type);
+                variableMap.put("memberId", member.memberId());
+                variableMap.put("memberName", member.name());
+                variableMap.put("profileImageUrl", member.profileImageUrl());
+                variableMap.put("serialNumber", member.serialNumber());
 
-        return client
-            .get()
-            .uri(uri)
-            .retrieve()
-            .onStatus(HttpStatus.BAD_REQUEST::equals, response -> Mono.empty())
-            .onStatus(status -> !status.is2xxSuccessful(), res -> Mono.error(new MafooPhotoApiFailedException()))
-            .bodyToMono(new ParameterizedTypeReference<>() {});
+                if (domain.equals(NONE)) {
+                    return Mono.just(variableMap);
+                }
+
+                String uri = VariableUriGenerator.generate(endpoint, receiverMemberId, domain, sort, type);
+
+                return client.get()
+                    .uri(uri)
+                    .retrieve()
+                    .onStatus(HttpStatus.BAD_REQUEST::equals, response -> Mono.empty())
+                    .onStatus(status -> !status.is2xxSuccessful(), res -> Mono.error(new MafooPhotoApiFailedException()))
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {})
+                    .defaultIfEmpty(Map.of())
+                    .map(responseMap -> {
+                        variableMap.putAll(responseMap);
+                        return variableMap;
+                    });
+            });
     }
 }
