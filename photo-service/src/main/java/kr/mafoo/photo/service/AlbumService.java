@@ -39,7 +39,7 @@ public class AlbumService {
     private final SharedMemberQuery sharedMemberQuery;
     private final SharedMemberCommand sharedMemberCommand;
 
-    private final MemberService memberService;
+    private final MemberServiceClient memberServiceClient;
 
     @Transactional(readOnly = true)
     public Flux<ViewableAlbumDto> findViewableAlbumListByMemberId(String memberId) {
@@ -88,7 +88,7 @@ public class AlbumService {
     private Flux<ViewableAlbumDto> findOwnedAlbumListByMemberId(String memberId) {
         return albumQuery.findByMemberId(memberId)
                 .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
-                .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                .flatMap(album -> memberServiceClient.getMemberInfoById(album.getOwnerMemberId())
                     .flatMap(member -> Mono.just(ViewableAlbumDto.fromOwnedAlbum(album, member)))
                 );
     }
@@ -97,7 +97,7 @@ public class AlbumService {
         return sharedMemberQuery.findAllByMemberIdWhereStatusNotRejected(memberId)
                 .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
                 .concatMap(sharedMember -> albumQuery.findById(sharedMember.getAlbumId())
-                        .flatMap(album -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                        .flatMap(album -> memberServiceClient.getMemberInfoById(album.getOwnerMemberId())
                                 .flatMap(member -> Mono.just(
                                     ViewableAlbumDto.fromSharedAlbum(album, member, sharedMember)))
                         )
@@ -110,11 +110,11 @@ public class AlbumService {
                 .flatMap(album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
                         .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
-                        .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
+                        .flatMap(sharedMember -> memberServiceClient.getMemberInfoById(sharedMember.getMemberId())
                                 .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
                         .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
                         .collectList()
-                        .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                        .flatMap(sharedMembers -> memberServiceClient.getMemberInfoById(album.getOwnerMemberId())
                                 .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
                         )
 
@@ -127,11 +127,11 @@ public class AlbumService {
         return albumQuery.findById(albumId).flatMap( album -> sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(albumId)
                 .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
 
-                .flatMap(sharedMember -> memberService.getMemberInfoById(sharedMember.getMemberId())
+                .flatMap(sharedMember -> memberServiceClient.getMemberInfoById(sharedMember.getMemberId())
                         .map(memberInfo -> SharedMemberForAlbumDto.fromSharedMember(sharedMember, memberInfo)))
                 .sort(Comparator.comparing(SharedMemberForAlbumDto::shareStatus))
                 .collectList()
-                .flatMap(sharedMembers -> memberService.getMemberInfoById(album.getOwnerMemberId())
+                .flatMap(sharedMembers -> memberServiceClient.getMemberInfoById(album.getOwnerMemberId())
                         .map(ownerMember -> ViewableAlbumDetailDto.fromSharedAlbum(album, ownerMember, sharedMembers))
                 )
 

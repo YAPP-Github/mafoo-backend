@@ -31,7 +31,7 @@ public class RecapServiceOld {
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
     private final PhotoService photoService;
-    private final MemberService memberService;
+    private final MemberServiceClient memberServiceClient;
 
     private final ObjectStorageService objectStorageService;
     private final Graphics2dService graphics2dService;
@@ -49,7 +49,7 @@ public class RecapServiceOld {
                     String albumType = String.valueOf(albumEntity.getType());
 
                     return graphics2dService.generateAlbumChipForRecap(recapId, albumEntity.getName(), albumType)
-                            .then(memberService.getMemberInfoByToken(token))
+                            .then(memberServiceClient.getMemberInfoByToken(token))
                             .flatMap(memberInfo -> generateRecapFrame(recapId, memberInfo.name(), albumType))
                             .then(photoService.findPhotoListByAlbumId(albumId, requestMemberId, sort)
                                 .collectList()

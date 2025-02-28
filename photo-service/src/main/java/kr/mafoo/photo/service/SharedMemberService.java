@@ -32,7 +32,7 @@ public class SharedMemberService {
 
     private final AlbumPermissionVerifier albumPermissionVerifier;
 
-    private final MemberService memberService;
+    private final MemberServiceClient memberServiceClient;
     private final AlbumQuery albumQuery;
 
     @Transactional(readOnly = true)
@@ -84,7 +84,7 @@ public class SharedMemberService {
 
     private Mono<SharedMemberDetailDto> getSharedMemberDetail(SharedMemberEntity sharedMember) {
         return albumQuery.findById(sharedMember.getAlbumId())
-            .flatMap(album -> memberService.getMemberInfoById(sharedMember.getMemberId())
+            .flatMap(album -> memberServiceClient.getMemberInfoById(sharedMember.getMemberId())
                 .map(memberInfo -> SharedMemberDetailDto.fromSharedMember(sharedMember, memberInfo, album))
             );
     }

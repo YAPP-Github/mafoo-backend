@@ -15,10 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @RequiredArgsConstructor
 @Service
-public class MemberService {
-
-    @Value("${app.gateway.endpoint}")
-    private String endpoint;
+public class MemberServiceClient {
 
     @Value("${app.user.endpoint}")
     private String userEndpoint;
@@ -29,7 +26,7 @@ public class MemberService {
     public Mono<NotificationDto> sendScenarioNotification(NotificationType notificationType, List<String> receiverMemberIds, Map<String, String> variables) {
         return client
             .post()
-            .uri(endpoint + "/user/v1/notifications/")
+            .uri(userEndpoint + "/v1/notifications/")
             .bodyValue(
                 createSendNotificationRequestBody(notificationType, receiverMemberIds, variables)
             )
@@ -48,34 +45,15 @@ public class MemberService {
         return requestBody;
     }
 
-//    public Mono<MemberDto> getMemberInfoById(String memberId) {
-//        return client
-//            .get()
-//            .uri(endpoint + "/user/v1/members/" + memberId)
-//            .retrieve()
-//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-//            .bodyToMono(MemberDto.class);
-//    }
-//
     public Mono<MemberDto> getMemberInfoByToken(String authorizationToken) {
         return client
             .get()
-            .uri(endpoint + "/user/v1/me")
+            .uri(userEndpoint + "/v1/me")
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
             .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
             .bodyToMono(MemberDto.class);
     }
-//
-//    public Flux<MemberDto> getMemberListByKeyword(String keyword, String authorizationToken) {
-//        return client
-//            .get()
-//            .uri(endpoint + "/user/v1/members?keyword=" + keyword)
-//            .header("Authorization", "Bearer " + authorizationToken)
-//            .retrieve()
-//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooUserApiFailedException()))
-//            .bodyToFlux(MemberDto.class);
-//    }
 
     public Mono<MemberDto> getMemberInfoById(String memberId) {
         return client

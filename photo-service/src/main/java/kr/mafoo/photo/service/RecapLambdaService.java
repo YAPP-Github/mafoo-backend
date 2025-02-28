@@ -19,23 +19,23 @@ public class RecapLambdaService {
     private final WebClient client;
     private final AlbumPermissionVerifier albumPermissionVerifier;
 
-    private final MemberService memberService;
+    private final MemberServiceClient memberServiceClient;
 
     public RecapLambdaService(
         @Qualifier("recapLambdaClient")
         WebClient client,
         AlbumPermissionVerifier albumPermissionVerifier,
-        MemberService memberService
+        MemberServiceClient memberServiceClient
     ) {
         this.client = client;
         this.albumPermissionVerifier = albumPermissionVerifier;
-        this.memberService = memberService;
+        this.memberServiceClient = memberServiceClient;
     }
 
     public Mono<RecapUrlDto> generateMafooRecapVideo(List<String> recapPhotoUrls, String albumId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, DOWNLOAD_ACCESS)
                 .then(generateVideo(recapPhotoUrls)
-                    .flatMap(recapUrlDto -> memberService.sendScenarioNotification(RECAP_CREATED, List.of(requestMemberId), Map.of("recapUrl", recapUrlDto.recapUrl()))
+                    .flatMap(recapUrlDto -> memberServiceClient.sendScenarioNotification(RECAP_CREATED, List.of(requestMemberId), Map.of("recapUrl", recapUrlDto.recapUrl()))
                         .then(Mono.just(recapUrlDto))
                     )
                 );
