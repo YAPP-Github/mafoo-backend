@@ -19,6 +19,8 @@ public enum VariablePlaceholder {
     ALBUM_OWNER_MEMBER_ID("ownerMemberId", "{{앨범 소유자 ID}}"),
     ALBUM_OWNER_MEMBER_NAME("ownerName", "{{앨범 소유자 이름}}"),
 
+    RECAP_URL("recapUrl", "{{리캡 URL}}"),
+
     SHARED_MEMBER_ID("sharedMemberId", "{{공유 사용자 ID}}"),
     SHARED_MEMBER_SHARE_STATUS("shareStatus", "{{공유 사용자 초대 상태}}"),
     SHARED_MEMBER_PERMISSION_LEVEL("permissionLevel", "{{공유 사용자 권한 종류}}"),

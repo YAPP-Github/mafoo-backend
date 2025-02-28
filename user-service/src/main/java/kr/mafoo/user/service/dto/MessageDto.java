@@ -2,6 +2,8 @@ package kr.mafoo.user.service.dto;
 
 import java.util.List;
 import java.util.Map;
+import kr.mafoo.user.enums.ButtonType;
+import kr.mafoo.user.enums.RouteType;
 import kr.mafoo.user.enums.VariablePlaceholder;
 
 public record MessageDto(
@@ -9,21 +11,25 @@ public record MessageDto(
     List<String> tokens,
     String title,
     String body,
-    String url
+    String route,
+    String key,
+    ButtonType buttonType
 ) {
     public static MessageDto fromTemplateWithoutVariables(
         List<String> receiverMemberIds,
         List<String> tokens,
         String title,
         String body,
-        String url
+        RouteType routeType
     ) {
         return new MessageDto(
             receiverMemberIds,
             tokens,
             title,
             body,
-            url
+            routeType.getRoute(),
+            null,
+            null
         );
     }
 
@@ -32,7 +38,7 @@ public record MessageDto(
         List<String> tokens,
         String title,
         String body,
-        String url,
+        RouteType routeType,
         Map<String, String> variables
     ) {
         return new MessageDto(
@@ -40,7 +46,9 @@ public record MessageDto(
             tokens,
             convertVariables(title, variables),
             convertVariables(body, variables),
-            convertVariables(url, variables)
+            routeType.getRoute(),
+            convertVariables(routeType.getKeyType().getPlaceholder(), variables),
+            routeType.getButtonType()
         );
     }
 
@@ -61,6 +69,5 @@ public record MessageDto(
 
         return result.toString();
     }
-
 
 }

@@ -45,9 +45,9 @@ public class TemplateController implements TemplateApi {
             .addTemplate(
                 request.notificationType(),
                 request.thumbnailImageUrl(),
-                request.url(),
                 request.title(),
-                request.body()
+                request.body(),
+                request.routeType()
             )
             .map(TemplateResponse::fromEntity);
     }
@@ -63,9 +63,9 @@ public class TemplateController implements TemplateApi {
                 templateId,
                 request.notificationType(),
                 request.thumbnailImageUrl(),
-                request.url(),
                 request.title(),
-                request.body()
+                request.body(),
+                request.routeType()
             )
             .map(TemplateResponse::fromEntity);
     }
