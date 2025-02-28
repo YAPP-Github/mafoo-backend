@@ -1,5 +1,9 @@
 package kr.mafoo.user.service;
 
+import static kr.mafoo.user.enums.NotificationType.NEW_MEMBER;
+
+import java.util.List;
+import java.util.Map;
 import kr.mafoo.user.domain.FcmTokenEntity;
 import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,10 @@ public class FcmTokenService {
     private final FcmTokenQuery fcmTokenQuery;
     private final FcmTokenCommand fcmTokenCommand;
 
+    private final MemberQuery memberQuery;
+
+    private final NotificationService notificationService;
+
     @Transactional(readOnly = true)
     public Flux<FcmTokenEntity> findFcmTokenList() {
         return fcmTokenQuery.findAll()
@@ -26,8 +34,14 @@ public class FcmTokenService {
         String requestMemberId,
         String token
     ) {
-        return fcmTokenQuery.checkDuplicateExists(requestMemberId)
-            .then(fcmTokenCommand.addFcmToken(requestMemberId, token));
+        return memberQuery.findById(requestMemberId)
+            .flatMap(member -> fcmTokenQuery.checkDuplicateExists(requestMemberId)
+                    .then(fcmTokenCommand.addFcmToken(requestMemberId, token)
+                        .flatMap(fcmToken -> notificationService.sendNotificationByScenario(NEW_MEMBER, List.of(requestMemberId), Map.of("name", member.getName()))
+                            .then(Mono.just(fcmToken))
+                        )
+                    )
+            );
     }
 
     @Transactional
