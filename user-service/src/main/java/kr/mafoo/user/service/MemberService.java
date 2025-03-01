@@ -1,9 +1,11 @@
 package kr.mafoo.user.service;
 
 import kr.mafoo.user.domain.MemberEntity;
+import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import kr.mafoo.user.exception.MemberNotFoundException;
 import kr.mafoo.user.repository.MemberRepository;
 import kr.mafoo.user.repository.SocialMemberRepository;
+import kr.mafoo.user.service.dto.MeDto;
 import kr.mafoo.user.service.dto.MemberDetailDto;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,9 @@ public class MemberService {
     private final SharedMemberService sharedMemberService;
 
     private final MemberDataService memberDataService;
+    private final MemberQuery memberQuery;
+
+    private final FcmTokenQuery fcmTokenQuery;
 
     @Transactional
     public Mono<Void> quitMemberByMemberId(String memberId, String token) {
@@ -44,9 +49,17 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Mono<MemberEntity> getMemberByMemberId(String memberId) {
-        return memberRepository
-                .findByIdAndDeletedAtIsNull(memberId)
-                .switchIfEmpty(Mono.error(new MemberNotFoundException()));
+        return memberQuery.findById(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public Mono<MeDto> getMemberDetailByMemberId(String memberId) {
+        return memberQuery.findById(memberId)
+            .flatMap(member -> fcmTokenQuery.findByOwnerMemberId(memberId)
+                .onErrorResume(FcmTokenNotFoundException.class, ex -> Mono.empty())
+                .flatMap(fcmToken -> Mono.just(MeDto.fromEntities(member, fcmToken)))
+                .switchIfEmpty(Mono.just(MeDto.fromEntities(member)))
+            );
     }
 
     @Transactional

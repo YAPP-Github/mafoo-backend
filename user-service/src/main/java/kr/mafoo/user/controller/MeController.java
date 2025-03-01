@@ -2,6 +2,7 @@ package kr.mafoo.user.controller;
 
 import kr.mafoo.user.api.MeApi;
 import kr.mafoo.user.controller.dto.request.ChangeNameRequest;
+import kr.mafoo.user.controller.dto.response.MeResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,10 @@ public class MeController implements MeApi {
     private final MemberService memberService;
 
     @Override
-    public Mono<MemberResponse> getMemberWhoRequested(String memberId) {
+    public Mono<MeResponse> getMemberWhoRequested(String memberId) {
         return memberService
-                .getMemberByMemberId(memberId)
-                .map(MemberResponse::fromEntity);
+                .getMemberDetailByMemberId(memberId)
+                .map(MeResponse::fromDto);
     }
 
     @Override

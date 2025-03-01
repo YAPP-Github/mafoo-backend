@@ -27,7 +27,7 @@ public class VariableService {
 
     private final WebClient client;
 
-    private final MemberService memberService;
+    private final MemberQuery memberQuery;
 
     public Mono<Map<String, String>> getVariableMap(
         String receiverMemberId,
@@ -35,7 +35,7 @@ public class VariableService {
         VariableSort sort,
         VariableType type
     ) {
-        return memberService.getMemberByMemberId(receiverMemberId)
+        return memberQuery.findById(receiverMemberId)
             .map(MemberResponse::fromEntity)
             .flatMap(member -> {
                 Map<String, String> variableMap = new HashMap<>();

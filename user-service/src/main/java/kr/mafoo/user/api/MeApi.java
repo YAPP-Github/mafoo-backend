@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.controller.dto.request.ChangeNameRequest;
+import kr.mafoo.user.controller.dto.response.MeResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono;
 public interface MeApi {
     @Operation(summary = "내 정보 조회", description = "현재 토큰 주인의 정보를 조회합니다.")
     @GetMapping
-    Mono<MemberResponse> getMemberWhoRequested(
+    Mono<MeResponse> getMemberWhoRequested(
             @RequestMemberId @Parameter(hidden = true) String memberId
     );
 
