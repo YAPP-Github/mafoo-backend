@@ -1,5 +1,6 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.NotificationType.SHARED_MEMBER_INVITATION_ACCEPTED;
 import static kr.mafoo.photo.domain.enums.NotificationType.SHARED_MEMBER_INVITATION_CREATED;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
@@ -128,7 +129,7 @@ public class SharedMemberService {
                                 List.of(sharingMemberId),
                                 Map.of(
                                     "senderName", requestMember.name(),
-                                    "albumName", album.getName(),
+                                    "shareTargetAlbumName", album.getName(),
                                     "sharedMemberId", sharedMember.getSharedMemberId()
                                 )
                             )
@@ -172,7 +173,30 @@ public class SharedMemberService {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> {
                 if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && isPendingStatus(sharedMember.getShareStatus())) {
-                    return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED);
+                    return sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(sharedMember.getAlbumId())
+                        .collectList()
+                        .flatMap(sharedMemberList -> {
+                            List<String> receiverMemberIds = new java.util.ArrayList<>(sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList());
+                            receiverMemberIds.remove(requestMemberId);
+
+                            return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
+                                .then(memberServiceClient.getMemberInfoById(requestMemberId)
+                                    .flatMap(memberDto -> albumQuery.findById(sharedMember.getAlbumId())
+                                        .flatMap(album -> memberServiceClient
+                                            .sendScenarioNotification(
+                                                SHARED_MEMBER_INVITATION_ACCEPTED,
+                                                receiverMemberIds,
+                                                Map.of(
+                                                    "shareTargetMemberName", album.getName(),
+                                                    "shareTargetAlbumName", album.getName(),
+                                                    "shareTargetAlbumId", sharedMember.getAlbumId()
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                                .thenReturn(sharedMember);
+                        });
                 } else {
                     return Mono.error(new SharedMemberPermissionDeniedException());
                 }
