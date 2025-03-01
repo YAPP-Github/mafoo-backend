@@ -17,10 +17,10 @@ spring:
         - id: album-export
           uri: http://photo-service
           predicates:
-            - Path=/photo/v1/exports/**/album/**
+            - Path=/photo/v1/exports/{id}/album/{albumId}
             - Method=GET
           filters:
-            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
+            - RewritePath=/photo/v1/exports/(?<id>.*)/album/(?<albumId>.*), /v1/exports/${id}/album/${albumId}
         - id: admin-service
           uri: http://admin-service
           predicates:
