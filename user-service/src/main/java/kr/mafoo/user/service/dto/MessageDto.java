@@ -5,8 +5,10 @@ import java.util.Map;
 import kr.mafoo.user.enums.ButtonType;
 import kr.mafoo.user.enums.RouteType;
 import kr.mafoo.user.enums.VariablePlaceholder;
+import kr.mafoo.user.util.IdGenerator;
 
 public record MessageDto(
+    String notificationId,
     List<String> receiverMemberIds,
     List<String> tokens,
     String title,
@@ -23,6 +25,7 @@ public record MessageDto(
         RouteType routeType
     ) {
         return new MessageDto(
+            IdGenerator.generate(),
             receiverMemberIds,
             tokens,
             title,
@@ -42,6 +45,7 @@ public record MessageDto(
         Map<String, String> variables
     ) {
         return new MessageDto(
+            IdGenerator.generate(),
             receiverMemberIds,
             tokens,
             convertVariables(title, variables),

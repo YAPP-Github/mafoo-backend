@@ -57,6 +57,7 @@ public class MessageService {
                 .setBody(messageDto.body())
                 .build()
             )
+            .putData("notificationId", messageDto.notificationId())
             .putData("route", messageDto.route());
 
         addOptionalData(builder, messageDto);
@@ -71,6 +72,7 @@ public class MessageService {
                 .setBody(messageDto.body())
                 .build()
             )
+            .putData("notificationId", messageDto.notificationId())
             .putData("route", messageDto.route());
 
         addOptionalData(builder, messageDto);
