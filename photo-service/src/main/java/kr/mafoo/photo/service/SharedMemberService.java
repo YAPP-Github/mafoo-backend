@@ -1,11 +1,13 @@
 package kr.mafoo.photo.service;
 
+import static kr.mafoo.photo.domain.enums.NotificationType.SHARED_MEMBER_INVITATION_CREATED;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
 import static kr.mafoo.photo.domain.enums.ShareStatus.PENDING;
 import static kr.mafoo.photo.domain.enums.SortOrder.DESC;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.SharedMemberEntity;
@@ -115,8 +117,23 @@ public class SharedMemberService {
     @Transactional
     public Mono<SharedMemberEntity> addSharedMember(String albumId, String permissionLevel, String sharingMemberId, String requestMemberId) {
         return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, FULL_ACCESS)
-            .then(sharedMemberQuery.checkDuplicateByAlbumIdAndMemberId(albumId, sharingMemberId)
-                .then(sharedMemberCommand.addSharedMember(albumId, permissionLevel, Optional.empty(), sharingMemberId))
+            .flatMap(album -> sharedMemberQuery.checkDuplicateByAlbumIdAndMemberId(albumId, sharingMemberId)
+                .then(sharedMemberCommand.addSharedMember(albumId, permissionLevel, Optional.empty(), sharingMemberId)
+                    .flatMap(sharedMember -> memberServiceClient.getMemberInfoById(requestMemberId)
+                        .flatMap(requestMember -> memberServiceClient
+                            .sendScenarioNotification(
+                                SHARED_MEMBER_INVITATION_CREATED,
+                                List.of(sharingMemberId),
+                                Map.of(
+                                    "senderName", requestMember.name(),
+                                    "albumName", album.getName(),
+                                    "sharedMemberId", sharedMember.getSharedMemberId()
+                                )
+                            )
+                            .thenReturn(sharedMember)
+                        )
+                    )
+                )
             );
     }
 
