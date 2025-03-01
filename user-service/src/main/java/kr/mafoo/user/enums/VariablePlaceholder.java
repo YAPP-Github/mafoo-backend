@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum VariablePlaceholder {
-
     SENDER_MEMBER_ID("senderMemberId", "{{발신자 사용자 ID}}"),
     SENDER_MEMBER_NAME("senderName", "{{발신자 사용자 이름}}"),
     SENDER_MEMBER_PROFILE_IMAGE_URL("senderProfileImageUrl", "{{발신자 사용자 프로필 URL}}"),
@@ -17,6 +16,7 @@ public enum VariablePlaceholder {
     RECEIVER_MEMBER_PROFILE_IMAGE_URL("receiverProfileImageUrl", "{{수신자 사용자 프로필 URL}}"),
     RECEIVER_MEMBER_SERIAL_NUMBER("receiverSerialNumber", "{{수신자 사용자 식별자}}"),
 
+    // TODO: paramKey 규칙성 확보 필요
     ALBUM_ID("albumId", "{{앨범 ID}}"),
     ALBUM_NAME("name","{{앨범 이름}}"),
     ALBUM_TYPE("type", "{{앨범 종류}}"),
