@@ -39,7 +39,10 @@ public class AlbumExportService {
     }
 
     public Mono<ExportedAlbumResponse> getAlbumByExportId(String exportId, String memberId) {
-        albumExportRepository.increaseViewCount(exportId).subscribeOn(Schedulers.boundedElastic());
+        albumExportRepository
+                .increaseViewCount(exportId)
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
         return albumExportRepository
                 .findById(exportId)
                 .switchIfEmpty(Mono.error(new AlbumExportNotFoundException()))
