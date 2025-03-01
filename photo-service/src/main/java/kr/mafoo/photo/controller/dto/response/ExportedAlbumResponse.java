@@ -49,6 +49,7 @@ public record ExportedAlbumResponse(
         public static ExportedAlbumResponse fromDto(
             ViewableAlbumDetailDto dto,
             Long likeCount,
+            Long viewCount,
             Long noteCount,
                 Boolean isMeLiked
         ) {
@@ -57,7 +58,7 @@ public record ExportedAlbumResponse(
                     dto.name(),
                     dto.type(),
                     dto.photoCount().toString(),
-                    10L,
+                    viewCount,
                     dto.ownerMemberId(),
                     dto.ownerName(),
                     dto.ownerProfileImageUrl(),

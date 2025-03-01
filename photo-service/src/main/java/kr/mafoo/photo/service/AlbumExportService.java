@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,7 @@ public class AlbumExportService {
     }
 
     public Mono<ExportedAlbumResponse> getAlbumByExportId(String exportId, String memberId) {
+        albumExportRepository.increaseViewCount(exportId).subscribeOn(Schedulers.boundedElastic());
         return albumExportRepository
                 .findById(exportId)
                 .switchIfEmpty(Mono.error(new AlbumExportNotFoundException()))
@@ -49,7 +51,7 @@ public class AlbumExportService {
                                                     Mono<Boolean> likeChain = memberId != null ? albumExportLikeRepository.existsByExportIdAndMemberId(exportId, memberId) : Mono.just(false);
                                                     return likeChain
                                                             .flatMap(exists -> albumExportLikeRepository.countByExportId(exportId)
-                                                                    .map(likeCount -> ExportedAlbumResponse.fromDto(detailDto, likeCount, noteCount, exists)));
+                                                                    .map(likeCount -> ExportedAlbumResponse.fromDto(detailDto, likeCount, export.getViewCount(), noteCount, exists)));
                                                 }
                                         )
                         )

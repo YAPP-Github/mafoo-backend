@@ -22,6 +22,9 @@ public class AlbumExportEntity implements Persistable<String> {
     @Column("album_id")
     private String albumId;
 
+    @Column("view_count")
+    private Long viewCount;
+
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
@@ -38,6 +41,7 @@ public class AlbumExportEntity implements Persistable<String> {
         AlbumExportEntity albumExportEntity = new AlbumExportEntity();
         albumExportEntity.exportId = IdGenerator.generate();
         albumExportEntity.albumId = albumEntity.getAlbumId();
+        albumExportEntity.viewCount = 0L;
         albumExportEntity.isNew = true;
         return albumExportEntity;
     }
