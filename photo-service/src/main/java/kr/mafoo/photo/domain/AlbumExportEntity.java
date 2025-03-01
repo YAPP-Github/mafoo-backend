@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -30,15 +31,14 @@ public class AlbumExportEntity implements Persistable<String> {
         return exportId;
     }
 
-    @Override
-    public boolean isNew() {
-        return true;
-    }
+    @Transient
+    private boolean isNew = false;
 
     public static AlbumExportEntity newAlbumExport(AlbumEntity albumEntity) {
         AlbumExportEntity albumExportEntity = new AlbumExportEntity();
         albumExportEntity.exportId = IdGenerator.generate();
         albumExportEntity.albumId = albumEntity.getAlbumId();
+        albumExportEntity.isNew = true;
         return albumExportEntity;
     }
 

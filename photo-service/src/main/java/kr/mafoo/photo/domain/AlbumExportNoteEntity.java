@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.joda.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -43,10 +44,8 @@ public class AlbumExportNoteEntity implements Persistable<String> {
         return noteId;
     }
 
-    @Override
-    public boolean isNew() {
-        return true;
-    }
+    @Transient
+    private boolean isNew = false;
 
     public static AlbumExportNoteEntity newAlbumExportNote(String exportId, NoteType type, String memberId, String content, String nickname) {
         AlbumExportNoteEntity albumExportNoteEntity = new AlbumExportNoteEntity();
@@ -56,6 +55,7 @@ public class AlbumExportNoteEntity implements Persistable<String> {
         albumExportNoteEntity.memberId = memberId;
         albumExportNoteEntity.content = content;
         albumExportNoteEntity.nickname = nickname;
+        albumExportNoteEntity.isNew = true;
         return albumExportNoteEntity;
     }
 }
