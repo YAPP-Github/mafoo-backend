@@ -16,7 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("album_export_like")
 public class AlbumExportLikeEntity implements Persistable<AlbumExportLikeEntityKey> {
     @Id
-    @Column("id")
+    @Column("export_id")
     private String exportId;
 
     @Column("member_id")
