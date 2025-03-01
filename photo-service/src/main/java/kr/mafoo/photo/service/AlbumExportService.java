@@ -32,15 +32,9 @@ public class AlbumExportService {
                 .verifyOwnership(albumId, requesterMemberId)
                 .flatMap(album ->
                         albumExportRepository
-                                .existsByAlbumId(albumId)
-                                .flatMap(exists -> {
-                                    if (exists) {
-                                        return Mono.error(new AlbumExportAlreadyExistsException());
-                                    }
-                                    return Mono.just(album);
-                                })
-                )
-                .flatMap(album -> albumExportRepository.save(AlbumExportEntity.newAlbumExport(album)));
+                                .findFirstByAlbumId(albumId)
+                                        .switchIfEmpty(albumExportRepository.save(AlbumExportEntity.newAlbumExport(album))
+                ));
     }
 
     public Mono<ExportedAlbumResponse> getAlbumByExportId(String exportId, String memberId) {

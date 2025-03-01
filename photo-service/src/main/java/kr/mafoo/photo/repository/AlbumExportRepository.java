@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface AlbumExportRepository extends R2dbcRepository<AlbumExportEntity, String> {
     Mono<Boolean> existsByAlbumId(String albumId);
+    Mono<AlbumExportEntity> findFirstByAlbumId(String albumId);
 }

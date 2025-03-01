@@ -19,6 +19,9 @@ public record ExportedAlbumResponse(
         @Schema(description = "앨범 내 사진 수", example = "6")
         String photoCount,
 
+        @Schema(description = "조회 수", example = "6")
+        Long viewCount,
+
         @Schema(description = "공유 앨범 소유자 ID", example = "test_member_id")
         String ownerMemberId,
 
@@ -54,6 +57,7 @@ public record ExportedAlbumResponse(
                     dto.name(),
                     dto.type(),
                     dto.photoCount().toString(),
+                    10L,
                     dto.ownerMemberId(),
                     dto.ownerName(),
                     dto.ownerProfileImageUrl(),
