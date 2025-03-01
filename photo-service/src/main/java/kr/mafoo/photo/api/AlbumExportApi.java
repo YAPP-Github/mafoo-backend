@@ -63,8 +63,8 @@ public interface AlbumExportApi {
     );
 
     @Operation(summary = "방명록 목록 조회")
+    @GetMapping("/{exportId}/notes")
     Flux<AlbumExportNoteResponse> getNotes(
-            @RequestMemberId String memberId,
             @PathVariable String exportId
     );
 }

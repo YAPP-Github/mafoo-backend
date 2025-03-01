@@ -58,7 +58,7 @@ public class AlbumExportController implements AlbumExportApi {
     }
 
     @Override
-    public Flux<AlbumExportNoteResponse> getNotes(String memberId, String exportId) {
+    public Flux<AlbumExportNoteResponse> getNotes(String exportId) {
         return albumExportService
                 .getNotesByExportId(exportId)
                 .map(AlbumExportNoteResponse::fromEntity);
