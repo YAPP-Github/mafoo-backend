@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum VariablePlaceholder {
-
     SENDER_MEMBER_ID("senderMemberId", "{{발신자 사용자 ID}}"),
     SENDER_MEMBER_NAME("senderName", "{{발신자 사용자 이름}}"),
     SENDER_MEMBER_PROFILE_IMAGE_URL("senderProfileImageUrl", "{{발신자 사용자 프로필 URL}}"),
@@ -18,9 +17,9 @@ public enum VariablePlaceholder {
     RECEIVER_MEMBER_SERIAL_NUMBER("receiverSerialNumber", "{{수신자 사용자 식별자}}"),
 
     ALBUM_ID("albumId", "{{앨범 ID}}"),
-    ALBUM_NAME("name","{{앨범 이름}}"),
-    ALBUM_TYPE("type", "{{앨범 종류}}"),
-    ALBUM_PHOTO_COUNT("photoCount", "{{앨범 사진 수}}"),
+    ALBUM_NAME("albumName","{{앨범 이름}}"),
+    ALBUM_TYPE("albumType", "{{앨범 종류}}"),
+    ALBUM_PHOTO_COUNT("albumPhotoCount", "{{앨범 사진 수}}"),
 
     ALBUM_OWNER_MEMBER_ID("ownerMemberId", "{{앨범 소유자 ID}}"),
     ALBUM_OWNER_MEMBER_NAME("ownerName", "{{앨범 소유자 이름}}"),
@@ -31,6 +30,7 @@ public enum VariablePlaceholder {
     SHARED_MEMBER_SHARE_STATUS("shareStatus", "{{공유 사용자 초대 상태}}"),
     SHARED_MEMBER_PERMISSION_LEVEL("permissionLevel", "{{공유 사용자 권한 종류}}"),
 
+    // TODO: paramKey 규칙성 확보 필요
     SHARED_MEMBER_MEMBER_ID("memberId", "{{공유 대상 사용자 ID}}"),
     SHARED_MEMBER_MEMBER_NAME("memberName", "{{공유 대상 사용자 이름}}"),
     SHARED_MEMBER_MEMBER_PROFILE_IMAGE_URL("memberProfileImageUrl", "{{공유 대상 사용자 프로필 URL}}"),

@@ -83,6 +83,7 @@ public class NotificationEntity implements Persistable<String> {
         notificationEntity.title = title;
         notificationEntity.body = body;
         notificationEntity.paramKey = paramKey;
+        notificationEntity.isRead = false;
         notificationEntity.isNew = true;
         return notificationEntity;
     }

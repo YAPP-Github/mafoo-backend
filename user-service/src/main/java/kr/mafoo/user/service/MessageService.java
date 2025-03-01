@@ -24,23 +24,7 @@ public class MessageService {
     @Value("${cloud.firebase-channel-id}")
     private String channelId;
 
-    public Mono<Void> sendMessage(MessageDto messageDto) {
-        return (messageDto.tokens().size() == 1)
-            ? sendMessageToSingleMember(messageDto)
-            : sendMessageToMultipleMember(messageDto);
-    }
-
-    public Mono<Void> sendMessageToSingleMember(MessageDto messageDto) {
-        Message message = buildMessage(messageDto);
-        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendAsync(message))).then();
-    }
-
-    public Mono<Void> sendMessageToMultipleMember(MessageDto messageDto) {
-        MulticastMessage message = buildMulticastMessage(messageDto);
-        return Mono.fromFuture(toCompletableFuture(firebaseMessaging.sendEachForMulticastAsync(message))).then();
-    }
-
-    public Mono<Void> sendDynamicMessageToMultipleMember(List<MessageDto> messageDtoList) {
+    public Mono<Void> sendMessageToMultipleMember(List<MessageDto> messageDtoList) {
         List<MulticastMessage> multicastMessages = new java.util.ArrayList<>();
 
         for (int i = 0; i < messageDtoList.size(); i += 500) {
@@ -53,29 +37,6 @@ public class MessageService {
             .toList();
 
         return Mono.when(sendOperations);
-    }
-
-    private Message buildMessage(MessageDto messageDto) {
-        Message.Builder builder = Message.builder()
-            .setToken(messageDto.tokens().get(0))
-            .setNotification(Notification.builder()
-                .setTitle(messageDto.title())
-                .setBody(messageDto.body())
-                .build()
-            )
-            .setAndroidConfig(AndroidConfig.builder()
-                .setNotification(AndroidNotification.builder()
-                    .setChannelId(channelId)
-                    .build()
-                )
-                .setPriority(AndroidConfig.Priority.HIGH)
-                .build()
-            )
-            .putData("notificationId", messageDto.notificationId())
-            .putData("route", messageDto.route());
-
-        addOptionalData(builder, messageDto);
-        return builder.build();
     }
 
     private MulticastMessage buildMulticastMessage(MessageDto messageDto) {
@@ -99,15 +60,6 @@ public class MessageService {
 
         addOptionalData(builder, messageDto);
         return builder.build();
-    }
-
-    private void addOptionalData(Message.Builder builder, MessageDto messageDto) {
-        if (messageDto.paramKey() != null) {
-            builder.putData("paramKey", messageDto.paramKey());
-        }
-        if (messageDto.buttonType() != null) {
-            builder.putData("buttonType", messageDto.buttonType().name());
-        }
     }
 
     private void addOptionalData(MulticastMessage.Builder builder, MessageDto messageDto) {

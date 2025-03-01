@@ -46,5 +46,25 @@ public class PhotoServiceClient {
             .bodyToMono(SharedMemberDto.class);
     }
 
+    public Mono<Map<String, String>> getPhotoServiceVariableMap(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
+        return client.get()
+            .uri(generateGetPhotoServiceVariableMapUri(receiverMemberId, domain, sort, type))
+            .retrieve()
+            .onStatus(HttpStatus.BAD_REQUEST::equals, response -> Mono.empty())
+            .onStatus(status -> !status.is2xxSuccessful(), res -> Mono.error(new MafooPhotoApiFailedException()))
+            .bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {})
+            .defaultIfEmpty(Map.of());
+    }
+
+    private String generateGetPhotoServiceVariableMapUri(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
+        return String.format("%s/v1/%s/variables?memberId=%s&%s%s",
+            photoEndpoint,
+            domain.getName(),
+            receiverMemberId,
+            sort.toQueryParam(),
+            type != VariableType.NONE ? "&" + type.toQueryParam() : ""
+        );
+    }
+
 }
 
