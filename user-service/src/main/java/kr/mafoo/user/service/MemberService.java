@@ -22,18 +22,18 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SocialMemberRepository socialMemberRepository;
     private final SlackService slackService;
-    private final SharedMemberService sharedMemberService;
 
-    private final MemberDataService memberDataService;
     private final MemberQuery memberQuery;
 
     private final FcmTokenQuery fcmTokenQuery;
+
+    private final PhotoServiceClient photoServiceClient;
 
     @Transactional
     public Mono<Void> quitMemberByMemberId(String memberId, String token) {
         return socialMemberRepository.softDeleteByMemberId(memberId)
             .then(memberRepository.softDeleteById(memberId))
-            .then(memberDataService.deleteMemberData(token));
+            .then(photoServiceClient.deleteMemberData(token));
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +42,7 @@ public class MemberService {
             .findAllByNameContainingAndDeletedAtIsNull(keyword)
             .filter(member -> !member.getId().equals(memberId))
             .switchIfEmpty(Mono.empty())
-            .concatMap(member -> sharedMemberService.getSharedMemberInfoByAlbumId(albumId, member.getId(), token)
+            .concatMap(member -> photoServiceClient.getSharedMemberInfoByAlbumId(albumId, member.getId(), token)
                 .flatMap(sharedMemberDto -> Mono.just(MemberDetailDto.fromSharedMember(member, sharedMemberDto)))
             );
     }

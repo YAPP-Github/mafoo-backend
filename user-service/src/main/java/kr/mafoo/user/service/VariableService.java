@@ -40,10 +40,10 @@ public class VariableService {
             .flatMap(member -> {
                 Map<String, String> variableMap = new HashMap<>();
 
-                variableMap.put("memberId", member.memberId());
-                variableMap.put("memberName", member.name());
-                variableMap.put("profileImageUrl", member.profileImageUrl());
-                variableMap.put("serialNumber", member.serialNumber());
+                variableMap.put("receiverMemberId", member.memberId());
+                variableMap.put("receiverName", member.name());
+                variableMap.put("receiverProfileImageUrl", member.profileImageUrl());
+                variableMap.put("receiverSerialNumber", member.serialNumber());
 
                 if (domain.equals(NONE)) {
                     return Mono.just(variableMap);

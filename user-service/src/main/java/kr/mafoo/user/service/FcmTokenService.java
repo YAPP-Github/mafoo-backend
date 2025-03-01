@@ -37,7 +37,7 @@ public class FcmTokenService {
         return memberQuery.findById(requestMemberId)
             .flatMap(member -> fcmTokenQuery.checkDuplicateExists(requestMemberId)
                     .then(fcmTokenCommand.addFcmToken(requestMemberId, token)
-                        .flatMap(fcmToken -> notificationService.sendNotificationByScenario(NEW_MEMBER, List.of(requestMemberId), Map.of("name", member.getName()))
+                        .flatMap(fcmToken -> notificationService.sendNotificationByScenario(NEW_MEMBER, List.of(requestMemberId), Map.of("receiverName", member.getName()))
                             .then(Mono.just(fcmToken))
                         )
                     )
