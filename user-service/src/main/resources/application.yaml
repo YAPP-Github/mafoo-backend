@@ -62,3 +62,6 @@ slack:
 
 cloud:
   firebase: ${FIREBASE_SECRET}
+  firebase-channel-id: mafoo-notification
+
+

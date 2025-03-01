@@ -1,6 +1,8 @@
 package kr.mafoo.user.service;
 
 import com.google.api.core.ApiFuture;
+import com.google.firebase.messaging.AndroidConfig;
+import com.google.firebase.messaging.AndroidNotification;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import kr.mafoo.user.service.dto.MessageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +20,9 @@ import reactor.core.publisher.Mono;
 public class MessageService {
 
     private final FirebaseMessaging firebaseMessaging;
+
+    @Value("${cloud.firebase-channel-id}")
+    private String channelId;
 
     public Mono<Void> sendMessage(MessageDto messageDto) {
         return (messageDto.tokens().size() == 1)
@@ -57,6 +63,14 @@ public class MessageService {
                 .setBody(messageDto.body())
                 .build()
             )
+            .setAndroidConfig(AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                    .setChannelId(channelId)
+                    .build()
+                )
+                .setPriority(AndroidConfig.Priority.HIGH)
+                .build()
+            )
             .putData("notificationId", messageDto.notificationId())
             .putData("route", messageDto.route());
 
@@ -70,6 +84,14 @@ public class MessageService {
             .setNotification(Notification.builder()
                 .setTitle(messageDto.title())
                 .setBody(messageDto.body())
+                .build()
+            )
+            .setAndroidConfig(AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                    .setChannelId(channelId)
+                    .build()
+                )
+                .setPriority(AndroidConfig.Priority.HIGH)
                 .build()
             )
             .putData("notificationId", messageDto.notificationId())
