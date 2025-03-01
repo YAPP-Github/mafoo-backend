@@ -4,13 +4,13 @@ import kr.mafoo.photo.domain.enums.NoteType;
 import kr.mafoo.photo.util.IdGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.joda.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
