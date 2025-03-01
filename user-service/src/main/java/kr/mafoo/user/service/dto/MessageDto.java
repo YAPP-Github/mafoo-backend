@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import kr.mafoo.user.enums.ButtonType;
 import kr.mafoo.user.enums.RouteType;
-import kr.mafoo.user.enums.VariablePlaceholder;
 import kr.mafoo.user.util.IdGenerator;
+import kr.mafoo.user.util.VariableConverter;
 
 public record MessageDto(
     String notificationId,
@@ -48,30 +48,12 @@ public record MessageDto(
             IdGenerator.generate(),
             receiverMemberIds,
             tokens,
-            convertVariables(title, variables),
-            convertVariables(body, variables),
+            VariableConverter.convert(title, variables),
+            VariableConverter.convert(body, variables),
             routeType.getRoute(),
-            routeType.getParamKeyType() != null ? convertVariables(routeType.getParamKeyType().getPlaceholder(), variables) : null,
+            routeType.getParamKeyType() != null ? VariableConverter.convert(routeType.getParamKeyType().getPlaceholder(), variables) : null,
             routeType.getButtonType()
         );
-    }
-
-    private static String convertVariables(String text, Map<String, String> variables) {
-        StringBuilder result = new StringBuilder(text);
-
-        for (VariablePlaceholder variablePlaceholder : VariablePlaceholder.values()) {
-            String placeholder = variablePlaceholder.getPlaceholder();
-            String paramKey = variablePlaceholder.getParamKey();
-
-            String replacement = variables.getOrDefault(paramKey, "");
-
-            int index;
-            while ((index = result.indexOf(placeholder)) != -1) {
-                result.replace(index, index + placeholder.length(), replacement);
-            }
-        }
-
-        return result.toString();
     }
 
 }
