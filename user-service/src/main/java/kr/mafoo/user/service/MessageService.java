@@ -78,8 +78,8 @@ public class MessageService {
     }
 
     private void addOptionalData(Message.Builder builder, MessageDto messageDto) {
-        if (messageDto.key() != null) {
-            builder.putData("key", messageDto.key());
+        if (messageDto.paramKey() != null) {
+            builder.putData("paramKey", messageDto.paramKey());
         }
         if (messageDto.buttonType() != null) {
             builder.putData("buttonType", messageDto.buttonType().name());
@@ -87,8 +87,8 @@ public class MessageService {
     }
 
     private void addOptionalData(MulticastMessage.Builder builder, MessageDto messageDto) {
-        if (messageDto.key() != null) {
-            builder.putData("key", messageDto.key());
+        if (messageDto.paramKey() != null) {
+            builder.putData("paramKey", messageDto.paramKey());
         }
         if (messageDto.buttonType() != null) {
             builder.putData("buttonType", messageDto.buttonType().name());

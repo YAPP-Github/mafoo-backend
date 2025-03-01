@@ -36,7 +36,7 @@ public enum VariablePlaceholder {
     SHARED_MEMBER_ALBUM_PHOTO_COUNT("albumPhotoCount", "{{공유 대상 앨범 사진 수}}")
     ;
 
-    private final String key;
+    private final String paramKey;
     private final String placeholder;
 }
 

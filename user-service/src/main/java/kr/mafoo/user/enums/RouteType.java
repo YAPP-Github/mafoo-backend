@@ -25,7 +25,7 @@ public enum RouteType {
     ;
 
     private final String route;
-    private final VariablePlaceholder keyType;
+    private final VariablePlaceholder paramKeyType;
     private final ButtonType buttonType;
 }
 

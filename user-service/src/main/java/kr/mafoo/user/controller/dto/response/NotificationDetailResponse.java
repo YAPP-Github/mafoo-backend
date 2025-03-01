@@ -33,8 +33,8 @@ public record NotificationDetailResponse(
     @Schema(description = "알림 route")
     String route,
 
-    @Schema(description = "알림 key")
-    String key,
+    @Schema(description = "알림 paramKey")
+    String paramKey,
 
     @Schema(description = "알림 button 종류")
     ButtonType buttonType,
@@ -62,7 +62,7 @@ public record NotificationDetailResponse(
                     dto.title(),
                     dto.body(),
                     dto.route(),
-                    dto.key(),
+                    dto.paramKey(),
                     dto.buttonType(),
                     dto.isRead(),
                     dto.createdAt(),

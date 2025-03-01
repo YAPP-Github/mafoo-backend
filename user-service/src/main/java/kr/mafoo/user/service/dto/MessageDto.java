@@ -12,7 +12,7 @@ public record MessageDto(
     String title,
     String body,
     String route,
-    String key,
+    String paramKey,
     ButtonType buttonType
 ) {
     public static MessageDto fromTemplateWithoutVariables(
@@ -47,7 +47,7 @@ public record MessageDto(
             convertVariables(title, variables),
             convertVariables(body, variables),
             routeType.getRoute(),
-            routeType.getKeyType() != null ? convertVariables(routeType.getKeyType().getPlaceholder(), variables) : null,
+            routeType.getParamKeyType() != null ? convertVariables(routeType.getParamKeyType().getPlaceholder(), variables) : null,
             routeType.getButtonType()
         );
     }
@@ -57,9 +57,9 @@ public record MessageDto(
 
         for (VariablePlaceholder variablePlaceholder : VariablePlaceholder.values()) {
             String placeholder = variablePlaceholder.getPlaceholder();
-            String key = variablePlaceholder.getKey();
+            String paramKey = variablePlaceholder.getParamKey();
 
-            String replacement = variables.getOrDefault(key, "");
+            String replacement = variables.getOrDefault(paramKey, "");
 
             int index;
             while ((index = result.indexOf(placeholder)) != -1) {

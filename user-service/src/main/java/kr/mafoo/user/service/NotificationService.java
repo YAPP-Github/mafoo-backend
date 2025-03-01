@@ -102,7 +102,7 @@ public class NotificationService {
     private Flux<NotificationEntity> addNotificationBulk(String templateId, MessageDto messageDto) {
         return Flux.fromIterable(messageDto.receiverMemberIds())
             .flatMap(receiverMemberId -> notificationCommand.addNotification(
-                templateId, receiverMemberId, messageDto.title(), messageDto.body(), messageDto.key()
+                templateId, receiverMemberId, messageDto.title(), messageDto.body(), messageDto.paramKey()
             ))
             .flatMap(notifications -> messageService.sendMessage(messageDto)
                 .thenReturn(notifications)
@@ -112,7 +112,7 @@ public class NotificationService {
     private Flux<NotificationEntity> addDynamicNotificationBulk(String templateId, List<MessageDto> messageDtoList) {
         return Flux.fromIterable(messageDtoList)
             .flatMap(messageDto -> notificationCommand.addNotification(
-                templateId, messageDto.receiverMemberIds().get(0), messageDto.title(), messageDto.body(), messageDto.key()
+                templateId, messageDto.receiverMemberIds().get(0), messageDto.title(), messageDto.body(), messageDto.paramKey()
             ))
             .flatMap(notifications -> messageService.sendDynamicMessageToMultipleMember(messageDtoList)
                 .thenReturn(notifications)

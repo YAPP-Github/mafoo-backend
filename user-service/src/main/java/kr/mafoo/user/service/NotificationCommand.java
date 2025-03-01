@@ -13,9 +13,9 @@ public class NotificationCommand {
 
     private final NotificationRepository notificationRepository;
 
-    public Mono<NotificationEntity> addNotification(String templateId, String receiverMemberId, String title, String body, String key) {
+    public Mono<NotificationEntity> addNotification(String templateId, String receiverMemberId, String title, String body, String paramKey) {
         return notificationRepository.save(
-            NotificationEntity.newNotification(IdGenerator.generate(), templateId, receiverMemberId, title, body, key)
+            NotificationEntity.newNotification(IdGenerator.generate(), templateId, receiverMemberId, title, body, paramKey)
         );
     }
 
