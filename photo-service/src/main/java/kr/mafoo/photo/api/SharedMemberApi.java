@@ -103,6 +103,30 @@ public interface SharedMemberApi {
             SharedMemberUpdateStatusRequest request
     );
 
+    @Operation(summary = "공유 사용자 상태 수락 변경", description = "공유 사용자의 상태를 수락으로 변경합니다.")
+    @PatchMapping("/{sharedMemberId}/status/accept")
+    Mono<SharedMemberResponse> updateSharedMemberStatusAccept(
+        @RequestMemberId
+        String memberId,
+
+        @ULID
+        @Parameter(description = "공유 사용자 ID", example = "test_shared_member_id")
+        @PathVariable
+        String sharedMemberId
+    );
+
+    @Operation(summary = "공유 사용자 상태 거절 변경", description = "공유 사용자의 상태를 거절로 변경합니다.")
+    @PatchMapping("/{sharedMemberId}/status/reject")
+    Mono<SharedMemberResponse> updateSharedMemberStatusReject(
+        @RequestMemberId
+        String memberId,
+
+        @ULID
+        @Parameter(description = "공유 사용자 ID", example = "test_shared_member_id")
+        @PathVariable
+        String sharedMemberId
+    );
+
     @Operation(summary = "공유 사용자 권한 변경", description = "공유 사용자의 권한을 변경합니다.")
     @PatchMapping("/{sharedMemberId}/permission")
     Mono<SharedMemberResponse> updateSharedMemberPermission(

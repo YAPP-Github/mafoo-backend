@@ -30,16 +30,15 @@ public enum VariablePlaceholder {
     SHARED_MEMBER_SHARE_STATUS("shareStatus", "{{공유 사용자 초대 상태}}"),
     SHARED_MEMBER_PERMISSION_LEVEL("permissionLevel", "{{공유 사용자 권한 종류}}"),
 
-    // TODO: paramKey 규칙성 확보 필요
-    SHARED_MEMBER_MEMBER_ID("memberId", "{{공유 대상 사용자 ID}}"),
-    SHARED_MEMBER_MEMBER_NAME("memberName", "{{공유 대상 사용자 이름}}"),
-    SHARED_MEMBER_MEMBER_PROFILE_IMAGE_URL("memberProfileImageUrl", "{{공유 대상 사용자 프로필 URL}}"),
-    SHARED_MEMBER_MEMBER_SERIAL_NUMBER("memberSerialNumber", "{{공유 대상 사용자 식별자}}"),
+    SHARED_MEMBER_MEMBER_ID("shareTargetMemberId", "{{공유 대상 사용자 ID}}"),
+    SHARED_MEMBER_MEMBER_NAME("shareTargetMemberName", "{{공유 대상 사용자 이름}}"),
+    SHARED_MEMBER_MEMBER_PROFILE_IMAGE_URL("shareTargetMemberProfileImageUrl", "{{공유 대상 사용자 프로필 URL}}"),
+    SHARED_MEMBER_MEMBER_SERIAL_NUMBER("shareTargetMemberSerialNumber", "{{공유 대상 사용자 식별자}}"),
 
-    SHARED_MEMBER_ALBUM_ID("albumId", "{{공유 대상 앨범 ID}}"),
-    SHARED_MEMBER_ALBUM_NAME("albumName", "{{공유 대상 앨범 이름}}"),
-    SHARED_MEMBER_ALBUM_TYPE("albumType", "{{공유 대상 앨범 종류}}"),
-    SHARED_MEMBER_ALBUM_PHOTO_COUNT("albumPhotoCount", "{{공유 대상 앨범 사진 수}}")
+    SHARED_MEMBER_ALBUM_ID("shareTargetAlbumId", "{{공유 대상 앨범 ID}}"),
+    SHARED_MEMBER_ALBUM_NAME("shareTargetAlbumName", "{{공유 대상 앨범 이름}}"),
+    SHARED_MEMBER_ALBUM_TYPE("shareTargetAlbumType", "{{공유 대상 앨범 종류}}"),
+    SHARED_MEMBER_ALBUM_PHOTO_COUNT("shareTargetAlbumPhotoCount", "{{공유 대상 앨범 사진 수}}")
     ;
 
     private final String paramKey;
