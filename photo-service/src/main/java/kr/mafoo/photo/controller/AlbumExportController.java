@@ -52,8 +52,9 @@ public class AlbumExportController implements AlbumExportApi {
 
     @Override
     public Mono<AlbumExportNoteResponse> createNote(String memberId, String exportId, AlbumExportNoteCreateRequest noteCreateRequest) {
+        String actualMemberId = memberId == null ? "MAFOONOTE_ANONYMOUS_MEMBER" : memberId;
         return albumExportService
-                .createNote(exportId, noteCreateRequest.type(), memberId, noteCreateRequest.content(), noteCreateRequest.nickname())
+                .createNote(exportId, noteCreateRequest.type(), actualMemberId, noteCreateRequest.content(), noteCreateRequest.nickname())
                 .map(AlbumExportNoteResponse::fromEntity);
     }
 

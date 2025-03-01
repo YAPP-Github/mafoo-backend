@@ -34,8 +34,8 @@ spring:
           uri: http://photo-service
           predicates:
           - Path=/photo/v1/exports/{id}/notes
-          - Method=GET
           filters:
+          - JWTSafeAuthenticationFilter
           - RewritePath=/photo/v1/exports/(?<id>.*)/notes, /v1/exports/${id}/notes
         - id: admin-service
           uri: http://admin-service
