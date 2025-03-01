@@ -21,6 +21,13 @@ spring:
             - Method=GET
           filters:
             - RewritePath=/photo/v1/exports/(?<id>.*)/album/(?<albumId>.*), /v1/exports/${id}/album/${albumId}
+        - id: album-export-root
+          uri: http://photo-service
+          predicates:
+          - Path=/photo/v1/exports/{id}/album
+          - Method=GET
+          filters:
+          - RewritePath=/photo/v1/exports/(?<id>.*)/album, /v1/exports/${id}/album
         - id: admin-service
           uri: http://admin-service
           predicates:
