@@ -14,12 +14,13 @@ spring:
             allowedHeaders: '*'
             allowedMethods: '*'
       routes:
-        - id: sumone-event
+        - id: album-export
           uri: http://photo-service
           predicates:
-            - Path=/sumone/**
+            - Path=/photo/v1/exports/**/album/**
+            - Method=GET
           filters:
-            - RewritePath=/sumone/(?<segment>/?.*), /$\{segment}
+            - RewritePath=/photo/(?<segment>/?.*), /$\{segment}
         - id: admin-service
           uri: http://admin-service
           predicates:

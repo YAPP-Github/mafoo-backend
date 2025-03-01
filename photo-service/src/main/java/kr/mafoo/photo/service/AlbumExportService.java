@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 public class AlbumExportService {
+
     private final AlbumExportRepository albumExportRepository;
     private final AlbumExportLikeRepository albumExportLikeRepository;
     private final AlbumExportNoteRepository albumExportNoteRepository;
@@ -47,15 +48,18 @@ public class AlbumExportService {
                 .findById(exportId)
                 .switchIfEmpty(Mono.error(new AlbumExportNotFoundException()))
                 .flatMap(export -> albumService
-                .findAlbumDetailByIdWithoutVerify(export.getAlbumId())
-                .flatMap(detailDto ->
-                        albumExportNoteRepository.countByExportId(exportId)
-                                .flatMap(noteCount -> albumExportLikeRepository.existsByExportIdAndMemberId(exportId, memberId)
-                                        .flatMap(exists -> albumExportLikeRepository.countByExportId(exportId)
-                                                .map(likeCount -> ExportedAlbumResponse.fromDto(detailDto, likeCount, noteCount, exists)))
-                                )
-                )
-        );
+                        .findAlbumDetailByIdWithoutVerify(export.getAlbumId())
+                        .flatMap(detailDto ->
+                                albumExportNoteRepository.countByExportId(exportId)
+                                        .flatMap(noteCount -> {
+                                                    Mono<Boolean> likeChain = memberId != null ? albumExportLikeRepository.existsByExportIdAndMemberId(exportId, memberId) : Mono.just(false);
+                                                    return likeChain
+                                                            .flatMap(exists -> albumExportLikeRepository.countByExportId(exportId)
+                                                                    .map(likeCount -> ExportedAlbumResponse.fromDto(detailDto, likeCount, noteCount, exists)));
+                                                }
+                                        )
+                        )
+                );
 
     }
 
