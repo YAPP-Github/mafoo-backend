@@ -2,7 +2,9 @@ package kr.mafoo.photo.service;
 
 import static kr.mafoo.photo.domain.enums.NotificationType.SHARED_MEMBER_INVITATION_CREATED;
 import static kr.mafoo.photo.domain.enums.PermissionLevel.FULL_ACCESS;
+import static kr.mafoo.photo.domain.enums.ShareStatus.ACCEPTED;
 import static kr.mafoo.photo.domain.enums.ShareStatus.PENDING;
+import static kr.mafoo.photo.domain.enums.ShareStatus.REJECTED;
 import static kr.mafoo.photo.domain.enums.SortOrder.DESC;
 
 import java.util.Comparator;
@@ -159,6 +161,30 @@ public class SharedMemberService {
             .flatMap(sharedMember -> {
                 if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && isPendingStatus(sharedMember.getShareStatus())) {
                     return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, newShareStatus);
+                } else {
+                    return Mono.error(new SharedMemberPermissionDeniedException());
+                }
+            });
+    }
+
+    @Transactional
+    public Mono<SharedMemberEntity> modifySharedMemberShareStatusAccept(String sharedMemberId, String requestMemberId) {
+        return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
+            .flatMap(sharedMember -> {
+                if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && isPendingStatus(sharedMember.getShareStatus())) {
+                    return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED);
+                } else {
+                    return Mono.error(new SharedMemberPermissionDeniedException());
+                }
+            });
+    }
+
+    @Transactional
+    public Mono<SharedMemberEntity> modifySharedMemberShareStatusReject(String sharedMemberId, String requestMemberId) {
+        return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
+            .flatMap(sharedMember -> {
+                if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && isPendingStatus(sharedMember.getShareStatus())) {
+                    return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, REJECTED);
                 } else {
                     return Mono.error(new SharedMemberPermissionDeniedException());
                 }

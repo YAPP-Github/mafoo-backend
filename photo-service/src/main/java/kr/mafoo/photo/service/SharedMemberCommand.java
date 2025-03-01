@@ -32,6 +32,12 @@ public class SharedMemberCommand {
         ));
     }
 
+    public Mono<SharedMemberEntity> modifySharedMemberShareStatus(SharedMemberEntity sharedMember, ShareStatus newShareStatus) {
+        return sharedMemberRepository.save(sharedMember.updateShareStatus(
+            newShareStatus
+        ));
+    }
+
     public Mono<SharedMemberEntity> modifySharedMemberPermissionLevel(SharedMemberEntity sharedMember, String newPermissionLevel) {
         return sharedMemberRepository.save(sharedMember.updatePermissionLevel(
             PermissionLevel.valueOf(newPermissionLevel)

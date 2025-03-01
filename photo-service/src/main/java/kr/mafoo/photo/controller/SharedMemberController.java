@@ -75,6 +75,24 @@ public class SharedMemberController implements SharedMemberApi {
     }
 
     @Override
+    public Mono<SharedMemberResponse> updateSharedMemberStatusAccept(
+        String memberId,
+        String sharedMemberId
+    ){
+        return sharedMemberService.modifySharedMemberShareStatusAccept(sharedMemberId, memberId)
+            .map(SharedMemberResponse::fromEntity);
+    }
+
+    @Override
+    public Mono<SharedMemberResponse> updateSharedMemberStatusReject(
+        String memberId,
+        String sharedMemberId
+    ){
+        return sharedMemberService.modifySharedMemberShareStatusReject(sharedMemberId, memberId)
+            .map(SharedMemberResponse::fromEntity);
+    }
+
+    @Override
     public Mono<SharedMemberResponse> updateSharedMemberPermission(
         String memberId,
         String sharedMemberId,
