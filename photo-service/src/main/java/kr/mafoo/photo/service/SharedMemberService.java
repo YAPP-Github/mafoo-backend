@@ -133,6 +133,7 @@ public class SharedMemberService {
                                     "sharedMemberId", sharedMember.getSharedMemberId()
                                 )
                             )
+                            .collectList()
                             .thenReturn(sharedMember)
                         )
                     )
@@ -180,9 +181,9 @@ public class SharedMemberService {
                             receiverMemberIds.remove(requestMemberId);
 
                             return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
-                                .then(memberServiceClient.getMemberInfoById(requestMemberId)
-                                    .flatMap(memberDto -> albumQuery.findById(sharedMember.getAlbumId())
-                                        .flatMap(album -> memberServiceClient
+                                .thenMany(memberServiceClient.getMemberInfoById(requestMemberId)
+                                    .flatMapMany(memberDto -> albumQuery.findById(sharedMember.getAlbumId())
+                                        .flatMapMany(album -> memberServiceClient
                                             .sendScenarioNotification(
                                                 SHARED_MEMBER_INVITATION_ACCEPTED,
                                                 receiverMemberIds,
@@ -195,6 +196,7 @@ public class SharedMemberService {
                                         )
                                     )
                                 )
+                                .collectList()
                                 .thenReturn(sharedMember);
                         });
                 } else {
