@@ -42,7 +42,7 @@ public class PhotoServiceClient {
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
             .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
+//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
             .bodyToMono(SharedMemberDto.class);
     }
 
