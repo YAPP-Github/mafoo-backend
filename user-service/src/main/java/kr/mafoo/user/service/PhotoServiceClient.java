@@ -1,5 +1,6 @@
 package kr.mafoo.user.service;
 
+import java.util.List;
 import java.util.Map;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
@@ -12,6 +13,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -35,14 +37,14 @@ public class PhotoServiceClient {
             .then();
     }
 
-    public Mono<SharedMemberDto> getSharedMemberInfoByAlbumId(String albumId, String memberId) {
+    public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList) {
         return client
             .get()
-            .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberId=" + memberId)
+            .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
             .retrieve()
             .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
-//            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
-            .bodyToMono(SharedMemberDto.class);
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
+            .bodyToFlux(SharedMemberDto.class);
     }
 
     public Mono<Map<String, String>> getPhotoServiceVariableMap(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {

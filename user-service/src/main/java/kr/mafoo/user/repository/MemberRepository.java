@@ -11,7 +11,8 @@ public interface MemberRepository extends R2dbcRepository<MemberEntity, String> 
 
     Mono<MemberEntity> findByIdAndDeletedAtIsNull(String memberId);
 
-    Flux<MemberEntity> findAllByNameContainingAndDeletedAtIsNull(String keyword);
+    @Query("SELECT * FROM member WHERE name LIKE :keyword AND member_id != :memberId AND deleted_at IS NULL")
+    Flux<MemberEntity> findAllByNameContainingAndMemberIdNot(String keyword, String memberId);
 
     @Modifying
     @Query("UPDATE member SET deleted_at = NOW() WHERE member_id = :memberId AND deleted_at IS NULL")

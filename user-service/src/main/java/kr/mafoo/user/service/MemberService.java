@@ -1,5 +1,6 @@
 package kr.mafoo.user.service;
 
+import java.util.List;
 import kr.mafoo.user.domain.MemberEntity;
 import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import kr.mafoo.user.exception.MemberNotFoundException;
@@ -7,6 +8,7 @@ import kr.mafoo.user.repository.MemberRepository;
 import kr.mafoo.user.repository.SocialMemberRepository;
 import kr.mafoo.user.service.dto.MeDto;
 import kr.mafoo.user.service.dto.MemberDetailDto;
+import kr.mafoo.user.service.dto.SharedMemberDto;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +40,25 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId) {
-        return memberRepository.findAllByNameContainingAndDeletedAtIsNull(keyword)
-            .filter(member -> !member.getId().equals(memberId))
+        return memberQuery.findAllByNameKeywordAndMemberIdNot(keyword, memberId)
             .switchIfEmpty(Mono.empty())
-            .flatMap(member -> photoServiceClient.getSharedMemberInfoByAlbumId(albumId, member.getId())
-                .flatMap(sharedMemberDto -> Mono.just(MemberDetailDto.fromSharedMember(member, sharedMemberDto)))
+            .collectList()
+            .flatMapMany(memberList -> photoServiceClient.getSharedMemberFluxByAlbumId(albumId, memberList.stream().map(MemberEntity::getId).toList())
+                .collectList()
+                .flatMapMany(sharedMemberList -> mergeMembersWithSharedMemberInfo(memberList, sharedMemberList))
             );
+    }
+
+    private Flux<MemberDetailDto> mergeMembersWithSharedMemberInfo(List<MemberEntity> memberList, List<SharedMemberDto> sharedMemberList) {
+        return Flux.fromIterable(memberList)
+            .map(member -> MemberDetailDto.fromSharedMember(member, findSharedMember(member, sharedMemberList)));
+    }
+
+    private SharedMemberDto findSharedMember(MemberEntity member, List<SharedMemberDto> sharedMemberList) {
+        return sharedMemberList.stream()
+            .filter(sharedMember -> sharedMember.memberId().equals(member.getId()))
+            .findFirst()
+            .orElse(null);
     }
 
     @Transactional(readOnly = true)
