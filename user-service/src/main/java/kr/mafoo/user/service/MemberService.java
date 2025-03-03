@@ -38,11 +38,10 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId) {
-        return memberRepository
-            .findAllByNameContainingAndDeletedAtIsNull(keyword)
+        return memberRepository.findAllByNameContainingAndDeletedAtIsNull(keyword)
             .filter(member -> !member.getId().equals(memberId))
             .switchIfEmpty(Mono.empty())
-            .concatMap(member -> photoServiceClient.getSharedMemberInfoByAlbumId(albumId, member.getId())
+            .flatMap(member -> photoServiceClient.getSharedMemberInfoByAlbumId(albumId, member.getId())
                 .flatMap(sharedMemberDto -> Mono.just(MemberDetailDto.fromSharedMember(member, sharedMemberDto)))
             );
     }
