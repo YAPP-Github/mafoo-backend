@@ -62,9 +62,6 @@ public interface SharedMemberApi {
     @Operation(summary = "공유 사용자 조회", description = "앨범 ID 및 사용자 ID에 해당하는 공유 사용자를 조회합니다.")
     @GetMapping
     Mono<SharedMemberResponse> getSharedMemberByAlbumAndMember(
-        @RequestMemberId
-        String requestMemberId,
-
         @ULID
         @Parameter(description = "앨범 ID", example = "test_album_id")
         @RequestParam

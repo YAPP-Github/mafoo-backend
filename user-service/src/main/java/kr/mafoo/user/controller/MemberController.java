@@ -19,12 +19,9 @@ public class MemberController implements MemberApi {
     public Flux<MemberDetailResponse> getMemberListByNameForSharedAlbum(
         String requesterId,
         String keyword,
-        String albumId,
-        ServerHttpRequest serverHttpRequest
+        String albumId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
-        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, requesterId, authorizationToken)
+        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, requesterId)
             .map(MemberDetailResponse::fromDto);
     }
 

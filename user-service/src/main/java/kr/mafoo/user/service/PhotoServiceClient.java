@@ -35,11 +35,10 @@ public class PhotoServiceClient {
             .then();
     }
 
-    public Mono<SharedMemberDto> getSharedMemberInfoByAlbumId(String albumId, String memberId, String authorizationToken) {
+    public Mono<SharedMemberDto> getSharedMemberInfoByAlbumId(String albumId, String memberId) {
         return client
             .get()
             .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberId=" + memberId)
-            .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
             .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
 //            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))

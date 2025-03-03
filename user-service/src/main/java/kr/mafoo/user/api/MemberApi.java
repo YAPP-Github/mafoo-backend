@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.mafoo.user.annotation.RequestMemberId;
 import kr.mafoo.user.controller.dto.response.MemberDetailResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +31,7 @@ public interface MemberApi {
 
         @Parameter(description = "앨범 ID", example = "test_album_id")
         @RequestParam
-        String albumId,
-
-        // Authorization Header를 받아올 목적
-        ServerHttpRequest serverHttpRequest
+        String albumId
     );
 
     @Operation(summary = "사용자 단건 조회", description = "사용자 단건 정보를 조회합니다.")

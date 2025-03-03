@@ -47,7 +47,6 @@ public class SharedMemberController implements SharedMemberApi {
 
     @Override
     public Mono<SharedMemberResponse> getSharedMemberByAlbumAndMember(
-        String requestMemberId,
         String albumId,
         String memberId
     ) {
