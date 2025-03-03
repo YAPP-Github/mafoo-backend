@@ -19,6 +19,9 @@ public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEnti
     @Query("SELECT * FROM shared_member WHERE album_id IN (:albumIdList) AND member_id != :memberId AND deleted_at IS NULL")
     Flux<SharedMemberEntity> findAllByAlbumIdListAndMemberIdNot(List<String> albumIdList, String memberId);
 
+    @Query("SELECT * FROM shared_member WHERE album_id = :albumIdList AND member_id IN (:memberIdList) AND deleted_at IS NULL")
+    Flux<SharedMemberEntity> findAllByAlbumIdAndMemberIdList(String albumId, List<String> memberIdList);
+
     Flux<SharedMemberEntity> findByMemberIdAndDeletedAtIsNull(String memberId);
 
     Mono<SharedMemberEntity> findByIdAndDeletedAtIsNull(String id);

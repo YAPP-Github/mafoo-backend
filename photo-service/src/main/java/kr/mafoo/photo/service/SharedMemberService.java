@@ -113,8 +113,9 @@ public class SharedMemberService {
     }
 
     @Transactional(readOnly = true)
-    public Mono<SharedMemberEntity> findSharedMemberByAlbumIdAndMemberId(String albumId, String requestMemberId) {
-        return sharedMemberQuery.findByAlbumIdAndMemberId(albumId, requestMemberId);
+    public Flux<SharedMemberEntity> findSharedMemberByAlbumIdAndMemberIdList(String albumId, List<String> memberIdList) {
+        return sharedMemberQuery.findAllByAlbumIdAndMemberIdList(albumId, memberIdList)
+            .onErrorResume(SharedMemberNotFoundException.class, ex -> Flux.empty());
     }
 
     @Transactional
