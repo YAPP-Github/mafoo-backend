@@ -1,5 +1,6 @@
 package kr.mafoo.photo.controller;
 
+import java.util.Arrays;
 import kr.mafoo.photo.api.SharedMemberApi;
 import kr.mafoo.photo.controller.dto.request.SharedMemberCreateRequest;
 import kr.mafoo.photo.controller.dto.request.SharedMemberUpdatePermissionRequest;
@@ -13,6 +14,7 @@ import kr.mafoo.photo.domain.enums.SortOrder;
 import kr.mafoo.photo.service.SharedMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -46,11 +48,11 @@ public class SharedMemberController implements SharedMemberApi {
     }
 
     @Override
-    public Mono<SharedMemberResponse> getSharedMemberByAlbumAndMember(
+    public Flux<SharedMemberResponse> getSharedMemberByAlbumAndMemberList(
         String albumId,
-        String memberId
+        String memberIdList
     ) {
-        return sharedMemberService.findSharedMemberByAlbumIdAndMemberId(albumId, memberId)
+        return sharedMemberService.findSharedMemberByAlbumIdAndMemberIdList(albumId, Arrays.stream(memberIdList.split(",")).toList())
             .map(SharedMemberResponse::fromEntity);
     }
 

@@ -15,14 +15,26 @@ public record MemberDetailDto(
         MemberEntity memberEntity,
         SharedMemberDto sharedMemberDto
     ) {
-        return new MemberDetailDto(
-            memberEntity.getId(),
-            memberEntity.getName(),
-            memberEntity.getProfileImageUrl(),
-            String.format("%04d", memberEntity.getSerialNumber()),
-            sharedMemberDto.sharedMemberId(),
-            sharedMemberDto.shareStatus(),
-            sharedMemberDto.permissionLevel()
-        );
+        if (sharedMemberDto == null) {
+            return new MemberDetailDto(
+                memberEntity.getId(),
+                memberEntity.getName(),
+                memberEntity.getProfileImageUrl(),
+                String.format("%04d", memberEntity.getSerialNumber()),
+                null,
+                null,
+                null
+            );
+        } else {
+            return new MemberDetailDto(
+                memberEntity.getId(),
+                memberEntity.getName(),
+                memberEntity.getProfileImageUrl(),
+                String.format("%04d", memberEntity.getSerialNumber()),
+                sharedMemberDto.sharedMemberId(),
+                sharedMemberDto.shareStatus(),
+                sharedMemberDto.permissionLevel()
+            );
+        }
     }
 }

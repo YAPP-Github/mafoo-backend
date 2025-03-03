@@ -29,6 +29,11 @@ public class SharedMemberQuery {
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
+    public Flux<SharedMemberEntity> findAllByAlbumIdAndMemberIdList(String albumId, List<String> memberIdList) {
+        return sharedMemberRepository.findAllByAlbumIdAndMemberIdList(albumId, memberIdList)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
     public Flux<SharedMemberEntity> findByMemberId(String memberId) {
         return sharedMemberRepository.findByMemberIdAndDeletedAtIsNull(memberId)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));

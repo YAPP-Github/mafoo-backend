@@ -17,6 +17,7 @@ import kr.mafoo.photo.domain.enums.SharedMemberSortType;
 import kr.mafoo.photo.domain.enums.SortOrder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Validated
@@ -59,18 +60,17 @@ public interface SharedMemberApi {
         String memberId
     );
 
-    @Operation(summary = "공유 사용자 조회", description = "앨범 ID 및 사용자 ID에 해당하는 공유 사용자를 조회합니다.")
+    @Operation(summary = "앨범 별 공유 사용자 조회", description = "앨범 별 공유 사용자를 조회합니다.")
     @GetMapping
-    Mono<SharedMemberResponse> getSharedMemberByAlbumAndMember(
+    Flux<SharedMemberResponse> getSharedMemberByAlbumAndMemberList(
         @ULID
         @Parameter(description = "앨범 ID", example = "test_album_id")
         @RequestParam
         String albumId,
 
-        @ULID
-        @Parameter(description = "사용자 ID", example = "test_album_id")
+        @Parameter(description = "앨범 ID", example = "test_album_id")
         @RequestParam
-        String memberId
+        String memberIdList
     );
 
     @Operation(summary = "공유 사용자 생성", description = "공유 사용자를 생성합니다.")
