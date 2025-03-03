@@ -177,10 +177,10 @@ public class SharedMemberService {
                     return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
                         .flatMap(newSharedMember -> sharedMemberQuery.findByAlbumIdWhereStatusAccepted(sharedMember.getAlbumId())
                             .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
+                            .filter(sharedMemberList -> sharedMemberList.getSharedMemberId().equals(sharedMemberId))
                             .collectList()
                             .flatMapMany(sharedMemberList -> {
-                                List<String> receiverMemberIds = new java.util.ArrayList<>(sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList());
-                                receiverMemberIds.remove(requestMemberId);
+                                List<String> receiverMemberIds = sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList();
 
                                 if (receiverMemberIds.isEmpty()) {
                                     return Mono.empty();
