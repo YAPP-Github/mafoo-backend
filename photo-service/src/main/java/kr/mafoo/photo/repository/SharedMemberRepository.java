@@ -27,6 +27,8 @@ public interface SharedMemberRepository extends R2dbcRepository<SharedMemberEnti
 
     Mono<SharedMemberEntity> findByAlbumIdAndMemberIdAndDeletedAtIsNull(String albumId, String memberId);
 
+    Flux<SharedMemberEntity> findAllByAlbumIdAndShareStatusAndDeletedAtIsNull(String albumId, ShareStatus status);
+
     Flux<SharedMemberEntity> findAllByAlbumIdAndShareStatusNotAndDeletedAtIsNull(String albumId, ShareStatus status);
 
     Flux<SharedMemberEntity> findAllByMemberIdAndShareStatusNotAndDeletedAtIsNull(String memberId, ShareStatus status);

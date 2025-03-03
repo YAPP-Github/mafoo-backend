@@ -34,6 +34,11 @@ public class SharedMemberQuery {
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
     }
 
+    public Flux<SharedMemberEntity> findByAlbumIdWhereStatusAccepted(String albumId) {
+        return sharedMemberRepository.findAllByAlbumIdAndShareStatusAndDeletedAtIsNull(albumId, ACCEPTED)
+            .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));
+    }
+
     public Flux<SharedMemberEntity> findAllByAlbumIdWhereStatusNotRejected(String albumId) {
         return sharedMemberRepository.findAllByAlbumIdAndShareStatusNotAndDeletedAtIsNull(albumId, REJECTED)
             .switchIfEmpty(Mono.error(new SharedMemberNotFoundException()));

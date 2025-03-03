@@ -13,7 +13,7 @@ public interface FcmTokenRepository extends R2dbcRepository<FcmTokenEntity, Stri
 
     Flux<FcmTokenEntity> findByDeletedAtNull();
 
-    @Query("SELECT * FROM fcm_token WHERE owner_member_id IN (:ownerMemberIdList)AND deleted_at IS NULL")
+    @Query("SELECT * FROM fcm_token WHERE owner_member_id IN (:ownerMemberIdList) AND deleted_at IS NULL")
     Flux<FcmTokenEntity> findAllByOwnerMemberIdList(List<String> ownerMemberIdList);
 
     @Modifying

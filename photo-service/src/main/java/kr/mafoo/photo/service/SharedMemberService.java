@@ -174,31 +174,35 @@ public class SharedMemberService {
         return sharedMemberQuery.findBySharedMemberId(sharedMemberId)
             .flatMap(sharedMember -> {
                 if (isSharedMemberSelfRequest(sharedMember, requestMemberId) && isPendingStatus(sharedMember.getShareStatus())) {
-                    return sharedMemberQuery.findAllByAlbumIdWhereStatusNotRejected(sharedMember.getAlbumId())
-                        .collectList()
-                        .flatMap(sharedMemberList -> {
-                            List<String> receiverMemberIds = new java.util.ArrayList<>(sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList());
-                            receiverMemberIds.remove(requestMemberId);
+                    return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
+                        .flatMap(newSharedMember -> sharedMemberQuery.findByAlbumIdWhereStatusAccepted(sharedMember.getAlbumId())
+                            .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
+                            .collectList()
+                            .flatMapMany(sharedMemberList -> {
+                                List<String> receiverMemberIds = new java.util.ArrayList<>(sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList());
+                                receiverMemberIds.remove(requestMemberId);
 
-                            return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
-                                .thenMany(memberServiceClient.getMemberInfoById(requestMemberId)
+                                if (receiverMemberIds.isEmpty()) {
+                                    return Mono.empty();
+                                }
+
+                                return memberServiceClient.getMemberInfoById(requestMemberId)
                                     .flatMapMany(memberDto -> albumQuery.findById(sharedMember.getAlbumId())
                                         .flatMapMany(album -> memberServiceClient
                                             .sendScenarioNotification(
                                                 SHARED_MEMBER_INVITATION_ACCEPTED,
                                                 receiverMemberIds,
                                                 Map.of(
-                                                    "shareTargetMemberName", album.getName(),
+                                                    "shareTargetMemberName", memberDto.name(),
                                                     "shareTargetAlbumName", album.getName(),
                                                     "shareTargetAlbumId", sharedMember.getAlbumId()
                                                 )
                                             )
                                         )
-                                    )
-                                )
-                                .collectList()
-                                .thenReturn(sharedMember);
-                        });
+                                );
+                            })
+                            .then(Mono.just(newSharedMember))
+                        );
                 } else {
                     return Mono.error(new SharedMemberPermissionDeniedException());
                 }
