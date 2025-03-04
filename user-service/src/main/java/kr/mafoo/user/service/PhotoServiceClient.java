@@ -8,6 +8,7 @@ import kr.mafoo.user.enums.VariableType;
 import kr.mafoo.user.exception.MafooPhotoApiFailedException;
 import kr.mafoo.user.service.dto.SharedMemberDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PhotoServiceClient {
@@ -43,12 +45,22 @@ public class PhotoServiceClient {
     public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList, String authorizationToken) {
         return client
             .get()
-            .uri(gatewayEndpoint + "/photo/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
-            .header("Authorization", "Bearer " + authorizationToken)
+            .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
+            .httpRequest(request -> {
+                log.info("Sending request to: {}", request.getURI());
+                request.getHeaders().forEach((name, values) -> log.info("Header: {}={}", name, values));
+            })
             .retrieve()
-            .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
-            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
+            .onStatus(HttpStatus.BAD_REQUEST::equals, response -> {
+                log.error("BAD_REQUEST error received: {}", response);
+                return Mono.empty();
+            })
+            .onStatus(status -> !status.is2xxSuccessful(), response -> {
+                log.error("Non-2XX response received: {}", response);
+                return Mono.error(new MafooPhotoApiFailedException());
+            })
             .bodyToFlux(SharedMemberDto.class);
+
     }
 
     public Mono<Map<String, String>> getPhotoServiceVariableMap(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
