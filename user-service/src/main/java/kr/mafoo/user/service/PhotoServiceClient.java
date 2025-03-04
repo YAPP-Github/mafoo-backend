@@ -47,7 +47,7 @@ public class PhotoServiceClient {
     public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList, String authorizationToken) {
         return client
             .get()
-            .uri(gatewayEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
+            .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
             .httpRequest(request -> {
                 logger.info("Sending request to: {}", request.getURI());
                 request.getHeaders().forEach((name, values) -> logger.info("Header: {}={}", name, values));
