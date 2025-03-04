@@ -27,7 +27,7 @@ app:
   gateway:
     endpoint: https://gateway.mafoo.kr
   photo:
-    endpoint: https://photo-service
+    endpoint: http://photo-service
   oauth:
     kakao:
       client-id: ${KAKAO_CLIENT_ID}
