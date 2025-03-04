@@ -8,8 +8,6 @@ import kr.mafoo.user.enums.VariableType;
 import kr.mafoo.user.exception.MafooPhotoApiFailedException;
 import kr.mafoo.user.service.dto.SharedMemberDto;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -21,11 +19,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 public class PhotoServiceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(PhotoServiceClient.class);
-
-    @Value("${app.gateway.endpoint}")
-    private String gatewayEndpoint;
 
     @Value("${app.photo.endpoint}")
     private String photoEndpoint;
@@ -44,23 +37,13 @@ public class PhotoServiceClient {
             .then();
     }
 
-    public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList, String authorizationToken) {
+    public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList) {
         return client
             .get()
             .uri(photoEndpoint + "/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
-            .httpRequest(request -> {
-                logger.info("Sending request to: {}", request.getURI());
-                request.getHeaders().forEach((name, values) -> logger.info("Header: {}={}", name, values));
-            })
             .retrieve()
-            .onStatus(HttpStatus.BAD_REQUEST::equals, response -> {
-                logger.error("BAD_REQUEST error received: {}", response);
-                return Mono.empty();
-            })
-            .onStatus(status -> !status.is2xxSuccessful(), response -> {
-                logger.error("Non-2XX response received: {}", response);
-                return Mono.error(new MafooPhotoApiFailedException());
-            })
+            .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
+            .onStatus(status -> !status.is2xxSuccessful(), (res) -> Mono.error(new MafooPhotoApiFailedException()))
             .bodyToFlux(SharedMemberDto.class);
     }
 

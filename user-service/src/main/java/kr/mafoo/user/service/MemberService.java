@@ -39,11 +39,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId, String authorizationToken) {
+    public Flux<MemberDetailDto> getMemberByKeywordForSharedAlbum(String keyword, String albumId, String memberId) {
         return memberQuery.findAllByNameKeywordAndMemberIdNot(keyword, memberId)
             .switchIfEmpty(Mono.empty())
             .collectList()
-            .flatMapMany(memberList -> photoServiceClient.getSharedMemberFluxByAlbumId(albumId, memberList.stream().map(MemberEntity::getId).toList(), authorizationToken)
+            .flatMapMany(memberList -> photoServiceClient.getSharedMemberFluxByAlbumId(albumId, memberList.stream().map(MemberEntity::getId).toList())
                 .collectList()
                 .flatMapMany(sharedMemberList -> mergeMembersWithSharedMemberInfo(memberList, sharedMemberList))
             );

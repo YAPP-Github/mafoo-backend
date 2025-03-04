@@ -5,7 +5,6 @@ import kr.mafoo.user.controller.dto.response.MemberDetailResponse;
 import kr.mafoo.user.controller.dto.response.MemberResponse;
 import kr.mafoo.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,12 +18,9 @@ public class MemberController implements MemberApi {
     public Flux<MemberDetailResponse> getMemberListByNameForSharedAlbum(
         String requesterId,
         String keyword,
-        String albumId,
-        ServerHttpRequest serverHttpRequest
+        String albumId
     ) {
-        String authorizationToken = serverHttpRequest.getHeaders().getFirst("Authorization");
-
-        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, requesterId, authorizationToken)
+        return memberService.getMemberByKeywordForSharedAlbum(keyword, albumId, requesterId)
             .map(MemberDetailResponse::fromDto);
     }
 
