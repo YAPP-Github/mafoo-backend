@@ -43,7 +43,7 @@ public class PhotoServiceClient {
     public Flux<SharedMemberDto> getSharedMemberFluxByAlbumId(String albumId, List<String> memberIdList, String authorizationToken) {
         return client
             .get()
-            .uri(gatewayEndpoint + "photo/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
+            .uri(gatewayEndpoint + "/photo/v1/shared-members?albumId=" + albumId + "&memberIdList=" + String.join(",", memberIdList))
             .header("Authorization", "Bearer " + authorizationToken)
             .retrieve()
             .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST), (res) -> Mono.empty())
