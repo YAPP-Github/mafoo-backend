@@ -131,7 +131,8 @@ public class SharedMemberService {
                                 Map.of(
                                     "senderName", requestMember.name(),
                                     "shareTargetAlbumName", album.getName(),
-                                    "sharedMemberId", sharedMember.getSharedMemberId()
+                                    "sharedMemberId", sharedMember.getSharedMemberId(),
+                                    "shareTargetAlbumType", album.getType().toString()
                                 )
                             )
                             .collectList()
