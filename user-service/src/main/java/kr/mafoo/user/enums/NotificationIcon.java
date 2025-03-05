@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum NotificationIcon {
     CONGRATULATION,
     STACK,
+    EVENT_BOX,
     HEART,
     FIRE,
     BASKETBALL,
