@@ -8,7 +8,7 @@ import java.util.List;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 
 @Schema(description = "알림 생성 요청")
 public record ReservationUpdateRequest(
@@ -22,7 +22,7 @@ public record ReservationUpdateRequest(
     VariableDomain variableDomain,
 
     @Schema(description = "변수 상태", example = "")
-    VariableType variableType,
+    VariableParam variableParam,
 
     @Schema(description = "변수 정렬", example = "")
     VariableSort variableSort,

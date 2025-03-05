@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import kr.mafoo.user.domain.NotificationEntity;
+import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
-import kr.mafoo.user.enums.RouteType;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import kr.mafoo.user.exception.NotificationNotFoundException;
 import kr.mafoo.user.service.dto.NotificationDetailDto;
@@ -25,13 +25,9 @@ public class NotificationService {
 
     private final NotificationQuery notificationQuery;
     private final NotificationCommand notificationCommand;
-
     private final TemplateQuery templateQuery;
-
     private final FcmTokenQuery fcmTokenQuery;
-
     private final VariableService variableService;
-
     private final MessageService messageService;
 
     @Transactional(readOnly = true)
@@ -45,61 +41,39 @@ public class NotificationService {
     @Transactional
     public Flux<NotificationEntity> sendNotificationByScenario(NotificationType notificationType, List<String> receiverMemberIds, Map<String, String> variables) {
         return templateQuery.findByNotificationType(notificationType)
-            .flatMapMany(template -> (variables == null)
-                    ? sendNotificationWithoutVariables(template.getTemplateId(), receiverMemberIds, template.getTitle(), template.getBody(), template.getRouteType())
-                    : sendNotificationWithVariables(template.getTemplateId(), receiverMemberIds, template.getTitle(), template.getBody(), template.getRouteType(), variables)
-            );
+            .flatMapMany(template -> sendNotification(receiverMemberIds, template, variables, null, null, null));
     }
 
     @Transactional
-    public Flux<NotificationEntity> sendNotificationByReservation(String templateId, String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
+    public Flux<NotificationEntity> sendNotificationByReservation(String templateId, String receiverMemberId, VariableDomain domain, VariableSort sort, VariableParam type) {
+        List<String> receiverMemberIds = Arrays.asList(receiverMemberId.replaceAll("[\\[\\]]", "").split(","));
+
         return templateQuery.findById(templateId)
-            .flatMapMany(template -> {
-                List<String> receiverMemberIds = Arrays.asList(receiverMemberId.replaceAll("[\\[\\]]", "").split(","));
-
-                return domain.equals(VariableDomain.NONE)
-                    ? sendNotificationWithoutVariables(template.getTemplateId(), receiverMemberIds, template.getTitle(), template.getBody(), template.getRouteType())
-                    : sendNotificationWithDynamicVariables(template.getTemplateId(), receiverMemberIds, template.getTitle(), template.getBody(), template.getRouteType(), domain, sort, type);
-            });
+            .flatMapMany(template -> sendNotification(receiverMemberIds, template, null, domain, sort, type));
     }
 
-    private Flux<NotificationEntity> sendNotificationWithoutVariables(String templateId, List<String> receiverMemberIds, String title, String body, RouteType routeType) {
+    private Flux<NotificationEntity> sendNotification(List<String> receiverMemberIds, TemplateEntity template, Map<String, String> variables, VariableDomain domain, VariableSort sort, VariableParam type) {
         return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
             .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
-            .flatMap(fcmToken -> variableService.getVariableMapWithoutVariables(fcmToken.getOwnerMemberId())
-                .map(variableMap -> MessageDto.fromTemplateWithVariables(
-                    List.of(fcmToken.getOwnerMemberId()), List.of(fcmToken.getToken()), title, body, routeType, variableMap))
+            .flatMap(fcmToken -> getVariableMap(fcmToken.getOwnerMemberId(), variables, domain, sort, type)
+                .map(variableMap -> MessageDto.fromEntities(fcmToken, template, variableMap))
             )
             .collectList()
-            .flatMapMany(messageDtoList -> addNotificationBulk(templateId, messageDtoList));
+            .flatMapMany(messageDtoList -> addNotificationBulkFromMessageDto(template.getTemplateId(), messageDtoList));
     }
 
-    private Flux<NotificationEntity> sendNotificationWithVariables(String templateId, List<String> receiverMemberIds, String title, String body, RouteType routeType, Map<String, String> variables) {
-        return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
-            .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
-            .flatMap(fcmToken -> variableService.getVariableMapWithVariables(fcmToken.getOwnerMemberId(), variables)
-                .map(variableMap -> MessageDto.fromTemplateWithVariables(
-                    List.of(fcmToken.getOwnerMemberId()), List.of(fcmToken.getToken()), title, body, routeType, variableMap))
-            )
-            .collectList()
-            .flatMapMany(messageDtoList -> addNotificationBulk(templateId, messageDtoList));
+    private Mono<Map<String, String>> getVariableMap(String ownerMemberId, Map<String, String> variables, VariableDomain domain, VariableSort sort, VariableParam type) {
+        if (variables != null) {
+            return variableService.getVariableMapWithVariables(ownerMemberId, variables);
+        } else {
+            return variableService.getVariableMapWithDynamicVariables(ownerMemberId, domain, sort, type);
+        }
     }
 
-    private Flux<NotificationEntity> sendNotificationWithDynamicVariables(String templateId, List<String> receiverMemberIds, String title, String body, RouteType routeType, VariableDomain domain, VariableSort sort, VariableType type) {
-        return fcmTokenQuery.findAllByOwnerMemberIdList(receiverMemberIds)
-            .onErrorResume(FcmTokenNotFoundException.class, ex -> Flux.empty())
-            .flatMap(fcmToken -> variableService.getVariableMapWithDynamicVariables(fcmToken.getOwnerMemberId(), domain, sort, type)
-                    .map(variableMap -> MessageDto.fromTemplateWithVariables(
-                        List.of(fcmToken.getOwnerMemberId()), List.of(fcmToken.getToken()), title, body, routeType, variableMap))
-            )
-            .collectList()
-            .flatMapMany(messageDtoList -> addNotificationBulk(templateId, messageDtoList));
-    }
-
-    private Flux<NotificationEntity> addNotificationBulk(String templateId, List<MessageDto> messageDtoList) {
+    private Flux<NotificationEntity> addNotificationBulkFromMessageDto(String templateId, List<MessageDto> messageDtoList) {
         return Flux.fromIterable(messageDtoList)
             .flatMap(messageDto -> notificationCommand.addNotification(
-                messageDto.notificationId(), templateId, messageDto.receiverMemberIds().get(0), messageDto.title(), messageDto.body(), messageDto.paramKey()
+                messageDto.notificationId(), templateId, messageDto.receiverMemberId(), messageDto.icon(), messageDto.title(), messageDto.body(), messageDto.paramKey()
             ))
             .flatMap(notifications -> messageService.sendMessageToMultipleMember(messageDtoList)
                 .thenReturn(notifications)

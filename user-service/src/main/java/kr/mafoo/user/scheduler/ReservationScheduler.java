@@ -43,7 +43,7 @@ public class ReservationScheduler {
                 reservation.getReceiverMemberIds(),
                 reservation.getVariableDomain(),
                 reservation.getVariableSort(),
-                reservation.getVariableType()
+                reservation.getVariableParam()
             ));
     }
 }

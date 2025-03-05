@@ -5,15 +5,15 @@ import java.util.List;
 import kr.mafoo.user.domain.ReservationEntity;
 import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
-import kr.mafoo.user.enums.RouteType;
+import kr.mafoo.user.enums.NotificationRoute;
 
 public record TemplateDetailDto(
     String templateId,
     NotificationType notificationType,
-    String thumbnailImageUrl,
+    String icon,
     String title,
     String body,
-    RouteType routeType,
+    NotificationRoute routeType,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<ReservationDto> reservation
@@ -25,7 +25,7 @@ public record TemplateDetailDto(
                 return new TemplateDetailDto(
                     templateEntity.getTemplateId(),
                     templateEntity.getNotificationType(),
-                    templateEntity.getThumbnailImageUrl(),
+                    templateEntity.getIcon(),
                     templateEntity.getTitle(),
                     templateEntity.getBody(),
                     templateEntity.getRouteType(),

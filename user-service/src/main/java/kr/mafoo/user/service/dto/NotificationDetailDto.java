@@ -3,7 +3,8 @@ package kr.mafoo.user.service.dto;
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.NotificationEntity;
 import kr.mafoo.user.domain.TemplateEntity;
-import kr.mafoo.user.enums.ButtonType;
+import kr.mafoo.user.enums.NotificationButton;
+import kr.mafoo.user.enums.NotificationIcon;
 import kr.mafoo.user.enums.NotificationType;
 
 public record NotificationDetailDto(
@@ -11,12 +12,12 @@ public record NotificationDetailDto(
     String templateId,
     String receiverMemberId,
     NotificationType notificationType,
-    String thumbnailImageUrl,
+    NotificationIcon icon,
     String title,
     String body,
     String route,
     String paramKey,
-    ButtonType buttonType,
+    NotificationButton buttonType,
     Boolean isRead,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
@@ -30,7 +31,7 @@ public record NotificationDetailDto(
                     notificationEntity.getTemplateId(),
                     notificationEntity.getReceiverMemberId(),
                     templateEntity.getNotificationType(),
-                    templateEntity.getThumbnailImageUrl(),
+                    notificationEntity.getIcon(),
                     notificationEntity.getTitle(),
                     notificationEntity.getBody(),
                     templateEntity.getRouteType().getRoute(),

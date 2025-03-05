@@ -6,7 +6,7 @@ import kr.mafoo.user.domain.ReservationEntity;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ public class ReservationService {
         String templateId,
         ReservationStatus status,
         VariableDomain variableDomain,
-        VariableType variableType,
+        VariableParam variableParam,
         VariableSort variableSort,
         List<String> receiverMemberIds,
         LocalDateTime sendAt,
@@ -32,8 +32,8 @@ public class ReservationService {
     ) {
         return reservationQuery.checkDuplicateExists(templateId, sendAt)
             .then(
-                reservationCommand.addReservation(templateId, status, variableDomain, variableType,
-                    variableSort, receiverMemberIds.toString(), sendAt, sendRepeatInterval));
+                reservationCommand.addReservation(templateId, status, variableDomain, variableParam, variableSort,
+                    receiverMemberIds.toString(), sendAt, sendRepeatInterval));
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class ReservationService {
         String templateId,
         ReservationStatus status,
         VariableDomain variableDomain,
-        VariableType variableType,
+        VariableParam variableParam,
         VariableSort variableSort,
         List<String> receiverMemberIds,
         LocalDateTime sendAt,
@@ -51,7 +51,7 @@ public class ReservationService {
         return reservationQuery.findById(reservationId)
             .flatMap(
                 reservation -> reservationCommand.modifyReservation(reservation, templateId, status,
-                    variableDomain, variableType, variableSort, receiverMemberIds.toString(), sendAt,
+                    variableDomain, variableParam, variableSort, receiverMemberIds.toString(), sendAt,
                     sendRepeatInterval));
     }
 

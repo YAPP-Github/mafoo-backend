@@ -3,7 +3,6 @@ package kr.mafoo.user.service;
 import static kr.mafoo.user.enums.NotificationType.NEW_MEMBER;
 
 import java.util.List;
-import java.util.Map;
 import kr.mafoo.user.domain.FcmTokenEntity;
 import kr.mafoo.user.exception.FcmTokenNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,6 @@
 package kr.mafoo.user.domain;
 
 import java.time.LocalDateTime;
-import kr.mafoo.user.enums.variables.IconVariable;
 import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.enums.NotificationRoute;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class TemplateEntity implements Persistable<String> {
     private NotificationType notificationType;
 
     @Column("icon")
-    private IconVariable icon;
+    private String icon;
 
     @Column("title")
     private String title;
@@ -70,7 +69,7 @@ public class TemplateEntity implements Persistable<String> {
         return templateId;
     }
 
-    public TemplateEntity updateTemplate(NotificationType notificationType, IconVariable icon, String title, String body, NotificationRoute routeType) {
+    public TemplateEntity updateTemplate(NotificationType notificationType, String icon, String title, String body, NotificationRoute routeType) {
         this.notificationType = notificationType;
         this.icon = icon;
         this.title = title;
@@ -79,7 +78,7 @@ public class TemplateEntity implements Persistable<String> {
         return this;
     }
 
-    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, IconVariable icon, String title, String body, NotificationRoute routeType) {
+    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String icon, String title, String body, NotificationRoute routeType) {
         TemplateEntity template = new TemplateEntity();
         template.templateId = templateId;
         template.notificationType = notificationType;
