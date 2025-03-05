@@ -1,8 +1,9 @@
 package kr.mafoo.user.domain;
 
 import java.time.LocalDateTime;
+import kr.mafoo.user.enums.variables.IconVariable;
 import kr.mafoo.user.enums.NotificationType;
-import kr.mafoo.user.enums.RouteType;
+import kr.mafoo.user.enums.NotificationRoute;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,8 +25,8 @@ public class TemplateEntity implements Persistable<String> {
     @Column("notification_type")
     private NotificationType notificationType;
 
-    @Column("thumbnail_image_url")
-    private String thumbnailImageUrl;
+    @Column("icon")
+    private IconVariable icon;
 
     @Column("title")
     private String title;
@@ -34,7 +35,7 @@ public class TemplateEntity implements Persistable<String> {
     private String body;
 
     @Column("routeType")
-    private RouteType routeType;
+    private NotificationRoute routeType;
 
     @CreatedDate
     @Column("created_at")
@@ -69,20 +70,20 @@ public class TemplateEntity implements Persistable<String> {
         return templateId;
     }
 
-    public TemplateEntity updateTemplate(NotificationType notificationType, String thumbnailImageUrl, String title, String body, RouteType routeType) {
+    public TemplateEntity updateTemplate(NotificationType notificationType, IconVariable icon, String title, String body, NotificationRoute routeType) {
         this.notificationType = notificationType;
-        this.thumbnailImageUrl = thumbnailImageUrl;
+        this.icon = icon;
         this.title = title;
         this.body = body;
         this.routeType = routeType;
         return this;
     }
 
-    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, String thumbnailImageUrl, String title, String body, RouteType routeType) {
+    public static TemplateEntity newTemplate(String templateId, NotificationType notificationType, IconVariable icon, String title, String body, NotificationRoute routeType) {
         TemplateEntity template = new TemplateEntity();
         template.templateId = templateId;
         template.notificationType = notificationType;
-        template.thumbnailImageUrl = thumbnailImageUrl;
+        template.icon = icon;
         template.title = title;
         template.body = body;
         template.routeType = routeType;

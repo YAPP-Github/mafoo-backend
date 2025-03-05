@@ -1,6 +1,7 @@
 package kr.mafoo.user.domain;
 
 import java.time.LocalDateTime;
+import kr.mafoo.user.enums.NotificationIcon;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,6 +25,9 @@ public class NotificationEntity implements Persistable<String> {
 
     @Column("receiver_member_id")
     private String receiverMemberId;
+
+    @Column("icon")
+    private NotificationIcon icon;
 
     @Column("title")
     private String title;
@@ -75,11 +79,12 @@ public class NotificationEntity implements Persistable<String> {
         return this;
     }
 
-    public static NotificationEntity newNotification(String notificationId, String templateId, String receiverMemberId, String title, String body, String paramKey) {
+    public static NotificationEntity newNotification(String notificationId, String templateId, String receiverMemberId, NotificationIcon icon, String title, String body, String paramKey) {
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.notificationId = notificationId;
         notificationEntity.templateId = templateId;
         notificationEntity.receiverMemberId = receiverMemberId;
+        notificationEntity.icon = icon;
         notificationEntity.title = title;
         notificationEntity.body = body;
         notificationEntity.paramKey = paramKey;

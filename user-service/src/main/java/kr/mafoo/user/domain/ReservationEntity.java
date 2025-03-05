@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -32,8 +32,8 @@ public class ReservationEntity implements Persistable<String> {
     @Column("variable_domain")
     private VariableDomain variableDomain;
 
-    @Column("variable_type")
-    private VariableType variableType;
+    @Column("variable_param")
+    private VariableParam variableParam;
 
     @Column("variable_sort")
     private VariableSort variableSort;
@@ -90,11 +90,11 @@ public class ReservationEntity implements Persistable<String> {
         return this;
     }
 
-    public ReservationEntity updateReservation(String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
+    public ReservationEntity updateReservation(String templateId, ReservationStatus status, VariableDomain variableDomain, VariableParam variableParam, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
         this.templateId = templateId;
         this.status = status;
         this.variableDomain = variableDomain;
-        this.variableType = variableType;
+        this.variableParam = variableParam;
         this.variableSort = variableSort;
         this.receiverMemberIds = receiverMemberIds;
         this.sendAt = sendAt;
@@ -102,13 +102,13 @@ public class ReservationEntity implements Persistable<String> {
         return this;
     }
 
-    public static ReservationEntity newReservation(String reservationId, String templateId, ReservationStatus status, VariableDomain variableDomain, VariableType variableType, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
+    public static ReservationEntity newReservation(String reservationId, String templateId, ReservationStatus status, VariableDomain variableDomain, VariableParam variableParam, VariableSort variableSort, String receiverMemberIds, LocalDateTime sendAt, Integer sendRepeatInterval) {
         ReservationEntity reservation = new ReservationEntity();
         reservation.reservationId = reservationId;
         reservation.templateId = templateId;
         reservation.status = status;
         reservation.variableDomain = variableDomain;
-        reservation.variableType = variableType;
+        reservation.variableParam = variableParam;
         reservation.variableSort = variableSort;
         reservation.receiverMemberIds = receiverMemberIds;
         reservation.sendAt = sendAt;
