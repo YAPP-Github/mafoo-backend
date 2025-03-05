@@ -4,7 +4,6 @@ import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.AndroidNotification;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import java.util.List;
@@ -41,7 +40,7 @@ public class MessageService {
 
     private MulticastMessage buildMulticastMessage(MessageDto messageDto) {
         MulticastMessage.Builder builder = MulticastMessage.builder()
-            .addAllTokens(messageDto.tokens())
+            .addAllTokens(List.of(messageDto.tokens()))
             .setNotification(Notification.builder()
                 .setTitle(messageDto.title())
                 .setBody(messageDto.body())

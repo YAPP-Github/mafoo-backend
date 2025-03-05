@@ -9,7 +9,7 @@ import kr.mafoo.user.domain.ReservationEntity;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 import kr.mafoo.user.service.dto.ReservationDto;
 
 @Schema(description = "예약 응답")
@@ -27,7 +27,7 @@ public record ReservationResponse(
     VariableDomain variableDomain,
 
     @Schema(description = "변수 종류")
-    VariableType variableType,
+    VariableParam variableParam,
 
     @Schema(description = "변수 정렬")
     VariableSort variableSort,
@@ -61,7 +61,7 @@ public record ReservationResponse(
                     entity.getTemplateId(),
                     entity.getStatus(),
                     entity.getVariableDomain(),
-                    entity.getVariableType(),
+                    entity.getVariableParam(),
                     entity.getVariableSort(),
                     entity.getReceiverMemberIds().lines().toList(),
                     entity.getSendAt(),
@@ -79,7 +79,7 @@ public record ReservationResponse(
                     dto.templateId(),
                     dto.status(),
                     dto.variableDomain(),
-                    dto.variableType(),
+                    dto.variableParam(),
                     dto.variableSort(),
                     dto.receiverMemberIds().lines().toList(),
                     dto.sendAt(),

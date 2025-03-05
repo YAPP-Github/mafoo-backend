@@ -44,7 +44,7 @@ public class TemplateController implements TemplateApi {
         return templateService
             .addTemplate(
                 request.notificationType(),
-                request.thumbnailImageUrl(),
+                request.icon(),
                 request.title(),
                 request.body(),
                 request.routeType()
@@ -62,7 +62,7 @@ public class TemplateController implements TemplateApi {
             .modifyTemplate(
                 templateId,
                 request.notificationType(),
-                request.thumbnailImageUrl(),
+                request.icon(),
                 request.title(),
                 request.body(),
                 request.routeType()

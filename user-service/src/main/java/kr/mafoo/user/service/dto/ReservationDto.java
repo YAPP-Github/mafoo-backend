@@ -5,14 +5,14 @@ import kr.mafoo.user.domain.ReservationEntity;
 import kr.mafoo.user.enums.ReservationStatus;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 
 public record ReservationDto(
     String reservationId,
     String templateId,
     ReservationStatus status,
     VariableDomain variableDomain,
-    VariableType variableType,
+    VariableParam variableParam,
     VariableSort variableSort,
     String receiverMemberIds,
     LocalDateTime sendAt,
@@ -28,7 +28,7 @@ public record ReservationDto(
                     entity.getTemplateId(),
                     entity.getStatus(),
                     entity.getVariableDomain(),
-                    entity.getVariableType(),
+                    entity.getVariableParam(),
                     entity.getVariableSort(),
                     entity.getReceiverMemberIds(),
                     entity.getSendAt(),

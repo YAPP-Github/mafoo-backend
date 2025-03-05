@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
-import kr.mafoo.user.enums.RouteType;
+import kr.mafoo.user.enums.NotificationRoute;
 
 @Schema(description = "템플릿 응답")
 public record TemplateResponse(
@@ -15,8 +15,8 @@ public record TemplateResponse(
         @Schema(description = "알림 타입(REGULAR, EVENT, ...)", example = "EVENT")
         NotificationType notificationType,
 
-        @Schema(description = "썸네일 이미지 URL", example = "thumbnail_image_url")
-        String thumbnailImageUrl,
+        @Schema(description = "아이콘")
+        String icon,
 
         @Schema(description = "제목", example = "{{album_name}} 앨범을 공유받았어요")
         String title,
@@ -25,7 +25,7 @@ public record TemplateResponse(
         String body,
 
         @Schema(description = "루트 종류", example = "SHARED_MEMBER_INVITATION")
-        RouteType routeType,
+        NotificationRoute routeType,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         @Schema(description = "템플릿 생성 일시")
@@ -41,7 +41,7 @@ public record TemplateResponse(
                 return new TemplateResponse(
                     entity.getTemplateId(),
                     entity.getNotificationType(),
-                    entity.getThumbnailImageUrl(),
+                    entity.getIcon(),
                     entity.getTitle(),
                     entity.getBody(),
                     entity.getRouteType(),

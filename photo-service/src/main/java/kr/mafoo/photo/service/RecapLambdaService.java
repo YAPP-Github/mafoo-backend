@@ -41,7 +41,9 @@ public class RecapLambdaService {
                             List.of(requestMemberId),
                             Map.of(
                                 "albumName", album.getName(),
-                                "recapUrl", recapUrlDto.recapUrl())
+                                "recapUrl", recapUrlDto.recapUrl(),
+                                "albumType", album.getType().toString()
+                            )
                         )
                         .then(Mono.just(recapUrlDto))
                     )

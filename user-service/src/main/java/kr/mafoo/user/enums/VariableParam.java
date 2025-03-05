@@ -3,7 +3,7 @@ package kr.mafoo.user.enums;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum VariableType {
+public enum VariableParam {
     NONE(null),
 
     HEART("albumType"),
@@ -23,10 +23,10 @@ public enum VariableType {
     REJECTED("shareStatus"),
     ;
 
-    private final String columnName;
+    private final String paramKey;
 
     public String toQueryParam() {
-        return (this != NONE) ? columnName + "=" + this : "";
+        return (this != NONE) ? paramKey + "=" + this : "";
     }
 }
 

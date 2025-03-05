@@ -11,13 +11,11 @@ import kr.mafoo.user.service.dto.MemberDetailDto;
 import kr.mafoo.user.service.dto.SharedMemberDto;
 import kr.mafoo.user.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MemberService {

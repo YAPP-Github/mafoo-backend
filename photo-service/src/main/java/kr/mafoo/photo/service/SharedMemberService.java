@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import kr.mafoo.photo.domain.AlbumEntity;
 import kr.mafoo.photo.domain.SharedMemberEntity;
 import kr.mafoo.photo.domain.enums.PermissionLevel;
@@ -23,11 +24,13 @@ import kr.mafoo.photo.exception.SharedMemberNotFoundException;
 import kr.mafoo.photo.exception.SharedMemberPermissionDeniedException;
 import kr.mafoo.photo.service.dto.SharedMemberDetailDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SharedMemberService {
@@ -131,7 +134,8 @@ public class SharedMemberService {
                                 Map.of(
                                     "senderName", requestMember.name(),
                                     "shareTargetAlbumName", album.getName(),
-                                    "sharedMemberId", sharedMember.getSharedMemberId()
+                                    "sharedMemberId", sharedMember.getSharedMemberId(),
+                                    "shareTargetAlbumType", album.getType().toString()
                                 )
                             )
                             .collectList()
@@ -178,30 +182,31 @@ public class SharedMemberService {
                     return sharedMemberCommand.modifySharedMemberShareStatus(sharedMember, ACCEPTED)
                         .flatMap(newSharedMember -> sharedMemberQuery.findByAlbumIdWhereStatusAccepted(sharedMember.getAlbumId())
                             .onErrorResume(SharedMemberNotFoundException.class, ex -> Mono.empty())
-                            .filter(sharedMemberList -> sharedMemberList.getSharedMemberId().equals(sharedMemberId))
+                            .filter(sharedMemberList -> !sharedMemberList.getSharedMemberId().equals(sharedMemberId))
                             .collectList()
-                            .flatMapMany(sharedMemberList -> {
-                                List<String> receiverMemberIds = sharedMemberList.stream().map(SharedMemberEntity::getMemberId).toList();
+                            .flatMapMany(sharedMemberList -> albumQuery.findById(sharedMember.getAlbumId())
+                                .flatMap(album -> {
+                                    List<String> receiverMemberIds = Stream.concat(
+                                        sharedMemberList.stream().map(SharedMemberEntity::getMemberId),
+                                        Stream.of(album.getOwnerMemberId())
+                                    ).toList();
 
-                                if (receiverMemberIds.isEmpty()) {
-                                    return Mono.empty();
-                                }
-
-                                return memberServiceClient.getMemberInfoById(requestMemberId)
-                                    .flatMapMany(memberDto -> albumQuery.findById(sharedMember.getAlbumId())
-                                        .flatMapMany(album -> memberServiceClient
+                                    return memberServiceClient.getMemberInfoById(requestMemberId)
+                                        .flatMapMany(memberDto -> memberServiceClient
                                             .sendScenarioNotification(
                                                 SHARED_MEMBER_INVITATION_ACCEPTED,
                                                 receiverMemberIds,
                                                 Map.of(
                                                     "shareTargetMemberName", memberDto.name(),
                                                     "shareTargetAlbumName", album.getName(),
-                                                    "shareTargetAlbumId", sharedMember.getAlbumId()
+                                                    "shareTargetAlbumId", sharedMember.getAlbumId(),
+                                                    "shareTargetAlbumType",
+                                                    album.getType().toString()
                                                 )
                                             )
-                                        )
-                                );
-                            })
+                                        ).then();
+                                })
+                            )
                             .then(Mono.just(newSharedMember))
                         );
                 } else {

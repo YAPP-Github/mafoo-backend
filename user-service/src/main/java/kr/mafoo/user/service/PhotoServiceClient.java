@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import kr.mafoo.user.enums.VariableDomain;
 import kr.mafoo.user.enums.VariableSort;
-import kr.mafoo.user.enums.VariableType;
+import kr.mafoo.user.enums.VariableParam;
 import kr.mafoo.user.exception.MafooPhotoApiFailedException;
 import kr.mafoo.user.service.dto.SharedMemberDto;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class PhotoServiceClient {
             .bodyToFlux(SharedMemberDto.class);
     }
 
-    public Mono<Map<String, String>> getPhotoServiceVariableMap(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
+    public Mono<Map<String, String>> getPhotoServiceVariableMap(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableParam type) {
         return client.get()
             .uri(generateGetPhotoServiceVariableMapUri(receiverMemberId, domain, sort, type))
             .retrieve()
@@ -57,13 +57,13 @@ public class PhotoServiceClient {
             .defaultIfEmpty(Map.of());
     }
 
-    private String generateGetPhotoServiceVariableMapUri(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableType type) {
+    private String generateGetPhotoServiceVariableMapUri(String receiverMemberId, VariableDomain domain, VariableSort sort, VariableParam type) {
         return String.format("%s/v1/%s/variables?memberId=%s&%s%s",
             photoEndpoint,
             domain.getName(),
             receiverMemberId,
             sort.toQueryParam(),
-            type != VariableType.NONE ? "&" + type.toQueryParam() : ""
+            type != VariableParam.NONE ? "&" + type.toQueryParam() : ""
         );
     }
 

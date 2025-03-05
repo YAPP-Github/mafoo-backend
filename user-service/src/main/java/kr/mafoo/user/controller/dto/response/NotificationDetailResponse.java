@@ -3,7 +3,8 @@ package kr.mafoo.user.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import kr.mafoo.user.enums.ButtonType;
+import kr.mafoo.user.enums.NotificationButton;
+import kr.mafoo.user.enums.NotificationIcon;
 import kr.mafoo.user.enums.NotificationType;
 import kr.mafoo.user.service.dto.NotificationDetailDto;
 
@@ -21,8 +22,8 @@ public record NotificationDetailResponse(
     @Schema(description = "알림 타입(REGULAR, EVENT, ...)", example = "EVENT")
     NotificationType notificationType,
 
-    @Schema(description = "썸네일 이미지 URL", example = "thumbnail_image_url")
-    String thumbnailImageUrl,
+    @Schema(description = "아이콘 종류")
+    NotificationIcon icon,
 
     @Schema(description = "제목", example = "\'시금치파슷하\' 앨범을 공유받았어요")
     String title,
@@ -37,7 +38,7 @@ public record NotificationDetailResponse(
     String paramKey,
 
     @Schema(description = "알림 button 종류")
-    ButtonType buttonType,
+    NotificationButton buttonType,
 
     @Schema(description = "읽음 여부", example = "true")
     Boolean isRead,
@@ -58,7 +59,7 @@ public record NotificationDetailResponse(
                     dto.templateId(),
                     dto.receiverMemberId(),
                     dto.notificationType(),
-                    dto.thumbnailImageUrl(),
+                    dto.icon(),
                     dto.title(),
                     dto.body(),
                     dto.route(),

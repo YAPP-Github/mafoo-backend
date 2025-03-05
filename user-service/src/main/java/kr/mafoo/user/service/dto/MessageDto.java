@@ -1,59 +1,50 @@
 package kr.mafoo.user.service.dto;
 
-import java.util.List;
+import static kr.mafoo.user.util.VariableConverter.convertIconVariables;
+import static kr.mafoo.user.util.VariableConverter.convertParamKeyVariables;
+import static kr.mafoo.user.util.VariableConverter.convertTextVariables;
+
 import java.util.Map;
-import kr.mafoo.user.enums.ButtonType;
-import kr.mafoo.user.enums.RouteType;
+import kr.mafoo.user.domain.FcmTokenEntity;
+import kr.mafoo.user.domain.TemplateEntity;
+import kr.mafoo.user.enums.NotificationButton;
+import kr.mafoo.user.enums.NotificationIcon;
 import kr.mafoo.user.util.IdGenerator;
-import kr.mafoo.user.util.VariableConverter;
 
 public record MessageDto(
     String notificationId,
-    List<String> receiverMemberIds,
-    List<String> tokens,
+    String receiverMemberId,
+    String tokens,
+    NotificationIcon icon,
     String title,
     String body,
     String route,
     String paramKey,
-    ButtonType buttonType
+    NotificationButton buttonType
 ) {
-    public static MessageDto fromTemplateWithoutVariables(
-        List<String> receiverMemberIds,
-        List<String> tokens,
-        String title,
-        String body,
-        RouteType routeType
-    ) {
-        return new MessageDto(
-            IdGenerator.generate(),
-            receiverMemberIds,
-            tokens,
-            title,
-            body,
-            routeType.getRoute(),
-            null,
-            null
-        );
-    }
-
-    public static MessageDto fromTemplateWithVariables(
-        List<String> receiverMemberIds,
-        List<String> tokens,
-        String title,
-        String body,
-        RouteType routeType,
+    public static MessageDto fromEntities(
+        FcmTokenEntity fcmTokenEntity,
+        TemplateEntity templateEntity,
         Map<String, String> variables
     ) {
         return new MessageDto(
             IdGenerator.generate(),
-            receiverMemberIds,
-            tokens,
-            VariableConverter.convert(title, variables),
-            VariableConverter.convert(body, variables),
-            routeType.getRoute(),
-            routeType.getParamKeyType() != null ? VariableConverter.convert(routeType.getParamKeyType().getPlaceholder(), variables) : null,
-            routeType.getButtonType()
+            fcmTokenEntity.getOwnerMemberId(),
+            fcmTokenEntity.getToken(),
+            NotificationIcon.valueOf(convertIconVariables(
+                templateEntity.getIcon(), variables
+            )),
+            convertTextVariables(
+                templateEntity.getTitle(), variables
+            ),
+            convertTextVariables(
+                templateEntity.getBody(), variables
+            ),
+            templateEntity.getRouteType().getRoute(),
+            templateEntity.getRouteType().getParamKeyVariable() != null
+                ? convertParamKeyVariables(templateEntity.getRouteType().getParamKeyVariable().getPlaceholder(), variables)
+                : null,
+            templateEntity.getRouteType().getButtonType()
         );
     }
-
 }

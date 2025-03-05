@@ -2,7 +2,7 @@ package kr.mafoo.user.service;
 
 import kr.mafoo.user.domain.TemplateEntity;
 import kr.mafoo.user.enums.NotificationType;
-import kr.mafoo.user.enums.RouteType;
+import kr.mafoo.user.enums.NotificationRoute;
 import kr.mafoo.user.exception.TemplateNotFoundException;
 import kr.mafoo.user.service.dto.TemplateDetailDto;
 import lombok.RequiredArgsConstructor;
@@ -40,25 +40,25 @@ public class TemplateService {
     @Transactional
     public Mono<TemplateEntity> addTemplate(
         NotificationType notificationType,
-        String thumbnailImageUrl,
+        String icon,
         String title,
         String body,
-        RouteType routeType
+        NotificationRoute routeType
     ) {
-        return templateCommand.addTemplate(notificationType, thumbnailImageUrl, title, body, routeType);
+        return templateCommand.addTemplate(notificationType, icon, title, body, routeType);
     }
 
     @Transactional
     public Mono<TemplateEntity> modifyTemplate(
         String templateId,
         NotificationType notificationType,
-        String thumbnailImageUrl,
+        String icon,
         String title,
         String body,
-        RouteType routeType
+        NotificationRoute routeType
     ) {
         return templateQuery.findById(templateId)
-            .flatMap(template -> templateCommand.modifyTemplate(template, notificationType, thumbnailImageUrl, title, body, routeType));
+            .flatMap(template -> templateCommand.modifyTemplate(template, notificationType, icon, title, body, routeType));
     }
 
     @Transactional
