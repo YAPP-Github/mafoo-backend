@@ -197,7 +197,8 @@ public class SharedMemberService {
                                                 Map.of(
                                                     "shareTargetMemberName", memberDto.name(),
                                                     "shareTargetAlbumName", album.getName(),
-                                                    "shareTargetAlbumId", sharedMember.getAlbumId()
+                                                    "shareTargetAlbumId", sharedMember.getAlbumId(),
+                                                    "shareTargetAlbumType", album.getType().toString()
                                                 )
                                             )
                                         )
