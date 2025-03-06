@@ -21,6 +21,7 @@ public interface PhotoRepository extends R2dbcRepository<PhotoEntity, String> {
     Flux<PhotoEntity> findAllByAlbumIdAndDeletedAtIsNullOrderByCreatedAtAsc(String ownerAlbumId);
 
     Flux<PhotoEntity> findAllByAlbumIdAndPhotoIdLessThanAndDeletedAtIsNullOrderByPhotoIdDesc(String albumId, String photoId, Limit limit);
+    Flux<PhotoEntity> findAllByAlbumIdAndDeletedAtIsNullOrderByPhotoIdDesc(String albumId, Limit limit);
 
     @Modifying
     @Query("UPDATE photo SET display_index = display_index - 1 WHERE album_id = :albumId AND display_index > :startIndex AND deleted_at IS NULL")
