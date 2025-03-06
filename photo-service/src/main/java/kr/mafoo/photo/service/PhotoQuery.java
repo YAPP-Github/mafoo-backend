@@ -40,7 +40,6 @@ public class PhotoQuery {
     public Flux<PhotoEntity> paginate(String albumId, String photoId, int limit) {
         return (photoId != null ?
                 photoRepository.findAllByAlbumIdAndPhotoIdLessThanAndDeletedAtIsNullOrderByPhotoIdDesc(albumId, photoId, Limit.of(limit))
-                        : photoRepository.findAllByAlbumIdAndDeletedAtIsNullOrderByPhotoIdDesc(albumId, Limit.of(limit)))
-            .switchIfEmpty(Mono.error(new PhotoNotFoundException()));
+                        : photoRepository.findAllByAlbumIdAndDeletedAtIsNullOrderByPhotoIdDesc(albumId, Limit.of(limit)));
     }
 }
