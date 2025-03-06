@@ -30,9 +30,13 @@ public interface PhotoApi {
             @RequestParam
             String albumId,
 
-            @Parameter(description = "정렬 종류", example = "ASC | DESC")
+            @Parameter(description = "커서", example = "image_id")
             @RequestParam(required = false)
-            String sort
+            String cursor,
+
+            @Parameter(description = "페이지 크기", example = "10")
+            @RequestParam(required = false)
+            Integer size
     );
 
     @Operation(summary = "(수정 이전) QR 사진 업로드", description = "QR을 사용해 사진을 업로드합니다.")

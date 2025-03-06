@@ -57,6 +57,13 @@ public class PhotoService {
     }
 
     @Transactional(readOnly = true)
+    public Flux<PhotoEntity> paginatePhotoById(String albumId, String requestMemberId, String cursor, int size) {
+        return albumPermissionVerifier.verifyOwnershipOrAccessPermission(albumId, requestMemberId, VIEW_ACCESS)
+                .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
+                .thenMany(photoQuery.paginate(albumId, cursor, size));
+    }
+
+    @Transactional(readOnly = true)
     public Flux<PhotoEntity> findPhotoListByAlbumIdWithoutVerify(String albumId, String sort) {
         String sortMethod = (sort == null) ? "CUSTOM" : sort.toUpperCase();
         return switch (sortMethod) {

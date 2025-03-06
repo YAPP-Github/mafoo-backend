@@ -20,10 +20,12 @@ public class PhotoController implements PhotoApi {
     public Flux<PhotoResponse> getPhotoListByAlbum(
             String memberId,
             String albumId,
-            String sort
+            String cursor,
+            Integer size
     ){
+        int actualSize = size != null ? size : 50;
         return photoService
-                .findPhotoListByAlbumId(albumId, memberId, sort)
+                .paginatePhotoById(albumId, memberId, cursor, actualSize)
                 .map(PhotoResponse::fromEntity);
     }
 
