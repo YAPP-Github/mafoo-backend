@@ -48,7 +48,9 @@ public class AlbumService {
                 findSharedAlbumListByMemberId(memberId)
             )
             .collectSortedList(Comparator.comparing(ViewableAlbumDto::createdAt).reversed())
-            .flatMapIterable(albumList -> albumList);
+            .flatMapIterable(albumList -> albumList)
+            .onErrorResume(AlbumNotFoundException.class, ex -> Mono.empty())
+            ;
     }
 
     @Transactional(readOnly = true)
